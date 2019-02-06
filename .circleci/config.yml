@@ -32,6 +32,25 @@ jobs:
       - run: dotnet build VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
       - run: dotnet test VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
 
+  coverage:
+    docker:
+      - image: microsoft/dotnet:2.2-sdk
+    working_directory: ~/workspace-netcoreapp2_0
+    steps:
+      - checkout
+      - run:
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+            ./cc-test-reporter before-build
+          when: always
+      - run: mkdir coverage
+      - run: dotnet restore VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj
+      - run: dotnet build VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
+      - run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput='./lcov.info' VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
+      - run: cp VJson.standalone/VJson.Editor.Tests/lcov.info coverage/.
+      - run: ./cc-test-reporter after-build -t lcov
+
 workflows:
   version: 2
   commit:
@@ -39,6 +58,7 @@ workflows:
       - test_net35
       - test_net45
       - test_netcoreapp2_0
+      - coverage
   nightly:
     triggers:
       - schedule:
