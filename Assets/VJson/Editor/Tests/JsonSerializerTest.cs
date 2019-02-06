@@ -3,10 +3,10 @@ using VJson;
 
 namespace VJson.UnitTests
 {
-    static class JsonSerializerTests
+    class JsonSerializerTests
     {
         [Test]
-        static public void ReturnFalseGivenValueOf1()
+        public void SampleTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(int));
 
