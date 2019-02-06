@@ -22,12 +22,23 @@ jobs:
       - run: msbuild VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj /p:TargetFramework=net45
       - run: mono --debug .nuget/NUnit.ConsoleRunner/tools/nunit3-console.exe VJson.standalone/VJson.Editor.Tests/bin/Debug/net45/VJson.Editor.Tests.dll
 
+  test_netcoreapp2_0:
+    docker:
+      - image: microsoft/dotnet:2.2-sdk
+    working_directory: ~/workspace-netcoreapp2_0
+    steps:
+      - checkout
+      - run: dotnet restore VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj
+      - run: dotnet build VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
+      - run: dotnet test VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
+
 workflows:
   version: 2
   commit:
     jobs:
       - test_net35
       - test_net45
+      - test_netcoreapp2_0
   nightly:
     triggers:
       - schedule:
@@ -39,4 +50,4 @@ workflows:
     jobs:
       - test_net35
       - test_net45
-#      - test_netcoreapp2_0:
+      - test_netcoreapp2_0
