@@ -1,0 +1,12 @@
+{
+    "name": "VJson.Editor",
+    "references": [
+        "VJson"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

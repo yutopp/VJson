@@ -1,0 +1,14 @@
+{
+    "name": "VJson.Editor.Tests",
+    "references": [
+        "VJson"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
