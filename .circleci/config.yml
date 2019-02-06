@@ -8,6 +8,7 @@ jobs:
       - checkout
       - run: nuget install NUnit.Console -ExcludeVersion -OutputDirectory .nuget
       - run: msbuild VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj /t:restore
+      - run: msbuild VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj
       - run: mono --debug .nuget/NUnit.ConsoleRunner/tools/nunit3-console.exe VJson.standalone/VJson.Editor.Tests/bin/Debug/net35/VJson.Editor.Tests.dll
 
 workflows:
