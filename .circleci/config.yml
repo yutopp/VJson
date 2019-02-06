@@ -1,10 +1,8 @@
 version: 2
 jobs:
-  test_net_base: &test_net_base_body
+  test_net35: &test_net35_body
     docker:
       - image: mono:latest
-
-  test_net35: &test_net_base_body
     working_directory: ~/workspace-net35
     steps:
       - checkout
