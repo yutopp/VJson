@@ -1,0 +1,31 @@
+version: 2
+jobs:
+  test_net_base: &test_net_base_body
+    docker:
+      - image: mono:latest
+
+  test_net35: &test_net_base_body
+    working_directory: ~/workspace-net35
+    steps:
+      - checkout
+      - run: nuget install NUnit.Console -ExcludeVersion -OutputDirectory .nuget
+      - run: msbuild VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj /t:restore
+      - run: mono --debug .nuget/NUnit.ConsoleRunner/tools/nunit3-console.exe VJson.standalone/VJson.Editor.Tests/bin/Debug/net35/VJson.Editor.Tests.dll
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - test_net35
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - test_net35
+#      - test_net45:
+#      - test_netcoreapp2_0:
