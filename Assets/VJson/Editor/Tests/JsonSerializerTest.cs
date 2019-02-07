@@ -7,6 +7,8 @@ namespace VJson.UnitTests
 {
     class SomeObject
     {
+        public int X;
+        public string Y;
     }
 
     [TestFixtureSource("FixtureArgs")]
@@ -35,10 +37,23 @@ namespace VJson.UnitTests
 
         //
         static object [] FixtureArgs = {
+            // Numbers
             new object[] {
-                new SomeObject() {
+                1,
+                @"1",
+            },
+            // Arrays
+            new object[] {
+                new object[]{1, "hoge", null},
+                @"[1,""hoge"",null]",
+            },
+            // Objects
+            new object[] {
+                new SomeObject {
+                    X = 10,
+                    Y = "abab",
                 },
-                "",
+                @"{""X"":10,""Y"":""abab""}",
             },
         };
     }
