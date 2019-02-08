@@ -4,6 +4,7 @@ using System.IO;
 
 namespace VJson
 {
+    // TODO: Add [Preserve] in Unity
     public class JsonWriter
     {
         enum State
