@@ -23,7 +23,7 @@ namespace VJson.UnitTests
         }
 
         [Test]
-        public void SampleTest()
+        public void SerializeTest()
         {
             var serializer = new VJson.JsonSerializer(obj.GetType());
 
@@ -34,6 +34,19 @@ namespace VJson.UnitTests
                 Assert.AreEqual(expected, actual);
             }
         }
+
+        /*
+        [Test]
+        public void DeserializeTest()
+        {
+            var serializer = new VJson.JsonSerializer(obj.GetType());
+            using(var textReader = new StringReader(expected)) {
+                var actual = serializer.Deserialize(textReader);
+
+                Assert.AreEqual(obj, actual);
+            }
+        }
+        */
 
         //
         static object [] FixtureArgs = {

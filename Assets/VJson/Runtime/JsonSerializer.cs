@@ -1,12 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
 namespace VJson {
-    public class JsonSerializer {
-        public JsonSerializer(Type type) {
+    public class JsonSerializer
+    {
+        private Type _type;
+
+        public JsonSerializer(Type type)
+        {
+            this._type = type;
         }
 
+        #region Serializer
         public void Serialize<T>(TextWriter textWriter, T o, IValidator v = null)
         {
             var writer = new JsonWriter(textWriter);
@@ -26,7 +33,8 @@ namespace VJson {
                     SerializeArray(writer, o, v);
                     return;
                 case NodeKind.String:
-                case NodeKind.Number:
+                case NodeKind.Integer:
+                case NodeKind.Float:
                 case NodeKind.Boolean:
                     SerializePrimitive(writer, o, v);
                     return;
@@ -79,6 +87,28 @@ namespace VJson {
         void SerializeNull<T>(JsonWriter writer, T o, IValidator v)
         {
             writer.WriteValueNull();
+        }
+        #endregion
+
+        #region Deserializer
+        public object Deserialize(TextReader textReader)
+        {
+            var ctx = new DeserializerContext(_type);
+            var reader = new JsonReader(textReader);
+            //reader.Read();
+
+            return null;
+        }
+        #endregion
+    }
+
+    class DeserializerContext
+    {
+        Stack<Type> expectedTypes = new Stack<Type>();
+
+        public DeserializerContext(Type type)
+        {
+            expectedTypes.Push(type);
         }
     }
 }
