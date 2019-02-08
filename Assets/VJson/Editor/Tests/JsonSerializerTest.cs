@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
@@ -5,22 +6,41 @@ using VJson;
 
 namespace VJson.UnitTests
 {
-    class SomeAllPublicObject
+    class SomeObject
     {
+        private float _p = 3.14f; // A private field will not be exported.
         public int X;
         public string Y;
 
         public override bool Equals(object rhsObj) {
-            var rhs = rhsObj as SomeAllPublicObject;
+            var rhs = rhsObj as SomeObject;
             if (rhs == null) {
                 return false;
             }
 
-            return X == rhs.X && Y == rhs.Y;
+            return _p == rhs._p && X == rhs.X && Y == rhs.Y;
         }
 
         public override int GetHashCode() {
-            return 0; // ...
+            throw new NotImplementedException();
+        }
+    }
+
+    class DerivedSomeObject : SomeObject
+    {
+        public bool D;
+
+        public override bool Equals(object rhsObj) {
+            var rhs = rhsObj as DerivedSomeObject;
+            if (rhs == null) {
+                return false;
+            }
+
+            return D == rhs.D && base.Equals(rhsObj);
+        }
+
+        public override int GetHashCode() {
+            throw new NotImplementedException();
         }
     }
 
@@ -102,11 +122,27 @@ namespace VJson.UnitTests
 
             // Objects
             new object[] {
-                new SomeAllPublicObject {
+                new SomeObject {
                     X = 10,
                     Y = "abab",
                 },
                 @"{""X"":10,""Y"":""abab""}",
+            },
+            new object[] {
+                new DerivedSomeObject {
+                    X = 10,
+                    Y = "abab",
+                    D = true,
+                },
+                @"{""D"":true,""X"":10,""Y"":""abab""}",
+            },
+            new object[] {
+                (SomeObject)(new DerivedSomeObject {
+                        X = 20,
+                        Y = "cdcd",
+                        D = false,
+                    }),
+                @"{""D"":false,""X"":20,""Y"":""cdcd""}",
             },
         };
     }
