@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace VJson
 {
@@ -25,6 +26,12 @@ namespace VJson
 		public string Span;
 
 		public NodeKind Kind => NodeKind.Boolean;
+
+        public bool Value {
+            get {
+                return Boolean.Parse(Span);
+            }
+        }
 
 		public BooleanNode(string span)
 		{
@@ -93,6 +100,12 @@ namespace VJson
 
 		public NodeKind Kind => NodeKind.Integer;
 
+        public int Value {
+            get {
+                return Int32.Parse(Span); // TODO: Fix for large numbers
+            }
+        }
+
 		public IntegerNode(string span)
 		{
 			Span = span;
@@ -130,6 +143,12 @@ namespace VJson
 
 		public NodeKind Kind => NodeKind.Float;
 
+        public float Value {
+            get {
+                return Single.Parse(Span); // TODO: Fix for large numbers
+            }
+        }
+
 		public FloatNode(string span)
 		{
 			Span = span;
@@ -165,10 +184,11 @@ namespace VJson
 	{
 		public string Span;
 
-		public NodeKind Kind => NodeKind.Integer;
+		public NodeKind Kind => NodeKind.String;
+
         public string Value {
             get {
-                return Span.Trim();
+                return Regex.Unescape(Span.Trim());
             }
         }
 
@@ -327,8 +347,12 @@ namespace VJson
 				return NodeKind.Null;
 			}
 
-			var ty = o.GetType();
+            var ty = o.GetType();
+            return KindOfType(ty);
+        }
 
+        public static NodeKind KindOfType(Type ty)
+        {
 			NodeKind k;
 			if (_primitiveTable.TryGetValue(ty, out k))
 			{

@@ -93,22 +93,9 @@ namespace VJson {
         #region Deserializer
         public object Deserialize(TextReader textReader)
         {
-            var ctx = new DeserializerContext(_type);
-            var reader = new JsonReader(textReader);
-            //reader.Read();
-
-            return null;
+            var d = new JsonDeserializer(_type);
+            return d.Deserialize(textReader);
         }
         #endregion
-    }
-
-    class DeserializerContext
-    {
-        Stack<Type> expectedTypes = new Stack<Type>();
-
-        public DeserializerContext(Type type)
-        {
-            expectedTypes.Push(type);
-        }
     }
 }

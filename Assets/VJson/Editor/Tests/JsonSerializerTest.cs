@@ -5,10 +5,23 @@ using VJson;
 
 namespace VJson.UnitTests
 {
-    class SomeObject
+    class SomeAllPublicObject
     {
         public int X;
         public string Y;
+
+        public override bool Equals(object rhsObj) {
+            var rhs = rhsObj as SomeAllPublicObject;
+            if (rhs == null) {
+                return false;
+            }
+
+            return X == rhs.X && Y == rhs.Y;
+        }
+
+        public override int GetHashCode() {
+            return 0; // ...
+        }
     }
 
     [TestFixtureSource("FixtureArgs")]
@@ -25,7 +38,7 @@ namespace VJson.UnitTests
         [Test]
         public void SerializeTest()
         {
-            var serializer = new VJson.JsonSerializer(obj.GetType());
+            var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
 
             using(var textWriter = new StringWriter()) {
                 serializer.Serialize(textWriter, obj);
@@ -35,34 +48,61 @@ namespace VJson.UnitTests
             }
         }
 
-        /*
         [Test]
         public void DeserializeTest()
         {
-            var serializer = new VJson.JsonSerializer(obj.GetType());
+            var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
             using(var textReader = new StringReader(expected)) {
                 var actual = serializer.Deserialize(textReader);
 
                 Assert.AreEqual(obj, actual);
             }
         }
-        */
 
         //
         static object [] FixtureArgs = {
+            // Boolean
+            new object[] {
+                true,
+                @"true",
+            },
+
+            new object[] {
+                false,
+                @"false",
+            },
+
+            // Null
+            new object[] {
+                (object)null,
+                @"null",
+            },
+
             // Numbers
             new object[] {
                 1,
                 @"1",
             },
+
+            // Strings
+            new object[] {
+                "🍣",
+                @"""🍣"""
+            },
+
             // Arrays
             new object[] {
-                new object[]{1, "hoge", null},
+                new object[] {1, "hoge", null},
                 @"[1,""hoge"",null]",
             },
+            new object[] {
+                new int[] {1, 2, 3},
+                @"[1,2,3]",
+            },
+
             // Objects
             new object[] {
-                new SomeObject {
+                new SomeAllPublicObject {
                     X = 10,
                     Y = "abab",
                 },

@@ -94,11 +94,71 @@ namespace VJson
             _states.Pop();
         }
 
-        public void WriteValue(int v)
+        public void WriteValue(bool v)
         {
             WriteDelimiter();
 
-            _writer.Write(v);
+            _writer.Write(v ? "true" : "false");
+        }
+
+        public void WriteValue(byte v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(sbyte v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(char v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(decimal v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(double v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(float v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(int v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(uint v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(long v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(ulong v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(short v)
+        {
+            WritePrimitive(v);
+        }
+
+        public void WriteValue(ushort v)
+        {
+            WritePrimitive(v);
         }
 
         public void WriteValue(string v)
@@ -115,6 +175,12 @@ namespace VJson
             WriteDelimiter();
 
             _writer.Write("null");
+        }
+
+        void WritePrimitive<T>(T v) {
+            WriteDelimiter();
+
+            _writer.Write(v);
         }
 
         void WriteDelimiter()
