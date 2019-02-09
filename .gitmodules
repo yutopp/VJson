@@ -1,0 +1,3 @@
+[submodule "Assets/VJson/Editor/Tests/Schema/JSON-Schema-Test-Suite"]
+	path = Assets/VJson/Editor/Tests/Schema/JSON-Schema-Test-Suite
+	url = https://github.com/json-schema-org/JSON-Schema-Test-Suite

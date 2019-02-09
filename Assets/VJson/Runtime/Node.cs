@@ -359,11 +359,19 @@ namespace VJson
 				return k;
 			}
 
+            // Arrays
 			if (ty.IsArray)
 			{
 				return NodeKind.Array;
 			}
+            if (ty.IsGenericType) {
+                var containerTy = ty.GetGenericTypeDefinition();
+                if (containerTy == typeof(List<>)) {
+                    return NodeKind.Array;
+                }
+            }
 
+            // Others
 			return NodeKind.Object;
 		}
 

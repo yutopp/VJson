@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -23,9 +24,7 @@ namespace VJson {
 
         object DeserializeValue(INode node, Type expectedType)
         {
-            Console.WriteLine("Node: " + node.Kind + " / " + expectedType);
             var expectedKind = Node.KindOfType(expectedType);
-            Console.WriteLine("expected: " + expectedKind);
 
             return DeserializeValueAs(node, expectedKind, expectedType);
         }
@@ -127,16 +126,31 @@ namespace VJson {
 
                 if (targetType.IsArray) {
                     var container = (Array)Activator.CreateInstance(targetType, new object[] { aNode.Elems.Count });
-                    var elementType = targetType.GetElementType();
 
+                    var elemType = targetType.GetElementType();
                     for(int i=0; i<aNode.Elems.Count; ++i) {
-                        var v = DeserializeValue(aNode.Elems[i], elementType);
+                        var v = DeserializeValue(aNode.Elems[i], elemType);
                         container.SetValue(v, i);
                     }
 
                     return container;
 
                 } else {
+                    if (targetType.IsGenericType) {
+                        var containerTy = targetType.GetGenericTypeDefinition();
+                        if (containerTy == typeof(List<>)) {
+                            var container = (IList)Activator.CreateInstance(targetType);
+
+                            var elemType = targetType.GetGenericArguments()[0];
+                            for(int i=0; i<aNode.Elems.Count; ++i) {
+                                var v = DeserializeValue(aNode.Elems[i], elemType);
+                                container.Add(v);
+                            }
+
+                            return container;
+                        }
+                    }
+
                     // container = Activator.CreateInstance(expectedType);
                     throw new NotImplementedException();
                 }
@@ -156,20 +170,35 @@ namespace VJson {
             if (node is ObjectNode oNode) {
                 // TODO: type check of targetType
 
-                // TODO: support dictionary
+                if (targetType.IsGenericType) {
+                    var containerTy = targetType.GetGenericTypeDefinition();
+                    if (containerTy != typeof(Dictionary<,>)) {
+                        goto mapping;
+                    }
 
-                Console.WriteLine("node: " + node);
-                Console.WriteLine("targetKind: " + targetKind);
-                Console.WriteLine("targetType: " + targetType);
+                    var keyType = targetType.GetGenericArguments()[0];
+                    if (keyType != typeof(string)) {
+                        throw new NotImplementedException();
+                    }
 
+                    var container0 = (IDictionary)Activator.CreateInstance(targetType);
+
+                    var elemType = targetType.GetGenericArguments()[1];
+                    foreach(var elem in oNode.Elems) {
+                        // TODO: duplication check
+                        var v = DeserializeValue(elem.Value, elemType);
+                        container0.Add(elem.Key, v);
+                    }
+
+                    return container0;
+                }
+
+            mapping:
                 var container = Activator.CreateInstance(targetType);
                 foreach(var elem in oNode.Elems) {
-                    Console.WriteLine("Key: " + elem.Key);
-
                     var elementInfo = targetType.GetField(elem.Key, BindingFlags.Public | BindingFlags.Instance);
                     if (elementInfo == null) {
                         // TODO: ignore or raise errors?
-                        Console.WriteLine("Ignored: " + elem.Key);
                         continue;
                     }
                     var elementType = elementInfo.FieldType;

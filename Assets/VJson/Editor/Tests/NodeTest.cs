@@ -1,19 +1,35 @@
 ﻿using System.IO;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace VJson.UnitTests
 {
 	public class NodeKindTests
 	{
-		[TestCase(true, NodeKind.Boolean)]
-		[TestCase(false, NodeKind.Boolean)]
-		[TestCase(1, NodeKind.Integer)]
-		[TestCase("", NodeKind.String)]
-		public void KindTest<T>(T value, NodeKind expected)
+        [TestCaseSource("ValuesArgs")]
+        public void KindOfValueTest<T>(T value, NodeKind expected)
 		{
 			var actual = Node.KindOfValue(value);
 			Assert.AreEqual(expected, actual);
 		}
+
+        [Test]
+        public void KindOfNullValueTest()
+		{
+			var actual = Node.KindOfValue<object>(null);
+			Assert.AreEqual(NodeKind.Null, actual);
+		}
+
+        public static object[] ValuesArgs = {
+            new object[] { true, NodeKind.Boolean },
+            new object[] { false, NodeKind.Boolean },
+            new object[] { 1, NodeKind.Integer },
+            new object[] { 1.0, NodeKind.Float },
+            new object[] { "", NodeKind.String },
+            new object[] { new object[] {}, NodeKind.Array },
+            new object[] { new List<int>(), NodeKind.Array },
+            new object[] { new Dictionary<string, object>(), NodeKind.Object },
+        };
 	}
 
 	[TestFixtureSource("FixtureArgs")]

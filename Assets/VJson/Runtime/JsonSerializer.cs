@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -26,17 +27,17 @@ namespace VJson {
 
             switch (kind)
             {
-                case NodeKind.Object:
-                    SerializeObject(writer, o, v);
-                    return;
-                case NodeKind.Array:
-                    SerializeArray(writer, o, v);
-                    return;
                 case NodeKind.String:
                 case NodeKind.Integer:
                 case NodeKind.Float:
                 case NodeKind.Boolean:
                     SerializePrimitive(writer, o, v);
+                    return;
+                case NodeKind.Array:
+                    SerializeArray(writer, o, v);
+                    return;
+                case NodeKind.Object:
+                    SerializeObject(writer, o, v);
                     return;
                 case NodeKind.Null:
                     SerializeNull(writer, o, v);
@@ -44,11 +45,65 @@ namespace VJson {
             }
         }
 
+        void SerializePrimitive<T>(JsonWriter writer, T o, IValidator v)
+        {
+            var write = typeof(JsonWriter).GetMethod("WriteValue", new []{o.GetType()});
+            write.Invoke(writer, new object[] {o});
+        }
+
+        void SerializeArray<T>(JsonWriter writer, T o, IValidator v)
+        {
+            writer.WriteArrayStart();
+
+            var ty = o.GetType();
+			if (ty.IsArray)
+			{
+                foreach (var elem in o as Array)
+                {
+                    SerializeValue(writer, elem, v);
+                }
+			}
+            if (ty.IsGenericType) {
+                var containerTy = ty.GetGenericTypeDefinition();
+                if (containerTy != typeof(List<>)) {
+                    throw new NotImplementedException();
+                }
+                foreach(var elem in (IList)o)
+                {
+                    SerializeValue(writer, elem, v);
+                }
+            }
+
+            writer.WriteArrayEnd();
+        }
+
         void SerializeObject<T>(JsonWriter writer, T o, IValidator v)
         {
             writer.WriteObjectStart();
 
             var ty = o.GetType();
+            if (ty.IsGenericType) {
+                var containerTy = ty.GetGenericTypeDefinition();
+                if (containerTy != typeof(Dictionary<,>)) {
+                    throw new NotImplementedException();
+                }
+
+                var keyType = ty.GetGenericArguments()[0];
+                if (keyType != typeof(string)) {
+                    // TODO: Should allow them and call `ToString`?
+                    throw new NotImplementedException();
+                }
+
+                foreach (DictionaryEntry elem in (IDictionary)o)
+                {
+                    writer.WriteObjectKey((string)elem.Key);
+                    SerializeValue(writer, elem.Value, v);
+                }
+
+                goto encoded;
+            }
+
+            // Traverse fields
             FieldInfo[] fields = ty.GetFields();
             foreach (var field in fields)
             {
@@ -59,29 +114,8 @@ namespace VJson {
                 SerializeValue(writer, elemValue, v);
             }
 
+        encoded:
             writer.WriteObjectEnd();
-        }
-
-        void SerializeArray<T>(JsonWriter writer, T o, IValidator v)
-        {
-            writer.WriteArrayStart();
-
-            var ty = o.GetType();
-            if (ty.IsArray)
-            {
-                foreach (var elem in o as Array)
-                {
-                    SerializeValue(writer, elem, v);
-                }
-            }
-
-            writer.WriteArrayEnd();
-        }
-
-        void SerializePrimitive<T>(JsonWriter writer, T o, IValidator v)
-        {
-            var write = typeof(JsonWriter).GetMethod("WriteValue", new []{o.GetType()});
-            write.Invoke(writer, new object[] {o});
         }
 
         void SerializeNull<T>(JsonWriter writer, T o, IValidator v)

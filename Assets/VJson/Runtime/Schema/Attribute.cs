@@ -211,7 +211,7 @@ namespace VJson.Schema
         // maximum
         // exclusiveMaximum
         // minimum
-        public double Minimum = double.MaxValue; // -1 is ignored
+        public double Minimum = double.MaxValue;
 
         // exclusiveMinimum
         #endregion
