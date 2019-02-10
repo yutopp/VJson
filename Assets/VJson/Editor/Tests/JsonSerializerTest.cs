@@ -178,6 +178,16 @@ namespace VJson.UnitTests
         }
 
         [Test]
+        public void SerializeFromStringTest()
+        {
+            var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
+
+            var actual = serializer.Serialize(obj);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
         public void DeserializeTest()
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
@@ -186,6 +196,15 @@ namespace VJson.UnitTests
 
                 Assert.AreEqual(obj, actual);
             }
+        }
+
+        [Test]
+        public void DeserializeFromStringTest()
+        {
+            var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
+            var actual = serializer.Deserialize(expected);
+
+            Assert.AreEqual(obj, actual);
         }
 
         //

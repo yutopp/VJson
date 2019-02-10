@@ -22,6 +22,13 @@ namespace VJson {
             return DeserializeValue(node, _expectedInitialType);
         }
 
+        public object Deserialize(string text)
+        {
+            using(var textReader = new StringReader(text)) {
+                return Deserialize(textReader);
+            }
+        }
+
         object DeserializeValue(INode node, Type expectedType)
         {
             Console.WriteLine("DeserializeValue :" + expectedType);

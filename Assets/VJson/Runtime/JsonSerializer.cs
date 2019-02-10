@@ -15,10 +15,18 @@ namespace VJson {
         }
 
         #region Serializer
-        public void Serialize<T>(TextWriter textWriter, T o, IValidator v = null)
+        public void Serialize<T>(TextWriter textWriter, T o)
         {
             var writer = new JsonWriter(textWriter);
-            SerializeValue(writer, o, v);
+            SerializeValue(writer, o, null);
+        }
+
+        public string Serialize<T>(T o)
+        {
+            using(var textWriter = new StringWriter()) {
+                Serialize(textWriter, o);
+                return textWriter.ToString();
+            }
         }
 
         void SerializeValue<T>(JsonWriter writer, T o, IValidator v)
@@ -136,6 +144,12 @@ namespace VJson {
         {
             var d = new JsonDeserializer(_type);
             return d.Deserialize(textReader);
+        }
+
+        public object Deserialize(String text)
+        {
+            var d = new JsonDeserializer(_type);
+            return d.Deserialize(text);
         }
         #endregion
     }
