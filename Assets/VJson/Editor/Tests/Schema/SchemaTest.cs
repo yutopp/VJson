@@ -9,17 +9,17 @@ namespace VJson.Schema.UnitTests
     //
     // http://json-schema.org/learn/miscellaneous-examples.html
     //
-    [Entity(Title="Person")]
+    [Meta(Title="Person")]
     class Person
     {
-        [Field(Description="The person's first name.")]
+        [Meta(Description="The person's first name.")]
         public string firstName;
 
-        [Field(Description="The person's last name.")]
+        [Meta(Description="The person's last name.")]
         public string lastName;
 
-        [Field(Description="Age in years which must be equal to or greater than zero.")]
-        [NumericValidation(Minimum = 0)]
+        [Meta(Description="Age in years which must be equal to or greater than zero.")]
+        [NumericConstraints(Minimum = 0)]
         public int age;
     }
 
@@ -31,52 +31,41 @@ namespace VJson.Schema.UnitTests
             var schema = JsonSchema.CreateFromClass<Person>();
             Assert.IsNotNull(schema);
 
-            Assert.AreEqual("Person", schema.Entity.Title);
-            Assert.AreEqual(null, schema.Entity.Description);
+            Assert.AreEqual("Person", schema.Title);
+            Assert.AreEqual(null, schema.Description);
 
-            Assert.AreEqual(NodeKind.Object, schema.Kind);
+            //Assert.AreEqual(NodeKind.Object, schema.Kind);
 
-            var validator = schema.Validator as ObjectValidator;
-            Assert.IsNotNull(validator);
+            Assert.That(schema.properties.Count, Is.EqualTo(3));
 
-            Assert.That( new Dictionary<string, JsonSchema>{
-                    {"firstName", new JsonSchema
-                        {
-                            Entity = new Entity
-                            {
-                                Description = "The person's first name.",
-                            },
-                            Kind = NodeKind.String,
-                        }
-                    },
-                    {"lastName", new JsonSchema
-                        {
-                            Entity = new Entity
-                            {
-                                Description = "The person's last name.",
-                            },
-                            Kind = NodeKind.String,
-                        }
-                    },
-                    {"age", new JsonSchema
-                        {
-                            Entity = new Entity
-                            {
-                                Description = "Age in years which must be equal to or greater than zero.",
-                            },
-                            Kind = NodeKind.Integer,
-                            Validator = new NumericValidator(new NumericValidation {
+            Assert.That(schema.properties["firstName"],
+                        Is.EqualTo(new JsonSchema
+                                {
+                                    Description = "The person's first name.",
+                                    Type = "string",
+                                })
+                        );
+            Assert.That(schema.properties["lastName"],
+                        Is.EqualTo( new JsonSchema
+                                {
+                                    Description = "The person's last name.",
+                                    Type = "string",
+                                })
+                        );
+            Assert.That(schema.properties["age"],
+                        Is.EqualTo(new JsonSchema
+                                {
+                                    Description = "Age in years which must be equal to or greater than zero.",
+                                    Type = "integer",
                                     Minimum = 0,
-                                }),
-                        }
-                    },
-                }, Is.EquivalentTo(validator.Props));
+                                })
+                        );
         }
 
         class TestCase
         {
             public string description;
-            public object schema;
+            public JsonSchema schema;
             public Test[] tests;
         }
 
@@ -89,24 +78,32 @@ namespace VJson.Schema.UnitTests
 
         public class JsonSchemaFromTestCasesTests
         {
-            [Test]
-            public void ValidationTest()
+            [TestCase("minimum.json")]
+            [TestCase("maximum.json")]
+            [TestCase("type.json")]
+            [TestCase("items.json")]
+            public void ValidationTest(string casePath)
             {
-                var path = Path.Combine("JSON-Schema-Test-Suite", "tests", "draft7", "minimum.json");
+                var path = Path.Combine("JSON-Schema-Test-Suite", "tests", "draft7", casePath);
                 using(var sr = new StreamReader(path)) {
                     var d = new JsonSerializer(typeof(TestCase[]));
                     var cases = (TestCase[])d.Deserialize(sr);
 
                     foreach(var c in cases) {
                         Console.WriteLine("c: " + c.description);
+                        Console.WriteLine("s: " + c.schema);
+
                         foreach(var t in c.tests) {
                             Console.WriteLine("  t: " + t.description);
                             Console.WriteLine("  d: " + t.data);
                             Console.WriteLine("  v: " + t.valid);
+
+                            var result = c.schema.Validate(t.data);
+                            Console.WriteLine("  r: " + result);
+
+                            Assert.That(result, Is.EqualTo(t.valid), t.description);
                         }
                     }
-
-                    Assert.AreEqual(0, 1);
                 }
             }
         }

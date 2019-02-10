@@ -107,7 +107,14 @@ namespace VJson {
             FieldInfo[] fields = ty.GetFields();
             foreach (var field in fields)
             {
+                var attr = field.GetCustomAttribute<JsonField>();
+
                 var elemName = field.Name;
+                if (attr != null && attr.Name != null) {
+                    // TODO: duplication check
+                    elemName = attr.Name;
+                }
+
                 var elemValue = field.GetValue(o);
 
                 writer.WriteObjectKey(elemName);

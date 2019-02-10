@@ -24,6 +24,7 @@ namespace VJson {
 
         object DeserializeValue(INode node, Type expectedType)
         {
+            Console.WriteLine("DeserializeValue :" + expectedType);
             var expectedKind = Node.KindOfType(expectedType);
 
             return DeserializeValueAs(node, expectedKind, expectedType);
@@ -47,10 +48,6 @@ namespace VJson {
                     return DeserializeToArray(node, targetKind, targetType);
 
                 case NodeKind.Object:
-                    if (node.Kind != NodeKind.Object) {
-                        return DeserializeValueAs(node, node.Kind, typeof(object));
-                    }
-
                     return DeserializeToObject(node, targetKind, targetType);
 
                 case NodeKind.Null:
@@ -64,13 +61,14 @@ namespace VJson {
         object DeserializeToBoolean(INode node, NodeKind targetKind, Type targetType)
         {
             if (node is NullNode) {
-                // TODO: type check of targetType
-                return default(bool);
+                if (!(targetType is object)) {
+                    throw new NotImplementedException();
+                }
+                return null;
             }
 
             if (node is BooleanNode bNode) {
-                // TODO: type check of targetType
-                return bNode.Value;
+                return CreateInstanceIfConstrucutable<bool>(targetType, bNode.Value);
             }
 
             // TODO: Should raise error?
@@ -116,19 +114,35 @@ namespace VJson {
 
         object DeserializeToArray(INode node, NodeKind targetKind, Type targetType)
         {
+            Console.WriteLine("Array -> " + targetType);
+
+            bool isConvertible =
+                targetType == typeof(object)
+                || (targetType.IsArray)
+                || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(List<>))
+                ;
+            if (!isConvertible) {
+                // TODO: raise suitable errors
+                throw new NotImplementedException();
+            }
+
             if (node is NullNode) {
-                // TODO: type check of targetType
                 return null;
             }
 
             if (node is ArrayNode aNode) {
-                // TODO: type check of targetType
+                if (targetType.IsArray || targetType == typeof(object)) {
+                    // To Array
+                    var conteinerTy = targetType;
+                    if (conteinerTy == typeof(object)) {
+                        conteinerTy = typeof(object[]);
+                    }
 
-                if (targetType.IsArray) {
-                    var container = (Array)Activator.CreateInstance(targetType, new object[] { aNode.Elems.Count });
+                    var len = aNode.Elems?.Count ?? 0;
+                    var container = (Array)Activator.CreateInstance(conteinerTy, new object[] {len});
 
-                    var elemType = targetType.GetElementType();
-                    for(int i=0; i<aNode.Elems.Count; ++i) {
+                    var elemType = conteinerTy.GetElementType();
+                    for(int i=0; i<len; ++i) {
                         var v = DeserializeValue(aNode.Elems[i], elemType);
                         container.SetValue(v, i);
                     }
@@ -136,23 +150,19 @@ namespace VJson {
                     return container;
 
                 } else {
-                    if (targetType.IsGenericType) {
-                        var containerTy = targetType.GetGenericTypeDefinition();
-                        if (containerTy == typeof(List<>)) {
-                            var container = (IList)Activator.CreateInstance(targetType);
+                    // To List
+                    var conteinerTy = targetType;
 
-                            var elemType = targetType.GetGenericArguments()[0];
-                            for(int i=0; i<aNode.Elems.Count; ++i) {
-                                var v = DeserializeValue(aNode.Elems[i], elemType);
-                                container.Add(v);
-                            }
+                    var len = aNode.Elems?.Count ?? 0;
+                    var container = (IList)Activator.CreateInstance(conteinerTy);
 
-                            return container;
-                        }
+                    var elemType = conteinerTy.GetGenericArguments()[0];
+                    for(int i=0; i<len; ++i) {
+                        var v = DeserializeValue(aNode.Elems[i], elemType);
+                        container.Add(v);
                     }
 
-                    // container = Activator.CreateInstance(expectedType);
-                    throw new NotImplementedException();
+                    return container;
                 }
             }
 
@@ -162,56 +172,109 @@ namespace VJson {
 
         object DeserializeToObject(INode node, NodeKind targetKind, Type targetType)
         {
+            Console.WriteLine("Object -> " + targetType);
+
+            if (targetKind != NodeKind.Object) {
+                // TODO: raise suitable errors
+                throw new NotImplementedException();
+            }
+
             if (node is NullNode) {
-                // TODO: type check of targetType
                 return null;
             }
 
             if (node is ObjectNode oNode) {
-                // TODO: type check of targetType
-
-                if (targetType.IsGenericType) {
-                    var containerTy = targetType.GetGenericTypeDefinition();
-                    if (containerTy != typeof(Dictionary<,>)) {
-                        goto mapping;
+                bool asDictionary =
+                    targetType == typeof(object)
+                    || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    ;
+                if (asDictionary) {
+                    // To Dictionary
+                    Type containerTy = targetType;
+                    if (containerTy == typeof(object)) {
+                        containerTy = typeof(Dictionary<string, object>);
                     }
 
-                    var keyType = targetType.GetGenericArguments()[0];
+                    var keyType = containerTy.GetGenericArguments()[0];
                     if (keyType != typeof(string)) {
                         throw new NotImplementedException();
                     }
 
-                    var container0 = (IDictionary)Activator.CreateInstance(targetType);
+                    var container = (IDictionary)Activator.CreateInstance(containerTy);
 
-                    var elemType = targetType.GetGenericArguments()[1];
+                    if (oNode.Elems == null) {
+                        goto dictionaryDecoded;
+                    }
+
+                    var elemType = containerTy.GetGenericArguments()[1];
                     foreach(var elem in oNode.Elems) {
                         // TODO: duplication check
                         var v = DeserializeValue(elem.Value, elemType);
-                        container0.Add(elem.Key, v);
+                        container.Add(elem.Key, v);
                     }
 
-                    return container0;
-                }
+                dictionaryDecoded:
+                    return container;
 
-            mapping:
-                var container = Activator.CreateInstance(targetType);
-                foreach(var elem in oNode.Elems) {
-                    var elementInfo = targetType.GetField(elem.Key, BindingFlags.Public | BindingFlags.Instance);
-                    if (elementInfo == null) {
-                        // TODO: ignore or raise errors?
-                        continue;
+                } else {
+                    // Mapping to the structure
+
+                    // TODO: add type check
+                    Console.WriteLine("To :" + targetType);
+
+                    var container = Activator.CreateInstance(targetType);
+                    var fields = targetType.GetFields();
+                    foreach(var field in fields) {
+                        var attr = field.GetCustomAttribute<JsonField>();
+
+                        var elemName = field.Name;
+                        if (attr != null && attr.Name != null) {
+                            // TODO: duplication check
+                            elemName = attr.Name;
+                        }
+
+                        INode elem = null;
+                        if (oNode.Elems == null || !oNode.Elems.TryGetValue(elemName, out elem)) {
+                            // TODO: ignore or raise errors?
+                            continue;
+                        }
+
+                        if (attr != null && attr.TypeHints != null) {
+                            bool resolved = false;
+                            foreach(var hint in attr.TypeHints) {
+                                var elemType = hint;
+                                try
+                                {
+                                    Console.WriteLine("Hint :" + elemType + " <- " + elem);
+                                    Console.WriteLine("     :" + (elemType == typeof(object)));
+                                    var v = DeserializeValue(elem, elemType);
+                                    field.SetValue(container, v);
+
+                                    resolved = true;
+                                    break;
+                                } catch(Exception e) {
+                                    Console.WriteLine("Ex :" + e);
+                                }
+                            }
+                            if (!resolved) {
+                                throw new NotImplementedException();
+                            }
+
+                        } else {
+                            var elemType = field.FieldType;
+
+                            var v = DeserializeValue(elem, elemType);
+                            field.SetValue(container, v);
+                        }
                     }
-                    var elementType = elementInfo.FieldType;
 
-                    var v = DeserializeValue(elem.Value, elementType);
-                    elementInfo.SetValue(container, v);
+                    return container;
                 }
-
-                return container;
             }
 
-            // TODO: Should raise error?
-            throw new NotImplementedException();
+            // A json node type is NOT an object but the target type is an object.
+            // Thus, change a target kind and retry.
+            return DeserializeValueAs(node, node.Kind, targetType);
         }
 
         object DeserializeToNull(INode node, NodeKind targetKind, Type targetType)
@@ -223,6 +286,31 @@ namespace VJson {
 
             // TODO: Should raise error?
             throw new NotImplementedException();
+        }
+
+        static object CreateInstanceIfConstrucutable<T>(Type targetType, T value)
+        {
+            // Raw
+            if (targetType == typeof(T) || targetType == typeof(object)) {
+                return value;
+            }
+
+            // Try to implicit conversion
+            var attr = targetType.GetCustomAttribute<Json>();
+            if (attr == null) {
+                throw new NotImplementedException(targetType.ToString());
+            }
+
+            if (!attr.ImplicitConstructable) {
+                throw new NotImplementedException(targetType.ToString());
+            }
+
+            var ctor = targetType.GetConstructor(new[] {typeof(T)});
+            if (ctor == null) {
+                throw new NotImplementedException();
+            }
+
+            return ctor.Invoke(new object[] {value});
         }
     }
 }
