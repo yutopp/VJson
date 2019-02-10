@@ -78,9 +78,12 @@ namespace VJson.Schema.UnitTests
 
         public class JsonSchemaFromTestCasesTests
         {
-            [TestCase("minimum.json")]
-            [TestCase("maximum.json")]
             [TestCase("type.json")]
+            //[TestCase("multipleOf.json")]
+            [TestCase("minimum.json")]
+            [TestCase("exclusiveMinimum.json")]
+            [TestCase("maximum.json")]
+            [TestCase("exclusiveMaximum.json")]
             [TestCase("items.json")]
             public void ValidationTest(string casePath)
             {

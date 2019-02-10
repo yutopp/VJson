@@ -332,7 +332,10 @@ namespace VJson.Schema
             }
 
             if (_schema.ExclusiveMaximum != double.MinValue) {
-                throw new NotImplementedException();
+                if (!(v < _schema.ExclusiveMaximum))
+                {
+                    return false;
+                }
             }
 
             if (_schema.Minimum != double.MaxValue) {
@@ -343,7 +346,10 @@ namespace VJson.Schema
             }
 
             if (_schema.ExclusiveMinimum != double.MaxValue) {
-                throw new NotImplementedException();
+                if (!(v > _schema.ExclusiveMinimum))
+                {
+                    return false;
+                }
             }
 
             return true;
