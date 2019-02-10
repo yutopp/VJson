@@ -9,17 +9,17 @@ namespace VJson.Schema.UnitTests
     //
     // http://json-schema.org/learn/miscellaneous-examples.html
     //
-    [Meta(Title="Person")]
+    [Schema(Title="Person")]
     class Person
     {
-        [Meta(Description="The person's first name.")]
+        [Schema(Description="The person's first name.")]
         public string firstName;
 
-        [Meta(Description="The person's last name.")]
+        [Schema(Description="The person's last name.")]
         public string lastName;
 
-        [Meta(Description="Age in years which must be equal to or greater than zero.")]
-        [NumericConstraints(Minimum = 0)]
+        [Schema(Description="Age in years which must be equal to or greater than zero.",
+                Minimum=0)]
         public int age;
     }
 
@@ -36,23 +36,23 @@ namespace VJson.Schema.UnitTests
 
             //Assert.AreEqual(NodeKind.Object, schema.Kind);
 
-            Assert.That(schema.properties.Count, Is.EqualTo(3));
+            Assert.That(schema.Properties.Count, Is.EqualTo(3));
 
-            Assert.That(schema.properties["firstName"],
+            Assert.That(schema.Properties["firstName"],
                         Is.EqualTo(new JsonSchema
                                 {
                                     Description = "The person's first name.",
                                     Type = "string",
                                 })
                         );
-            Assert.That(schema.properties["lastName"],
+            Assert.That(schema.Properties["lastName"],
                         Is.EqualTo( new JsonSchema
                                 {
                                     Description = "The person's last name.",
                                     Type = "string",
                                 })
                         );
-            Assert.That(schema.properties["age"],
+            Assert.That(schema.Properties["age"],
                         Is.EqualTo(new JsonSchema
                                 {
                                     Description = "Age in years which must be equal to or greater than zero.",
