@@ -6,6 +6,7 @@ jobs:
     working_directory: ~/workspace-net35
     steps:
       - checkout
+      - run: apt-get update -yy && apt-get install -yy make
       - run: make setup
       - run: make test-net35
 
@@ -15,6 +16,7 @@ jobs:
     working_directory: ~/workspace-net45
     steps:
       - checkout
+      - run: apt-get update -yy && apt-get install -yy make
       - run: make setup
       - run: make test-net45
 
@@ -24,6 +26,7 @@ jobs:
     working_directory: ~/workspace-netcoreapp2_0
     steps:
       - checkout
+      - run: apt-get update -yy && apt-get install -yy make
       - run: make setup
       - run: make test-netcore20
 
