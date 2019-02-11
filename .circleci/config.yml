@@ -36,18 +36,15 @@ jobs:
     working_directory: ~/workspace-netcoreapp2_0
     steps:
       - checkout
-      - run:
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-            ./cc-test-reporter before-build
-          when: always
+      - run: curl -s https://codecov.io/bash > codecov
+      - run: chmod +x codecov
       - run: mkdir coverage
-      - run: dotnet restore VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj
-      - run: dotnet build VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
-      - run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput='./lcov.info' VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
-      - run: cp VJson.standalone/VJson.Editor.Tests/lcov.info coverage/.
-      - run: ./cc-test-reporter after-build -t lcov
+      - run: apt-get update -yy && apt-get install -yy make git
+      - run: make setup
+      - run: make test-netcore20
+      - run: dotnet add package coverlet.msbuild
+      - run: make coverage-netcore20
+      - run: ./codecov -f coverage/lcov.info
 
 workflows:
   version: 2
