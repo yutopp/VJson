@@ -23,18 +23,24 @@ namespace VJson.Schema
     public class JsonSchema : Attribute
     {
         #region Metadata
+        [JsonFieldIgnorable]
         public string Title;
+
+        [JsonFieldIgnorable]
         public string Description;
         #endregion
 
         #region 6.1: Any instances
         [JsonField(Name="type", TypeHints = new Type[] {typeof(string), typeof(string[])})]
+        [JsonFieldIgnorable]
         public object Type;
 
         [JsonField(Name="enum")]
+        [JsonFieldIgnorable]
         public object[] Enum;
 
         [JsonField(Name="const")]
+        [JsonFieldIgnorable]
         public object Const;
 
         bool EqualsOnlyAny(JsonSchema rhs) {
@@ -47,18 +53,23 @@ namespace VJson.Schema
 
         #region 6.2: Numeric instances
         [JsonField(Name="multipleOf")]
+        [JsonFieldIgnorable(WhenValueIs = double.MinValue)]
         public double MultipleOf = double.MinValue;
 
         [JsonField(Name="maximum")]
+        [JsonFieldIgnorable(WhenValueIs = double.MinValue)]
         public double Maximum = double.MinValue;
 
         [JsonField(Name="exclusiveMaximum")]
+        [JsonFieldIgnorable(WhenValueIs = double.MinValue)]
         public double ExclusiveMaximum = double.MinValue;
 
         [JsonField(Name="minimum")]
+        [JsonFieldIgnorable(WhenValueIs = double.MaxValue)]
         public double Minimum = double.MaxValue;
 
         [JsonField(Name="exclusiveMinimum")]
+        [JsonFieldIgnorable(WhenValueIs = double.MaxValue)]
         public double ExclusiveMinimum = double.MaxValue;
 
         bool EqualsOnlyNum(JsonSchema rhs) {
@@ -73,12 +84,15 @@ namespace VJson.Schema
 
         #region 6.3. Strings
         [JsonField(Name="maxLength")]
+        [JsonFieldIgnorable(WhenValueIs = int.MinValue)]
         public int MaxLength = int.MinValue;
 
         [JsonField(Name="minLength")]
+        [JsonFieldIgnorable(WhenValueIs = int.MaxValue)]
         public int MinLength = int.MaxValue;
 
         [JsonField(Name="pattern")]
+        [JsonFieldIgnorable]
         public string Pattern;
 
         bool EqualsOnlyString(JsonSchema rhs) {
@@ -91,15 +105,19 @@ namespace VJson.Schema
 
         #region 6.4: Arrays
         [JsonField(Name="items", TypeHints=new Type[] {typeof(JsonSchema), typeof(JsonSchema[])})]
+        [JsonFieldIgnorable]
         public object Items;
 
         [JsonField(Name="additionalItems")]
+        [JsonFieldIgnorable]
         public JsonSchema AdditionalItems;
 
         [JsonField(Name="maxItems")]
+        [JsonFieldIgnorable(WhenValueIs = int.MinValue)]
         public int MaxItems = int.MinValue;
 
         [JsonField(Name="minItems")]
+        [JsonFieldIgnorable(WhenValueIs = int.MaxValue)]
         public int MinItems = int.MaxValue;
 
         // uniqueItems
@@ -116,21 +134,27 @@ namespace VJson.Schema
 
         #region 6.5: Objects
         [JsonField(Name="maxProperties")]
+        [JsonFieldIgnorable(WhenValueIs = int.MinValue)]
         public int MaxProperties = int.MinValue;
 
         [JsonField(Name="minProperties")]
+        [JsonFieldIgnorable(WhenValueIs = int.MaxValue)]
         public int MinProperties = int.MaxValue;
 
         [JsonField(Name="required")]
+        [JsonFieldIgnorable]
         public string[] Required;
 
         [JsonField(Name="properties")]
+        [JsonFieldIgnorable]
         public Dictionary<string, JsonSchema> Properties;
 
         [JsonField(Name="patternProperties")]
+        [JsonFieldIgnorable]
         public Dictionary<string, JsonSchema> PatternProperties;
 
         [JsonField(Name="additionalProperties")]
+        [JsonFieldIgnorable]
         public JsonSchema AdditionalProperties;
 
         // dependencies
@@ -147,6 +171,7 @@ namespace VJson.Schema
         // anyOf
         // oneOf
         [JsonField(Name="not")]
+        [JsonFieldIgnorable]
         public JsonSchema Not;
 
         bool EqualsOnlySubBool(JsonSchema rhs) {
@@ -580,8 +605,8 @@ namespace VJson.Schema
                     var elemValue = field.GetValue(v);
 
                     var fieldIgnoreAttr =
-                        (JsonFieldIgnore)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnore));
-                    if (JsonFieldIgnore.IsIgnorable(fieldIgnoreAttr, elemValue)) {
+                        (JsonFieldIgnorable)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnorable));
+                    if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue)) {
                         continue;
                     }
 

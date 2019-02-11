@@ -34,12 +34,12 @@ namespace VJson
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class JsonFieldIgnore : System.Attribute
+    public class JsonFieldIgnorable : System.Attribute
     {
         public object WhenValueIs;
         public int WhenLengthIs;
 
-        public static bool IsIgnorable<T>(JsonFieldIgnore f, T o)
+        public static bool IsIgnorable<T>(JsonFieldIgnorable f, T o)
         {
             if (f == null) {
                 return false;

@@ -129,8 +129,8 @@ namespace VJson {
                 var elemValue = field.GetValue(o);
 
                 var fieldIgnoreAttr =
-                    (JsonFieldIgnore)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnore));
-                if (JsonFieldIgnore.IsIgnorable(fieldIgnoreAttr, elemValue)) {
+                    (JsonFieldIgnorable)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnorable));
+                if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue)) {
                     continue;
                 }
 

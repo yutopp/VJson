@@ -128,10 +128,10 @@ namespace VJson.UnitTests
 
     class IgnorableObject
     {
-        [JsonFieldIgnore(WhenValueIs=0)]
+        [JsonFieldIgnorable(WhenValueIs = 0)]
         public int Ignore0;
 
-        [JsonFieldIgnore(WhenLengthIs=0)]
+        [JsonFieldIgnorable(WhenLengthIs = 0)]
         public List<int> Ignore1;
 
         public override bool Equals(object rhsObj) {

@@ -52,7 +52,7 @@ namespace VJson.Schema.UnitTests
         public class NotRequiredObjectWithIgnorable
         {
             [JsonSchema(Minimum = 1)]
-            [JsonFieldIgnore(WhenValueIs = -1)]
+            [JsonFieldIgnorable(WhenValueIs = -1)]
             public int X;
         }
 
