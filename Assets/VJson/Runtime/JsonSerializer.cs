@@ -70,23 +70,8 @@ namespace VJson {
         {
             writer.WriteArrayStart();
 
-            var ty = o.GetType();
-			if (ty.IsArray)
-			{
-                foreach (var elem in o as Array)
-                {
-                    SerializeValue(writer, elem);
-                }
-			}
-            if (ty.IsGenericType) {
-                var containerTy = ty.GetGenericTypeDefinition();
-                if (containerTy != typeof(List<>)) {
-                    throw new NotImplementedException();
-                }
-                foreach(var elem in (IList)o)
-                {
-                    SerializeValue(writer, elem);
-                }
+            foreach(var elem in TypeHelper.ToIEnumerable(o)) {
+                SerializeValue(writer, elem);
             }
 
             writer.WriteArrayEnd();
@@ -96,49 +81,11 @@ namespace VJson {
         {
             writer.WriteObjectStart();
 
-            var ty = o.GetType();
-            if (ty.IsGenericType) {
-                var containerTy = ty.GetGenericTypeDefinition();
-                if (containerTy != typeof(Dictionary<,>)) {
-                    throw new NotImplementedException();
-                }
-
-                var keyType = ty.GetGenericArguments()[0];
-                if (keyType != typeof(string)) {
-                    // TODO: Should allow them and call `ToString`?
-                    throw new NotImplementedException();
-                }
-
-                foreach (DictionaryEntry elem in (IDictionary)o)
-                {
-                    writer.WriteObjectKey((string)elem.Key);
-                    SerializeValue(writer, elem.Value);
-                }
-
-                goto encoded;
+            foreach(var kv in TypeHelper.ToKeyValues(o)) {
+                writer.WriteObjectKey(kv.Key);
+                SerializeValue(writer, kv.Value);
             }
 
-            // Traverse fields
-            FieldInfo[] fields = ty.GetFields();
-            foreach (var field in fields)
-            {
-                var fieldAttr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
-
-                // TODO: duplication check
-                var elemName = JsonField.FieldName(fieldAttr, field);
-                var elemValue = field.GetValue(o);
-
-                var fieldIgnoreAttr =
-                    (JsonFieldIgnorable)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnorable));
-                if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue)) {
-                    continue;
-                }
-
-                writer.WriteObjectKey(elemName);
-                SerializeValue(writer, elemValue);
-            }
-
-        encoded:
             writer.WriteObjectEnd();
         }
 

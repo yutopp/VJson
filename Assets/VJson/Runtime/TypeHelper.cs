@@ -38,6 +38,12 @@ namespace VJson
         {
             var ty = o.GetType();
             if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+                var keyType = ty.GetGenericArguments()[0];
+                if (keyType != typeof(string)) {
+                    // TODO: Should allow them and call `ToString`?
+                    throw new NotImplementedException();
+                }
+
                 foreach (DictionaryEntry elem in (IDictionary)o)
                 {
                     yield return new KeyValuePair<string, object>((string)elem.Key, elem.Value);
