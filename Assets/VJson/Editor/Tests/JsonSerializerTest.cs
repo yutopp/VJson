@@ -253,6 +253,14 @@ namespace VJson.UnitTests
                 new int[] {1, 2, 3},
                 @"[1,2,3]",
             },
+            new object[] {
+                new List<object> {1, 2, 3},
+                @"[1,2,3]",
+            },
+            new object[] {
+                new List<int> {1, 2, 3},
+                @"[1,2,3]",
+            },
 
             // Objects
             new object[] {
