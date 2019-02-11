@@ -8,14 +8,19 @@
 using System;
 using System.Runtime;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.IO;
+using System.Globalization;
 
 namespace VJson.Schema
 {
     [Json(ImplicitConstructable=true)]
-    public class JsonSchema : System.Attribute
+    [AttributeUsage(AttributeTargets.Class|AttributeTargets.Field,
+                    Inherited = false)]
+    public class JsonSchema : Attribute
     {
         #region Metadata
         public string Title;
@@ -66,31 +71,75 @@ namespace VJson.Schema
         }
         #endregion
 
+        #region 6.3. Strings
+        [JsonField(Name="maxLength")]
+        public int MaxLength = int.MinValue;
+
+        [JsonField(Name="minLength")]
+        public int MinLength = int.MaxValue;
+
+        [JsonField(Name="pattern")]
+        public string Pattern;
+
+        bool EqualsOnlyString(JsonSchema rhs) {
+            return MaxLength == rhs.MaxLength
+                && MinLength == rhs.MinLength
+                && Object.Equals(Pattern, rhs.Pattern)
+                ;
+        }
+        #endregion
+
         #region 6.4: Arrays
         [JsonField(Name="items", TypeHints=new Type[] {typeof(JsonSchema), typeof(JsonSchema[])})]
         public object Items;
 
-        // additionalItems
-        // maxItems
-        // minItems
+        [JsonField(Name="additionalItems")]
+        public JsonSchema AdditionalItems;
+
+        [JsonField(Name="maxItems")]
+        public int MaxItems = int.MinValue;
+
+        [JsonField(Name="minItems")]
+        public int MinItems = int.MaxValue;
+
         // uniqueItems
         // contains
 
         bool EqualsOnlyArray(JsonSchema rhs) {
-            return EqualsSingletonOrArray<JsonSchema>(Items, rhs.Items);
+            return EqualsSingletonOrArray<JsonSchema>(Items, rhs.Items)
+                && Object.Equals(AdditionalItems, rhs.AdditionalItems)
+                && MaxItems == rhs.MaxItems
+                && MinItems == rhs.MinItems
+                ;
         }
         #endregion
 
         #region 6.5: Objects
-        // maxProperties
-        // minProperties
-        // required
+        [JsonField(Name="maxProperties")]
+        public int MaxProperties = int.MinValue;
+
+        [JsonField(Name="minProperties")]
+        public int MinProperties = int.MaxValue;
+
+        [JsonField(Name="required")]
+        public string[] Required;
+
         [JsonField(Name="properties")]
         public Dictionary<string, JsonSchema> Properties;
-        // patternProperties
-        // additionalProperties
+
+        [JsonField(Name="patternProperties")]
+        public Dictionary<string, JsonSchema> PatternProperties;
+
+        [JsonField(Name="additionalProperties")]
+        public JsonSchema AdditionalProperties;
+
         // dependencies
         // propertyNames
+
+        bool EqualsOnlyObject(JsonSchema rhs) {
+            // TODO
+            return true;
+        }
         #endregion
 
         #region 6.7: Subschemas With Boolean Logic
@@ -131,7 +180,9 @@ namespace VJson.Schema
                 && Description == rhs.Description
                 && EqualsOnlyAny(rhs)
                 && EqualsOnlyNum(rhs)
+                && EqualsOnlyString(rhs)
                 && EqualsOnlyArray(rhs)
+                && EqualsOnlyObject(rhs)
                 && EqualsOnlySubBool(rhs)
                 ;
         }
@@ -174,27 +225,52 @@ namespace VJson.Schema
                         Type = "string",
                     };
 
+                case NodeKind.Array:
+                    return new JsonSchema {
+                        Type = "array",
+                    };
+
                 case NodeKind.Object:
+                    if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+                        return new JsonSchema {
+                            Type = "object",
+                        };
+                    }
+
                     break;
 
                 default:
                     throw new NotImplementedException();
             }
 
-            var schema = (Schema)Attribute.GetCustomAttribute(ty, typeof(Schema));
+            var schema = (JsonSchema)Attribute.GetCustomAttribute(ty, typeof(JsonSchema));
+            if (schema == null) {
+                schema = new JsonSchema();
+            }
             schema.Type = "object";
             schema.Properties = new Dictionary<string, JsonSchema>();
             schema.shouldRef = true;
 
             var fields = ty.GetFields(BindingFlags.Public|BindingFlags.Instance);
             foreach(var field in fields) {
-                var attr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
+                var attr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField), false);
 
                 // TODO: duplication check
                 var elemName = JsonField.FieldName(attr, field);
 
-                var fieldSchema = (Schema)Attribute.GetCustomAttribute(field, typeof(Schema));
-                //var fieldItemsSchema = Attribute.GetCustomAttributes(field, typeof(ItemsSchema));
+                var fieldSchema =
+                    (JsonSchema)Attribute.GetCustomAttributes(field, typeof(JsonSchema), false)
+                    .Where(f => f.GetType() == typeof(JsonSchema))
+                    .FirstOrDefault();
+                if (fieldSchema == null) {
+                    fieldSchema = new JsonSchema();
+                }
+
+                var fieldItemsSchema =
+                    (ItemsJsonSchema)Attribute.GetCustomAttribute(field, typeof(ItemsJsonSchema), false);
+                if (fieldItemsSchema != null) {
+                    fieldSchema.Items = fieldItemsSchema;
+                }
 
                 var fieldTypeSchema = CreateFromType(field.FieldType);
                 if (fieldTypeSchema.shouldRef) {
@@ -242,6 +318,12 @@ namespace VJson.Schema
         }
     }
 
+    [AttributeUsage(AttributeTargets.Field,
+                    Inherited = false)]
+    public class ItemsJsonSchema : JsonSchema
+    {
+    }
+
     public static class JsonSchemaExtensions
     {
         public static bool Validate(this JsonSchema j, object o)
@@ -259,6 +341,7 @@ namespace VJson.Schema
         }
 
         public bool Validate(object o) {
+            var ty = o != null ? o.GetType() : null;
             var kind = Node.KindOfValue(o);
 
             if (_schema.Type != null) {
@@ -302,16 +385,38 @@ namespace VJson.Schema
                     break;
 
                 case NodeKind.String:
+                    if (!ValidateString((string)o))
+                    {
+                        return false;
+                    }
                     break;
 
                 case NodeKind.Array:
-                    if (!ValidateArray((IEnumerable<object>)o))
+                    IEnumerable<object> elems = null;
+                    if (ty.IsArray) {
+                        if (ty.HasElementType && ty.GetElementType().IsClass) {
+                            elems = ((IEnumerable<object>)o);
+                        } else {
+                            elems = ((IEnumerable)o).Cast<object>();
+                        }
+                    } else {
+                        if (ty.IsGenericType && ty.GetGenericArguments()[0].IsClass) {
+                            elems = ((IEnumerable<object>)o);
+                        } else {
+                            elems = ((IEnumerable)o).Cast<object>();
+                        }
+                    }
+                    if (!ValidateArray(elems))
                     {
                         return false;
                     }
                     break;
 
                 case NodeKind.Object:
+                    if (!ValidateObject(o))
+                    {
+                        return false;
+                    }
                     break;
 
                 case NodeKind.Null:
@@ -360,7 +465,49 @@ namespace VJson.Schema
             return true;
         }
 
+        bool ValidateString(string v) {
+            StringInfo si = null;
+
+            if (_schema.MaxLength != int.MinValue) {
+                si = si ?? new StringInfo(v);
+                if (!(si.LengthInTextElements <= _schema.MaxLength)) {
+                    return false;
+                }
+            }
+
+            if (_schema.MinLength != int.MaxValue) {
+                si = si ?? new StringInfo(v);
+                if (!(si.LengthInTextElements >= _schema.MinLength)) {
+                    return false;
+                }
+            }
+
+            if (_schema.Pattern != null) {
+                if (!Regex.IsMatch(v, _schema.Pattern)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         bool ValidateArray(IEnumerable<object> v) {
+            var length = v.Count();
+
+            if (_schema.MaxItems != int.MinValue) {
+                if (!(length <= _schema.MaxItems)) {
+                    return false;
+                }
+            }
+
+            if (_schema.MinItems != int.MaxValue) {
+                if (!(length >= _schema.MinItems)) {
+                    return false;
+                }
+            }
+
+            List<object> extraItems = null;
+
             if (_schema.Items != null) {
                 if (_schema.Items.GetType().IsArray) {
                     var itemSchemas = (JsonSchema[])_schema.Items;
@@ -369,15 +516,18 @@ namespace VJson.Schema
                     foreach(var elem in v) {
                         var itemSchema = itemSchemas.ElementAtOrDefault(i);
                         if (itemSchema == null) {
-                            // TODO: check if additional items are supported
-                            break;
+                            if (extraItems == null) {
+                                extraItems = new List<object>();
+                            }
+                            extraItems.Add(elem);
+                            continue;
                         }
 
                         if (!itemSchema.Validate(elem)) {
                             return false;
                         }
 
-                        i++;
+                        ++i;
                     }
 
                 } else {
@@ -387,6 +537,117 @@ namespace VJson.Schema
                             return false;
                         }
                     }
+                }
+            }
+
+            if (_schema.AdditionalItems != null) {
+                if (extraItems != null) {
+                    foreach(var elem in extraItems) {
+                        if (!_schema.AdditionalItems.Validate(elem)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        bool ValidateObject(object v) {
+            var ty = v.GetType();
+
+            var validated = new List<string>();
+
+            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+                foreach (DictionaryEntry elem in (IDictionary)v)
+                {
+                    if (!ValidateObjectField((string)elem.Key, elem.Value))
+                    {
+                        return false;
+                    }
+
+                    validated.Add((string)elem.Key);
+                }
+
+            } else {
+                var fields = ty.GetFields();
+                foreach (var field in fields)
+                {
+                    var fieldAttr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
+
+                    // TODO: duplication check
+                    var elemName = JsonField.FieldName(fieldAttr, field);
+                    var elemValue = field.GetValue(v);
+
+                    var fieldIgnoreAttr =
+                        (JsonFieldIgnore)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnore));
+                    if (JsonFieldIgnore.IsIgnorable(fieldIgnoreAttr, elemValue)) {
+                        continue;
+                    }
+
+                    if (!ValidateObjectField(elemName, elemValue))
+                    {
+                        return false;
+                    }
+
+                    validated.Add(elemName);
+                }
+            }
+
+            if (_schema.Required != null) {
+                var req = new HashSet<string>(_schema.Required);
+                req.IntersectWith(validated);
+
+                if (req.Count != _schema.Required.Count()) {
+                    return false;
+                }
+            }
+
+            if (_schema.MaxProperties != int.MinValue) {
+                if (!(validated.Count <= _schema.MaxProperties)) {
+                    return false;
+                }
+            }
+
+            if (_schema.MinProperties != int.MaxValue) {
+                if (!(validated.Count >= _schema.MinProperties)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool ValidateObjectField(string key, object value)
+        {
+            var matched = false;
+
+            if (_schema.Properties != null) {
+                JsonSchema itemSchema = null;
+                if (_schema.Properties.TryGetValue(key, out itemSchema)) {
+                    matched = true;
+
+                    if (!itemSchema.Validate(value)) {
+                        return false;
+                    }
+                }
+            }
+
+            if (_schema.PatternProperties != null) {
+                foreach(var pprop in _schema.PatternProperties) {
+                    if (Regex.IsMatch(key, pprop.Key)) {
+                        matched = true;
+
+                        if (!pprop.Value.Validate(value)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            if (_schema.AdditionalProperties != null && !matched) {
+                if (!_schema.AdditionalProperties.Validate(value)) {
+                    return false;
                 }
             }
 

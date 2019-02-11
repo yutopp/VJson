@@ -162,6 +162,7 @@ namespace VJson.UnitTests
 
     class JsonSerializerTests
     {
+        [Test]
         [TestCaseSource("CommonArgs")]
         [TestCaseSource("OnlySerializeArgs")]
         public void SerializeTest(object obj, string expected)
@@ -176,6 +177,7 @@ namespace VJson.UnitTests
             }
         }
 
+        [Test]
         [TestCaseSource("CommonArgs")]
         [TestCaseSource("OnlySerializeArgs")]
         public void SerializeFromStringTest(object obj, string expected)
@@ -187,6 +189,7 @@ namespace VJson.UnitTests
             Assert.AreEqual(expected, actual);
         }
 
+        [Test]
         [TestCaseSource("CommonArgs")]
         [TestCaseSource("OnlyDeserializeArgs")]
         public void DeserializeTest(object obj, string expected)
@@ -199,6 +202,7 @@ namespace VJson.UnitTests
             }
         }
 
+        [Test]
         [TestCaseSource("CommonArgs")]
         [TestCaseSource("OnlyDeserializeArgs")]
         public void DeserializeFromStringTest(object obj, string expected)
@@ -315,6 +319,7 @@ namespace VJson.UnitTests
 
     class JsonSerializerForContainerTests
     {
+        [Test]
         [TestCaseSource("ListArgs")]
         public void SerializeTest<E>(IEnumerable<E> obj, string expected)
         {
@@ -327,6 +332,7 @@ namespace VJson.UnitTests
             }
         }
 
+        [Test]
         [TestCaseSource("DictArgs")]
         public void SerializeTest<K, V>(IDictionary<K, V> obj, string expected)
         {
@@ -339,6 +345,7 @@ namespace VJson.UnitTests
             }
         }
 
+        [Test]
         [TestCaseSource("ListArgs")]
         public void DeserializeTest<E>(IEnumerable<E> expected, string json)
         {
@@ -350,6 +357,7 @@ namespace VJson.UnitTests
             }
         }
 
+        [Test]
         [TestCaseSource("DictArgs")]
         public void DeserializeTest<K, V>(IDictionary<K, V> expected, string json)
         {

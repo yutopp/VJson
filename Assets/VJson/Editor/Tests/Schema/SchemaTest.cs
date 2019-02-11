@@ -16,17 +16,17 @@ namespace VJson.Schema.UnitTests
     //
     // http://json-schema.org/learn/miscellaneous-examples.html
     //
-    [Schema(Title="Person")]
+    [JsonSchema(Title="Person")]
     class Person
     {
-        [Schema(Description="The person's first name.")]
+        [JsonSchema(Description="The person's first name.")]
         public string firstName;
 
-        [Schema(Description="The person's last name.")]
+        [JsonSchema(Description="The person's last name.")]
         public string lastName;
 
-        [Schema(Description="Age in years which must be equal to or greater than zero.",
-                Minimum=0)]
+        [JsonSchema(Description="Age in years which must be equal to or greater than zero.",
+                    Minimum=0)]
         public int age;
     }
 
@@ -73,10 +73,10 @@ namespace VJson.Schema.UnitTests
         {
             public string description;
             public JsonSchema schema;
-            public Test[] tests;
+            public UnitTest[] tests;
         }
 
-        class Test
+        class UnitTest
         {
             public string description;
             public object data;
@@ -85,13 +85,43 @@ namespace VJson.Schema.UnitTests
 
         public class JsonSchemaFromTestCasesTests
         {
-            [TestCase("type.json")]
-            //[TestCase("multipleOf.json")]
-            [TestCase("minimum.json")]
-            [TestCase("exclusiveMinimum.json")]
-            [TestCase("maximum.json")]
+            [Test]
+            [TestCase("additionalItems.json")]
+            [TestCase("additionalProperties.json")]
+            //[TestCase("allOf.json")]
+            //[TestCase("anyOf.json")]
+            [TestCase("boolean_schema.json")]
+            //[TestCase("const.json")]
+            //[TestCase("contains.json")]
+            //[TestCase("default.json")]
+            //[TestCase("definitions.json")]
+            //[TestCase("dependencies.json")]
+            //[TestCase("enum.json")]
             [TestCase("exclusiveMaximum.json")]
+            [TestCase("exclusiveMinimum.json")]
+            //[TestCase("if-then-else.json")]
             [TestCase("items.json")]
+            [TestCase("maximum.json")]
+            [TestCase("maxItems.json")]
+            [TestCase("maxLength.json")]
+            [TestCase("maxProperties.json")]
+            [TestCase("minimum.json")]
+            [TestCase("minItems.json")]
+            [TestCase("minLength.json")]
+            [TestCase("minProperties.json")]
+            //[TestCase("multipleOf.json")]
+            [TestCase("not.json")]
+            //[TestCase("oneOf.json")]
+            //[TestCase("optional")]
+            [TestCase("pattern.json")]
+            //[TestCase("patternProperties.json")]
+            [TestCase("properties.json")]
+            //[TestCase("propertyNames.json")]
+            //[TestCase("ref.json")]
+            //[TestCase("refRemote.json")]
+            [TestCase("required.json")]
+            [TestCase("type.json")]
+            //[TestCase("uniqueItems.json")]
             public void ValidationTest(string casePath)
             {
                 var path = Path.Combine(Path.Combine(Path.Combine("JSON-Schema-Test-Suite", "tests"), "draft7"), casePath);
@@ -111,7 +141,9 @@ namespace VJson.Schema.UnitTests
                             var result = c.schema.Validate(t.data);
                             Console.WriteLine("  r: " + result);
 
-                            Assert.That(result, Is.EqualTo(t.valid), t.description);
+                            Assert.That(result, Is.EqualTo(t.valid),
+                                        String.Format("{0} ({1})", t.description, c.description)
+                                        );
                         }
                     }
                 }
