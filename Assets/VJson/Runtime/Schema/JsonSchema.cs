@@ -235,6 +235,11 @@ namespace VJson.Schema
         {
             var kind = Node.KindOfType(ty);
             switch (kind) {
+                case NodeKind.Boolean:
+                    return new JsonSchema {
+                        Type = "boolean",
+                    };
+
                 case NodeKind.Integer:
                     return new JsonSchema {
                         Type = "integer",
@@ -366,7 +371,6 @@ namespace VJson.Schema
         }
 
         public bool Validate(object o) {
-            var ty = o != null ? o.GetType() : null;
             var kind = Node.KindOfValue(o);
 
             if (_schema.Type != null) {
@@ -388,6 +392,19 @@ namespace VJson.Schema
                     if (!ValidateKind(kind, t)) {
                         return false;
                     }
+                }
+            }
+
+            if (_schema.Enum != null) {
+                var found = false;
+                foreach(var e in _schema.Enum) {
+                    if (DeepEquals(o, e)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return false;
                 }
             }
 
@@ -417,21 +434,7 @@ namespace VJson.Schema
                     break;
 
                 case NodeKind.Array:
-                    IEnumerable<object> elems = null;
-                    if (ty.IsArray) {
-                        if (ty.HasElementType && ty.GetElementType().IsClass) {
-                            elems = ((IEnumerable<object>)o);
-                        } else {
-                            elems = ((IEnumerable)o).Cast<object>();
-                        }
-                    } else {
-                        if (ty.IsGenericType && ty.GetGenericArguments()[0].IsClass) {
-                            elems = ((IEnumerable<object>)o);
-                        } else {
-                            elems = ((IEnumerable)o).Cast<object>();
-                        }
-                    }
-                    if (!ValidateArray(elems))
+                    if (!ValidateArray(ToIEnumerable(o)))
                     {
                         return false;
                     }
@@ -579,44 +582,15 @@ namespace VJson.Schema
         }
 
         bool ValidateObject(object v) {
-            var ty = v.GetType();
-
             var validated = new List<string>();
 
-            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-                foreach (DictionaryEntry elem in (IDictionary)v)
+            foreach(var kv in ToKeyValues(v)) {
+                if (!ValidateObjectField(kv.Key, kv.Value))
                 {
-                    if (!ValidateObjectField((string)elem.Key, elem.Value))
-                    {
-                        return false;
-                    }
-
-                    validated.Add((string)elem.Key);
+                    return false;
                 }
 
-            } else {
-                var fields = ty.GetFields();
-                foreach (var field in fields)
-                {
-                    var fieldAttr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
-
-                    // TODO: duplication check
-                    var elemName = JsonField.FieldName(fieldAttr, field);
-                    var elemValue = field.GetValue(v);
-
-                    var fieldIgnoreAttr =
-                        (JsonFieldIgnorable)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnorable));
-                    if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue)) {
-                        continue;
-                    }
-
-                    if (!ValidateObjectField(elemName, elemValue))
-                    {
-                        return false;
-                    }
-
-                    validated.Add(elemName);
-                }
+                validated.Add((string)kv.Key);
             }
 
             if (_schema.Required != null) {
@@ -703,6 +677,103 @@ namespace VJson.Schema
 
                 case "integer":
                     return kind == NodeKind.Integer;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        static IEnumerable<object> ToIEnumerable(object o)
+        {
+            var ty = o.GetType();
+            if (ty.IsArray) {
+                if (ty.HasElementType && ty.GetElementType().IsClass) {
+                    return ((IEnumerable<object>)o);
+                } else {
+                    return ((IEnumerable)o).Cast<object>();
+                }
+            } else {
+                if (ty.IsGenericType && ty.GetGenericArguments()[0].IsClass) {
+                    return ((IEnumerable<object>)o);
+                } else {
+                    return ((IEnumerable)o).Cast<object>();
+                }
+            }
+        }
+
+        static IEnumerable<KeyValuePair<string, object>> ToKeyValues(object o)
+        {
+            var ty = o.GetType();
+            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+                foreach (DictionaryEntry elem in (IDictionary)o)
+                {
+                    yield return new KeyValuePair<string, object>((string)elem.Key, elem.Value);
+                }
+
+            } else {
+                var fields = ty.GetFields();
+                foreach (var field in fields)
+                {
+                    var fieldAttr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
+
+                    // TODO: duplication check
+                    var elemName = JsonField.FieldName(fieldAttr, field);
+                    var elemValue = field.GetValue(o);
+
+                    var fieldIgnoreAttr =
+                        (JsonFieldIgnorable)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnorable));
+                    if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue)) {
+                        continue;
+                    }
+
+                    yield return new KeyValuePair<string, object>(elemName, elemValue);
+                }
+            }
+        }
+
+        class DeepEqualityComparer : IEqualityComparer<object>
+        {
+            public bool Equals(object a, object b)
+            {
+                return DeepEquals(a, b);
+            }
+
+            public int GetHashCode(object a)
+            {
+                return a.GetHashCode();
+            }
+        }
+
+        static bool DeepEquals(object lhs, object rhs)
+        {
+            var lhsKind = Node.KindOfValue(lhs);
+            var rhsKind = Node.KindOfValue(rhs);
+            if (lhsKind != rhsKind) {
+                return false;
+            }
+
+            switch (lhsKind) {
+                case NodeKind.Boolean:
+                case NodeKind.Integer:
+                case NodeKind.Float:
+                case NodeKind.String:
+                    return Object.Equals(lhs, rhs);
+
+                case NodeKind.Array:
+                    var lhsArr = ToIEnumerable(lhs);
+                    var rhsArr = ToIEnumerable(rhs);
+                    return lhsArr.SequenceEqual(rhsArr, new DeepEqualityComparer());
+
+                case NodeKind.Object:
+                    var lhsKvs = new Dictionary<string, object>(ToKeyValues(lhs));
+                    var rhsKvs = new Dictionary<string, object>(ToKeyValues(rhs));
+                    if (!lhsKvs.Keys.SequenceEqual(rhsKvs.Keys)) {
+                        return false;
+                    }
+                    return lhsKvs.All(kv => DeepEquals(kv.Value, rhsKvs[kv.Key]));
+
+                case NodeKind.Null:
+                    return true;
 
                 default:
                     throw new NotImplementedException();

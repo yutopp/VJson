@@ -96,7 +96,7 @@ namespace VJson.Schema.UnitTests
             //[TestCase("default.json")]
             //[TestCase("definitions.json")]
             //[TestCase("dependencies.json")]
-            //[TestCase("enum.json")]
+            [TestCase("enum.json")]
             [TestCase("exclusiveMaximum.json")]
             [TestCase("exclusiveMinimum.json")]
             //[TestCase("if-then-else.json")]
