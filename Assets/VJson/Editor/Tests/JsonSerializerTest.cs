@@ -160,19 +160,11 @@ namespace VJson.UnitTests
         }
     }
 
-    [TestFixtureSource("FixtureArgs")]
     class JsonSerializerTests
     {
-        object obj;
-        string expected;
-
-        public JsonSerializerTests(object obj, string expected) {
-            this.obj = obj;
-            this.expected = expected;
-        }
-
-        [Test]
-        public void SerializeTest()
+        [TestCaseSource("CommonArgs")]
+        [TestCaseSource("OnlySerializeArgs")]
+        public void SerializeTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
 
@@ -184,8 +176,9 @@ namespace VJson.UnitTests
             }
         }
 
-        [Test]
-        public void SerializeFromStringTest()
+        [TestCaseSource("CommonArgs")]
+        [TestCaseSource("OnlySerializeArgs")]
+        public void SerializeFromStringTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
 
@@ -194,8 +187,9 @@ namespace VJson.UnitTests
             Assert.AreEqual(expected, actual);
         }
 
-        [Test]
-        public void DeserializeTest()
+        [TestCaseSource("CommonArgs")]
+        [TestCaseSource("OnlyDeserializeArgs")]
+        public void DeserializeTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
             using(var textReader = new StringReader(expected)) {
@@ -205,8 +199,9 @@ namespace VJson.UnitTests
             }
         }
 
-        [Test]
-        public void DeserializeFromStringTest()
+        [TestCaseSource("CommonArgs")]
+        [TestCaseSource("OnlyDeserializeArgs")]
+        public void DeserializeFromStringTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
             var actual = serializer.Deserialize(expected);
@@ -215,7 +210,7 @@ namespace VJson.UnitTests
         }
 
         //
-        static object [] FixtureArgs = {
+        static object[] CommonArgs = {
             // Boolean
             new object[] {
                 true,
@@ -280,11 +275,41 @@ namespace VJson.UnitTests
                 @"{""D"":false,""X"":20,""Y"":""cdcd""}",
             },
             new object[] {
-                (new RenamedObject {
-                        Actual = 42,
-                    }),
+                new RenamedObject {
+                    Actual = 42,
+                },
                 @"{""renamed"":42}",
             },
+            new object[] {
+                new IgnorableObject {
+                    Ignore0 = 0,
+                },
+                @"{}",
+            },
+            new object[] {
+                new IgnorableObject {
+                    Ignore0 = 1,
+                },
+                @"{""Ignore0"":1}",
+            },
+            new object[] {
+                new IgnorableObject {
+                    Ignore1 = new List<int> {1},
+                },
+                @"{""Ignore1"":[1]}",
+            }
+        };
+
+        static object[] OnlySerializeArgs = {
+            new object[] {
+                new IgnorableObject {
+                    Ignore1 = new List<int>(),
+                },
+                @"{}",
+            },
+        };
+
+        static object[] OnlyDeserializeArgs = {
         };
     }
 

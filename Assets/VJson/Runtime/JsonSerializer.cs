@@ -122,11 +122,17 @@ namespace VJson {
             FieldInfo[] fields = ty.GetFields();
             foreach (var field in fields)
             {
-                var attr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
+                var fieldAttr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
 
                 // TODO: duplication check
-                var elemName = JsonField.FieldName(attr, field);
+                var elemName = JsonField.FieldName(fieldAttr, field);
                 var elemValue = field.GetValue(o);
+
+                var fieldIgnoreAttr =
+                    (JsonFieldIgnore)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnore));
+                if (JsonFieldIgnore.IsIgnorable(fieldIgnoreAttr, elemValue)) {
+                    continue;
+                }
 
                 writer.WriteObjectKey(elemName);
                 SerializeValue(writer, elemValue, v);

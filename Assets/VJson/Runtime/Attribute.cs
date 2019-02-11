@@ -6,6 +6,7 @@
 //
 
 using System;
+using System.Collections;
 using System.Reflection;
 
 namespace VJson
@@ -37,5 +38,27 @@ namespace VJson
     {
         public object WhenValueIs;
         public int WhenLengthIs;
+
+        public static bool IsIgnorable<T>(JsonFieldIgnore f, T o)
+        {
+            if (f == null) {
+                return false;
+            }
+
+            // Value
+            if (Object.Equals(o, f.WhenValueIs)) {
+                return true;
+            }
+
+            // Length
+            if (o is Array a) {
+                return a.Length == f.WhenLengthIs;
+            } else if (o is IList l) {
+                return l.Count == f.WhenLengthIs;
+            }
+
+            // Others
+            return false;
+        }
     }
 }
