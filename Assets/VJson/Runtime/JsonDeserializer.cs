@@ -38,7 +38,6 @@ namespace VJson {
 
         object DeserializeValue(INode node, Type expectedType)
         {
-            Console.WriteLine("DeserializeValue :" + expectedType);
             var expectedKind = Node.KindOfType(expectedType);
 
             return DeserializeValueAs(node, expectedKind, expectedType);
@@ -128,8 +127,6 @@ namespace VJson {
 
         object DeserializeToArray(INode node, NodeKind targetKind, Type targetType)
         {
-            Console.WriteLine("Array -> " + targetType);
-
             bool isConvertible =
                 targetType == typeof(object)
                 || (targetType.IsArray)
@@ -186,8 +183,6 @@ namespace VJson {
 
         object DeserializeToObject(INode node, NodeKind targetKind, Type targetType)
         {
-            Console.WriteLine("Object -> " + targetType);
-
             if (targetKind != NodeKind.Object) {
                 // TODO: raise suitable errors
                 throw new NotImplementedException();
@@ -234,8 +229,6 @@ namespace VJson {
                     // Mapping to the structure
 
                     // TODO: add type check
-                    Console.WriteLine("To :" + targetType);
-
                     var container = Activator.CreateInstance(targetType);
                     var fields = targetType.GetFields();
                     foreach(var field in fields) {
@@ -256,15 +249,13 @@ namespace VJson {
                                 var elemType = hint;
                                 try
                                 {
-                                    Console.WriteLine("Hint :" + elemType + " <- " + elem);
-                                    Console.WriteLine("     :" + (elemType == typeof(object)));
                                     var v = DeserializeValue(elem, elemType);
                                     field.SetValue(container, v);
 
                                     resolved = true;
                                     break;
                                 } catch(Exception e) {
-                                    Console.WriteLine("Ex :" + e);
+                                    // TODO: handle exceptions
                                 }
                             }
                             if (!resolved) {

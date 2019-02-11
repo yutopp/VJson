@@ -130,16 +130,8 @@ namespace VJson.Schema.UnitTests
                     var cases = (TestCase[])d.Deserialize(sr);
 
                     foreach(var c in cases) {
-                        Console.WriteLine("c: " + c.description);
-                        Console.WriteLine("s: " + c.schema);
-
                         foreach(var t in c.tests) {
-                            Console.WriteLine("  t: " + t.description);
-                            Console.WriteLine("  d: " + t.data);
-                            Console.WriteLine("  v: " + t.valid);
-
                             var result = c.schema.Validate(t.data);
-                            Console.WriteLine("  r: " + result);
 
                             Assert.That(result, Is.EqualTo(t.valid),
                                         String.Format("{0} ({1})", t.description, c.description)
