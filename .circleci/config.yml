@@ -42,7 +42,7 @@ jobs:
       - run: apt-get update -yy && apt-get install -yy make git
       - run: make setup
       - run: make test-netcore20
-      - run: dotnet add package coverlet.msbuild
+      - run: dotnet add VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj package coverlet.msbuild
       - run: make coverage-netcore20
       - run: ./codecov -f coverage/lcov.info
 
