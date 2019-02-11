@@ -26,4 +26,4 @@ This library is developed as a purely C# project, however it also supports that 
 ## References
 
 - [JSON](https://www.json.org/)
-- [JSON Schema Specification](hhttps://json-schema.org/specification.html)
+- [JSON Schema Specification](https://json-schema.org/specification.html)
