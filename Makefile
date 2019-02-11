@@ -1,7 +1,7 @@
 DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 .PHONY: all
-all: setup test
+all: setup-net test
 
 .PHONY: test
 test: test-net35 test-net45 test-netcore20
@@ -9,6 +9,9 @@ test: test-net35 test-net45 test-netcore20
 .PHONY: setup
 setup:
 	git submodule update --init --recursive
+
+.PHONY: setup-net
+setup-net: setup
 	nuget install NUnit.Console -ExcludeVersion -OutputDirectory .nuget
 
 # .NET Framework 3.5
