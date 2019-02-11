@@ -157,7 +157,18 @@ namespace VJson.Schema
         [JsonFieldIgnorable]
         public JsonSchema AdditionalProperties;
 
-        // dependencies
+        [JsonField(Name="dependencies",
+                   /* TODO:
+                      A type of this field should be Map<string, string[] | JsonSchema>.
+                      But there are no ways to represent this type currently...
+                    */
+                   TypeHints=new Type[] {
+                       typeof(Dictionary<string, string[]>),
+                       typeof(Dictionary<string, JsonSchema>)
+                   })]
+        [JsonFieldIgnorable]
+        public object Dependencies;
+
         // propertyNames
 
         bool EqualsOnlyObject(JsonSchema rhs) {
@@ -582,7 +593,7 @@ namespace VJson.Schema
         }
 
         bool ValidateObject(object v) {
-            var validated = new List<string>();
+            var validated = new Dictionary<string, object>();
 
             foreach(var kv in TypeHelper.ToKeyValues(v)) {
                 if (!ValidateObjectField(kv.Key, kv.Value))
@@ -590,12 +601,12 @@ namespace VJson.Schema
                     return false;
                 }
 
-                validated.Add((string)kv.Key);
+                validated.Add(kv.Key, kv.Value);
             }
 
             if (_schema.Required != null) {
                 var req = new HashSet<string>(_schema.Required);
-                req.IntersectWith(validated);
+                req.IntersectWith(validated.Keys);
 
                 if (req.Count != _schema.Required.Count()) {
                     return false;
@@ -611,6 +622,30 @@ namespace VJson.Schema
             if (_schema.MinProperties != int.MaxValue) {
                 if (!(validated.Count >= _schema.MinProperties)) {
                     return false;
+                }
+            }
+
+            if (_schema.Dependencies != null) {
+                if (_schema.Dependencies is Dictionary<string, string[]> strDep) {
+                    foreach(var va in validated) {
+                        string[] deps = null;
+                        if (strDep.TryGetValue(va.Key, out deps)) {
+                            var intersected = ((string[])deps.Clone()).Intersect(validated.Keys);
+                            if (intersected.Count() != deps.Count()) {
+                                return false;
+                            }
+                        }
+                    }
+
+                } else if (_schema.Dependencies is Dictionary<string, JsonSchema> schemaDep) {
+                    foreach(var va in validated) {
+                        JsonSchema ext = null;
+                        if (schemaDep.TryGetValue(va.Key, out ext)) {
+                            if (!ext.Validate(v)) {
+                                return false;
+                            }
+                        }
+                    }
                 }
             }
 
