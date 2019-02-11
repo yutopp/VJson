@@ -1,4 +1,5 @@
 using System;
+using System.Runtime;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
@@ -173,20 +174,17 @@ namespace VJson.Schema
                     throw new NotImplementedException();
             }
 
-            var schema = ty.GetCustomAttribute<Schema>();
+            var schema = (Schema)Attribute.GetCustomAttribute(ty, typeof(Schema));
             schema.Type = "object";
             schema.Properties = new Dictionary<string, JsonSchema>();
             schema.shouldRef = true;
 
             var fields = ty.GetFields(BindingFlags.Public|BindingFlags.Instance);
             foreach(var field in fields) {
-                var attr = field.GetCustomAttribute<JsonField>();
+                var attr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
 
-                var elemName = field.Name;
-                if (attr != null && attr.Name != null) {
-                    // TODO: duplication check
-                    elemName = attr.Name;
-                }
+                // TODO: duplication check
+                var elemName = JsonField.FieldName(attr, field);
 
                 var fieldSchema = (Schema)Attribute.GetCustomAttribute(field, typeof(Schema));
                 //var fieldItemsSchema = Attribute.GetCustomAttributes(field, typeof(ItemsSchema));

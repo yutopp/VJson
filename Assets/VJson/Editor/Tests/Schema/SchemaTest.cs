@@ -87,7 +87,7 @@ namespace VJson.Schema.UnitTests
             [TestCase("items.json")]
             public void ValidationTest(string casePath)
             {
-                var path = Path.Combine("JSON-Schema-Test-Suite", "tests", "draft7", casePath);
+                var path = Path.Combine(Path.Combine(Path.Combine("JSON-Schema-Test-Suite", "tests"), "draft7"), casePath);
                 using(var sr = new StreamReader(path)) {
                     var d = new JsonSerializer(typeof(TestCase[]));
                     var cases = (TestCase[])d.Deserialize(sr);

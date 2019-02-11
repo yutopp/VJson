@@ -232,13 +232,10 @@ namespace VJson {
                     var container = Activator.CreateInstance(targetType);
                     var fields = targetType.GetFields();
                     foreach(var field in fields) {
-                        var attr = field.GetCustomAttribute<JsonField>();
+                        var attr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
 
-                        var elemName = field.Name;
-                        if (attr != null && attr.Name != null) {
-                            // TODO: duplication check
-                            elemName = attr.Name;
-                        }
+                        // TODO: duplication check
+                        var elemName = JsonField.FieldName(attr, field);
 
                         INode elem = null;
                         if (oNode.Elems == null || !oNode.Elems.TryGetValue(elemName, out elem)) {
@@ -302,8 +299,8 @@ namespace VJson {
                 return value;
             }
 
-            // Try to implicit conversion
-            var attr = targetType.GetCustomAttribute<Json>();
+            // Try to convert value implicitly
+            var attr = (Json)Attribute.GetCustomAttribute(targetType, typeof(Json));
             if (attr == null) {
                 throw new NotImplementedException(targetType.ToString());
             }

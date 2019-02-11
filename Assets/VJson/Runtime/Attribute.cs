@@ -14,6 +14,15 @@ namespace VJson
     {
         public Type[] TypeHints;
         public string Name;
+
+        public static string FieldName(JsonField f, FieldInfo fi)
+        {
+            if (f != null && f.Name != null) {
+                return f.Name;
+            }
+
+            return fi.Name;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Field)]

@@ -333,7 +333,7 @@ namespace VJson
 				return "ARRAY: []";
 			}
 
-			return "ARRAY: " + String.Join("; ", Elems);
+			return "ARRAY: " + String.Join("; ", Elems.Select(e => e.ToString()).ToArray());
 		}
 	}
 
