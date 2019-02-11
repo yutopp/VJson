@@ -21,7 +21,7 @@
 
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <ItemGroup>
-      <MyBinFolder Include="../../Assets/VJson/Editor/Tests/Schema/JSON-Schema-Test-Suite/**/*.*" />
+      <MyBinFolder Include="../../JSON-Schema-Test-Suite/**/*.*" />
     </ItemGroup>
 
     <Copy SourceFiles="@(MyBinFolder)" DestinationFiles="$(OutDir)/JSON-Schema-Test-Suite/%(RecursiveDir)%(Filename)%(Extension)" />
