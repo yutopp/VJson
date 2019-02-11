@@ -40,9 +40,8 @@ jobs:
       - run: chmod +x codecov
       - run: mkdir coverage
       - run: apt-get update -yy && apt-get install -yy make git
-      - run: make setup
-      - run: make test-netcore20
       - run: dotnet add VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj package coverlet.msbuild
+      - run: make setup
       - run: make coverage-netcore20
       - run: ./codecov -f coverage/lcov.info
 
