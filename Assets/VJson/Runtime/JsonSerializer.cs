@@ -25,7 +25,7 @@ namespace VJson {
         public void Serialize<T>(TextWriter textWriter, T o)
         {
             var writer = new JsonWriter(textWriter);
-            SerializeValue(writer, o, null);
+            SerializeValue(writer, o);
         }
 
         public string Serialize<T>(T o)
@@ -36,7 +36,7 @@ namespace VJson {
             }
         }
 
-        void SerializeValue<T>(JsonWriter writer, T o, IValidator v)
+        void SerializeValue<T>(JsonWriter writer, T o)
         {
             var kind = Node.KindOfValue(o);
 
@@ -46,27 +46,27 @@ namespace VJson {
                 case NodeKind.Integer:
                 case NodeKind.Float:
                 case NodeKind.Boolean:
-                    SerializePrimitive(writer, o, v);
+                    SerializePrimitive(writer, o);
                     return;
                 case NodeKind.Array:
-                    SerializeArray(writer, o, v);
+                    SerializeArray(writer, o);
                     return;
                 case NodeKind.Object:
-                    SerializeObject(writer, o, v);
+                    SerializeObject(writer, o);
                     return;
                 case NodeKind.Null:
-                    SerializeNull(writer, o, v);
+                    SerializeNull(writer, o);
                     return;
             }
         }
 
-        void SerializePrimitive<T>(JsonWriter writer, T o, IValidator v)
+        void SerializePrimitive<T>(JsonWriter writer, T o)
         {
             var write = typeof(JsonWriter).GetMethod("WriteValue", new []{o.GetType()});
             write.Invoke(writer, new object[] {o});
         }
 
-        void SerializeArray<T>(JsonWriter writer, T o, IValidator v)
+        void SerializeArray<T>(JsonWriter writer, T o)
         {
             writer.WriteArrayStart();
 
@@ -75,7 +75,7 @@ namespace VJson {
 			{
                 foreach (var elem in o as Array)
                 {
-                    SerializeValue(writer, elem, v);
+                    SerializeValue(writer, elem);
                 }
 			}
             if (ty.IsGenericType) {
@@ -85,14 +85,14 @@ namespace VJson {
                 }
                 foreach(var elem in (IList)o)
                 {
-                    SerializeValue(writer, elem, v);
+                    SerializeValue(writer, elem);
                 }
             }
 
             writer.WriteArrayEnd();
         }
 
-        void SerializeObject<T>(JsonWriter writer, T o, IValidator v)
+        void SerializeObject<T>(JsonWriter writer, T o)
         {
             writer.WriteObjectStart();
 
@@ -112,7 +112,7 @@ namespace VJson {
                 foreach (DictionaryEntry elem in (IDictionary)o)
                 {
                     writer.WriteObjectKey((string)elem.Key);
-                    SerializeValue(writer, elem.Value, v);
+                    SerializeValue(writer, elem.Value);
                 }
 
                 goto encoded;
@@ -135,14 +135,14 @@ namespace VJson {
                 }
 
                 writer.WriteObjectKey(elemName);
-                SerializeValue(writer, elemValue, v);
+                SerializeValue(writer, elemValue);
             }
 
         encoded:
             writer.WriteObjectEnd();
         }
 
-        void SerializeNull<T>(JsonWriter writer, T o, IValidator v)
+        void SerializeNull<T>(JsonWriter writer, T o)
         {
             writer.WriteValueNull();
         }
