@@ -114,7 +114,7 @@ namespace VJson.Schema.UnitTests
             //[TestCase("oneOf.json")]
             //[TestCase("optional")]
             [TestCase("pattern.json")]
-            //[TestCase("patternProperties.json")]
+            [TestCase("patternProperties.json")]
             [TestCase("properties.json")]
             //[TestCase("propertyNames.json")]
             //[TestCase("ref.json")]
