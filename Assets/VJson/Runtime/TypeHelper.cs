@@ -104,8 +104,19 @@ namespace VJson
                     return lhsArr.SequenceEqual(rhsArr, new DeepEqualityComparer());
 
                 case NodeKind.Object:
+                    #if NETCOREAPP2_0
                     var lhsKvs = new Dictionary<string, object>(ToKeyValues(lhs));
                     var rhsKvs = new Dictionary<string, object>(ToKeyValues(rhs));
+                    #else
+                    var lhsKvs = new Dictionary<string, object>();
+                    foreach(var kv in ToKeyValues(lhs)) {
+                        lhsKvs.Add(kv.Key, kv.Value);
+                    }
+                    var rhsKvs = new Dictionary<string, object>();
+                    foreach(var kv in ToKeyValues(rhs)) {
+                        rhsKvs.Add(kv.Key, kv.Value);
+                    }
+                    #endif
                     if (!lhsKvs.Keys.SequenceEqual(rhsKvs.Keys)) {
                         return false;
                     }
