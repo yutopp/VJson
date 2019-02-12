@@ -25,7 +25,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasRequiredButIgnorableStringArgs")]
         [TestCaseSource("HasDepsArgs")]
         [TestCaseSource("HasNestedArgs")]
-        public void ValidationTest<T>(T o, string expectedMsg)
+        public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
         {
             var schema = JsonSchema.CreateFromClass<T>();
 
@@ -40,6 +40,7 @@ namespace VJson.Schema.UnitTests
             }
         }
 
+        // TODO: Move to elsewhere
         [Test]
         [TestCaseSource("NotRequiredObjectArgs")]
         [TestCaseSource("NotRequiredObjectWithIgnorableArgs")]
@@ -50,21 +51,14 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasRequiredButIgnorableStringArgs")]
         [TestCaseSource("HasDepsArgs")]
         [TestCaseSource("HasNestedArgs")]
-        public void SerializationTest<T>(T o, string expected)
+        public void SerializationTest<T>(T o, string _expectedMsg, string expectedContent)
         {
-            /*
-            var schema = JsonSchema.CreateFromClass<T>();
-
-            var ex = schema.Validate(o);
-
-            var message =
-                String.Format("{0} : {1}", new JsonSerializer(typeof(T)).Serialize(o), schema.ToString());
-            if (ex == null) {
-                Assert.AreEqual(null, expected, message);
-            } else {
-                Assert.AreEqual(expected, ex.Diagnosis(), message);
+            if (_expectedMsg != null) {
+                return;
             }
-            */
+
+            var content = new JsonSerializer(typeof(T)).Serialize(o);
+            Assert.AreEqual(expectedContent, content);
         }
 
         [Test]
@@ -86,10 +80,12 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new NotRequiredObject {X = 0},
                 "Object.Property.Number.[\"X\"]: Minimum assertion !(0 >= 1).",
+                null,
             },
             new object[] {
                 new NotRequiredObject {X = 1},
                 null,
+                "{\"X\":1}",
             },
         };
 
@@ -104,14 +100,17 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new NotRequiredObjectWithIgnorable {X = -1},
                 null,
+                "{}",
             },
             new object[] {
                 new NotRequiredObjectWithIgnorable {X = 0},
                 "Object.Property.Number.[\"X\"]: Minimum assertion !(0 >= 1).",
+                null,
             },
             new object[] {
                 new NotRequiredObjectWithIgnorable {X = 1},
                 null,
+                "{\"X\":1}",
             },
         };
 
@@ -124,11 +123,13 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new HasDictionary(),
                 null,
+                "{\"FP\":{}}",
             },
             new object[] {
                 new HasDictionary() {FP = null},
                 // Empty is not allowed
                 "Object.Property.[\"FP\"]: Type is not matched(Actual: Null; Expected: object).",
+                null,
             },
         };
 
@@ -148,23 +149,28 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new HasEnumerable {Fs = new float[] {}},
                 null,
+                "{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[]}",
             },
             new object[] {
                 new HasEnumerable {Fs = new float[] {-0.5f}},
                 "Object.Property.Array.Items.Number.[\"Fs\"][0]: Minimum assertion !(-0.5 >= 0).",
+                null,
             },
             new object[] {
                 new HasEnumerable {Fs = new float[] {0.5f}},
                 null,
+                "{\"Fs\":[0.5],\"FsList\":[],\"Os\":[],\"OsList\":[]}",
             },
             new object[] {
                 new HasEnumerable {Fs = new float[] {1.5f}},
                 "Object.Property.Array.Items.Number.[\"Fs\"][0]: Maximum assertion !(1.5 <= 1).",
+                null,
             },
             new object[] {
                 new HasEnumerable {Fs = null},
                 // Empty is not allowed
                 "Object.Property.[\"Fs\"]: Type is not matched(Actual: Null; Expected: array).",
+                null,
             },
         };
 
@@ -180,18 +186,22 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new HasRequiredItems(),
                 "Object.Property.[\"Xs\"]: Type is not matched(Actual: Null; Expected: array).",
+                null,
             },
             new object[] {
                 new HasRequiredItems {Xs = new int[] {}},
                 "Object.Property.Array.[\"Xs\"]: MinItems assertion !(0 >= 1).",
+                null,
             },
             new object[] {
                 new HasRequiredItems {Xs = new int[] {-1}},
                 "Object.Property.Array.Items.Number.[\"Xs\"][0]: Minimum assertion !(-1 >= 0).",
+                null,
             },
             new object[] {
                 new HasRequiredItems {Xs =  new int[] {0}},
                 null,
+                "{\"Xs\":[0]}",
             },
         };
 
@@ -205,10 +215,12 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new HasRequiredString(),
                 "Object.Property.[\"S\"]: Type is not matched(Actual: Null; Expected: string).",
+                null,
             },
             new object[] {
                 new HasRequiredString {S = ""},
                 null,
+                "{\"S\":\"\"}",
             },
         };
 
@@ -223,10 +235,12 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new HasRequiredButIgnorableString(),
                 "Object.: Lack of required fields(Actual: []; Expected: [S]).",
+                null,
             },
             new object[] {
                 new HasRequiredButIgnorableString {S = ""},
                 null,
+                "{\"S\":\"\"}",
             },
         };
 
@@ -244,10 +258,12 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new HasDeps(),
                 null,
+                "{\"X\":0,\"Y\":0}",
             },
             new object[] {
                 new HasDeps {X = -1},
                 "Object.: Dependencies assertion. Lack of depended fields for Y(Actual: []; Expected: [X]).",
+                null,
             },
         };
 
@@ -267,12 +283,14 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new HasNested(),
                 "Object.Property.[\"C\"]: Type is not matched(Actual: Null; Expected: object).",
+                null,
             },
             new object[] {
                 new HasNested() {
                     C = new HasNestedChild(),
                 },
                 "Object.Property.Object.Property.[\"C\"][\"X\"]: Type is not matched(Actual: Null; Expected: string).",
+                null,
             },
             new object[] {
                 new HasNested() {
@@ -281,6 +299,7 @@ namespace VJson.Schema.UnitTests
                     },
                 },
                 "Object.Property.Object.Property.String.[\"C\"][\"X\"]: MinLength assertion !(0 >= 1).",
+                null,
             },
         };
 
