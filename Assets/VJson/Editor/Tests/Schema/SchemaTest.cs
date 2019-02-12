@@ -131,10 +131,10 @@ namespace VJson.Schema.UnitTests
 
                     foreach(var c in cases) {
                         foreach(var t in c.tests) {
-                            var result = c.schema.Validate(t.data);
+                            var ex = c.schema.Validate(t.data);
 
-                            Assert.That(result, Is.EqualTo(t.valid),
-                                        String.Format("{0} ({1})", t.description, c.description)
+                            Assert.That(ex == null, Is.EqualTo(t.valid),
+                                        String.Format("{0} / {1} ({2})", ex, t.description, c.description)
                                         );
                         }
                     }

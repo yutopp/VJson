@@ -364,9 +364,16 @@ namespace VJson.Schema
 
     public static class JsonSchemaExtensions
     {
-        public static bool Validate(this JsonSchema j, object o)
+        public static ConstraintsViolationException Validate(this JsonSchema j, object o)
         {
             return (new JsonSchemaValidator(j)).Validate(o);
+        }
+
+        internal static ConstraintsViolationException Validate(this JsonSchema j,
+                                                               object o,
+                                                               JsonSchemaValidator.State state)
+        {
+            return (new JsonSchemaValidator(j)).Validate(o, state);
         }
     }
 }
