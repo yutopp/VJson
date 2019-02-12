@@ -286,8 +286,10 @@ namespace VJson.Schema
                 schema = new JsonSchema();
             }
             schema.Type = "object";
-            schema.Properties = new Dictionary<string, JsonSchema>();
             schema.shouldRef = true;
+
+            var properties = new Dictionary<string, JsonSchema>();
+            var required = new List<string>();
 
             var fields = ty.GetFields(BindingFlags.Public|BindingFlags.Instance);
             foreach(var field in fields) {
@@ -310,6 +312,12 @@ namespace VJson.Schema
                     fieldSchema.Items = fieldItemsSchema;
                 }
 
+                var fieldItemRequired =
+                    (JsonSchemaRequired)Attribute.GetCustomAttribute(field, typeof(JsonSchemaRequired), false);
+                if (fieldItemRequired != null) {
+                    required.Add(elemName);
+                }
+
                 var fieldTypeSchema = CreateFromType(field.FieldType);
                 if (fieldTypeSchema.shouldRef) {
                     // TODO:
@@ -322,7 +330,12 @@ namespace VJson.Schema
                     }
                 }
 
-                schema.Properties.Add(elemName, fieldSchema);
+                properties.Add(elemName, fieldSchema);
+            }
+
+            schema.Properties = properties;
+            if (required.Count != 0) {
+                schema.Required = required.ToArray();
             }
 
             return schema;

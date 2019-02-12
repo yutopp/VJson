@@ -44,7 +44,7 @@ namespace VJson.Schema
                     if (!found) {
                         var actual = kind.ToString();
                         var expected = String.Join(", ", ts);
-                        var msg = state.CreateMessage("Type is not contained(Actual: {0}; Expected: {1})",
+                        var msg = state.CreateMessage("Type is not contained(Actual: {0}; Expected: [{1}])",
                                                       actual, expected);
                         return new ConstraintsViolationException(msg);
                     }
@@ -289,9 +289,9 @@ namespace VJson.Schema
                 req.IntersectWith(validated.Keys);
 
                 if (req.Count != _schema.Required.Count()) {
-                    var actual = String.Join(", ", _schema.Required.Except(req).ToArray());
+                    var actual = String.Join(", ", req.ToArray());
                     var expected = String.Join(", ", _schema.Required);
-                    var msg = state.CreateMessage("Lack of required fields(Actual: {0}; Expected: {1})",
+                    var msg = state.CreateMessage("Lack of required fields(Actual: [{0}]; Expected: [{1}])",
                                                   actual, expected);
                     return new ConstraintsViolationException(msg);
                 }
@@ -322,7 +322,7 @@ namespace VJson.Schema
                             if (intersected.Count() != deps.Count()) {
                                 var actual = String.Join(", ", deps.Except(intersected).ToArray());
                                 var expected = String.Join(", ", deps);
-                                var msg = state.CreateMessage("Dependencies assertion. Lack of depended fields for {0}(Actual: {1}; Expected: {2})",
+                                var msg = state.CreateMessage("Dependencies assertion. Lack of depended fields for {0}(Actual: [{1}]; Expected: [{2}])",
                                                               va.Key, actual, expected);
                                 return new ConstraintsViolationException(msg);
                             }

@@ -22,6 +22,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasEnumerableArgs")]
         [TestCaseSource("HasRequiredItemsArgs")]
         [TestCaseSource("HasRequiredStringArgs")]
+        [TestCaseSource("HasRequiredButIgnorableStringArgs")]
         public void ValidationTest<T>(T o, string expected)
         {
             var schema = JsonSchema.CreateFromClass<T>();
@@ -33,8 +34,16 @@ namespace VJson.Schema.UnitTests
             if (ex == null) {
                 Assert.AreEqual(null, expected, message);
             } else {
-                Assert.AreEqual(ex.Diagnosis(), expected, message);
+                Assert.AreEqual(expected, ex.Diagnosis(), message);
             }
+        }
+
+        [Test]
+        [TestCaseSource("SchemaStringArgs")]
+        public void SchemaFormatTest(Type ty, string expected)
+        {
+            var schema = JsonSchema.CreateFromType(ty);
+            Assert.AreEqual(expected, schema.ToString());
         }
 
         public class NotRequiredObject
@@ -170,6 +179,56 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 new HasRequiredString {S = ""},
                 null,
+            },
+        };
+
+        class HasRequiredButIgnorableString
+        {
+            [JsonSchemaRequired]
+            [JsonFieldIgnorable]
+            public string S;
+        }
+
+        public static object[] HasRequiredButIgnorableStringArgs = new object[] {
+            new object[] {
+                new HasRequiredButIgnorableString(),
+                "Object.: Lack of required fields(Actual: []; Expected: [S]).",
+            },
+            new object[] {
+                new HasRequiredButIgnorableString {S = ""},
+                null,
+            },
+        };
+
+
+        public static object[] SchemaStringArgs = new object[] {
+            new object[] {
+                typeof(NotRequiredObject),
+                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\",\"minimum\":1}}}",
+            },
+            new object[] {
+                typeof(NotRequiredObjectWithIgnorable),
+                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\",\"minimum\":1}}}",
+            },
+            new object[] {
+                typeof(HasDictionary),
+                "{\"type\":\"object\",\"properties\":{\"FP\":{\"type\":\"object\"}}}",
+            },
+            new object[] {
+                typeof(HasEnumerable),
+                "{\"type\":\"object\",\"properties\":{\"Fs\":{\"type\":\"array\",\"items\":{\"maximum\":1,\"minimum\":0}},\"Os\":{\"type\":\"array\"},\"FsList\":{\"type\":\"array\"},\"OsList\":{\"type\":\"array\"}}}",
+            },
+            new object[] {
+                typeof(HasRequiredItems),
+                "{\"type\":\"object\",\"required\":[\"Xs\"],\"properties\":{\"Xs\":{\"type\":\"array\",\"items\":{\"minimum\":0},\"minItems\":1}}}",
+            },
+            new object[] {
+                typeof(HasRequiredString),
+                "{\"type\":\"object\",\"required\":[\"S\"],\"properties\":{\"S\":{\"type\":\"string\"}}}",
+            },
+            new object[] {
+                typeof(HasRequiredButIgnorableString),
+                "{\"type\":\"object\",\"required\":[\"S\"],\"properties\":{\"S\":{\"type\":\"string\"}}}",
             },
         };
     }
