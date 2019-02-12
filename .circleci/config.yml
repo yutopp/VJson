@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  codecov: codecov/codecov@1.0.2
 jobs:
   test_net35:
     docker:
@@ -36,14 +38,12 @@ jobs:
     working_directory: ~/workspace-netcoreapp2_0
     steps:
       - checkout
-      - run: curl -s https://codecov.io/bash > codecov
-      - run: chmod +x codecov
-      - run: mkdir coverage
       - run: apt-get update -yy && apt-get install -yy make git
       - run: dotnet add VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj package coverlet.msbuild
       - run: make setup
       - run: make coverage-netcore20
-      - run: ./codecov -f coverage/lcov.info
+      - codecov/upload:
+          file: VJson.standalone/VJson.Editor.Tests/lcov.info
 
 workflows:
   version: 2

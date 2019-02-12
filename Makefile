@@ -56,4 +56,3 @@ test-netcore20: build-debug-netcore20
 .PHONY: coverage-netcore20
 coverage-netcore20: build-debug-netcore20
 	dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput='./lcov.info' VJson.standalone/VJson.Editor.Tests/VJson.Editor.Tests.csproj -f netcoreapp2.0
-	cp VJson.standalone/VJson.Editor.Tests/lcov.info coverage/.
