@@ -36,6 +36,11 @@ namespace VJson
 
         public static IEnumerable<KeyValuePair<string, object>> ToKeyValues(object o)
         {
+            return ToKeyValuesUnordered(o).OrderBy(kv => kv.Key);
+        }
+
+        public static IEnumerable<KeyValuePair<string, object>> ToKeyValuesUnordered(object o)
+        {
             var ty = o.GetType();
             if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
                 var keyType = ty.GetGenericArguments()[0];

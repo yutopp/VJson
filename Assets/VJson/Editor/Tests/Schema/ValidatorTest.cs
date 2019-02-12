@@ -204,31 +204,31 @@ namespace VJson.Schema.UnitTests
         public static object[] SchemaStringArgs = new object[] {
             new object[] {
                 typeof(NotRequiredObject),
-                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\",\"minimum\":1}}}",
+                "{\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
             },
             new object[] {
                 typeof(NotRequiredObjectWithIgnorable),
-                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\",\"minimum\":1}}}",
+                "{\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
             },
             new object[] {
                 typeof(HasDictionary),
-                "{\"type\":\"object\",\"properties\":{\"FP\":{\"type\":\"object\"}}}",
+                "{\"properties\":{\"FP\":{\"type\":\"object\"}},\"type\":\"object\"}",
             },
             new object[] {
                 typeof(HasEnumerable),
-                "{\"type\":\"object\",\"properties\":{\"Fs\":{\"type\":\"array\",\"items\":{\"maximum\":1,\"minimum\":0}},\"Os\":{\"type\":\"array\"},\"FsList\":{\"type\":\"array\"},\"OsList\":{\"type\":\"array\"}}}",
+                "{\"properties\":{\"Fs\":{\"items\":{\"maximum\":1,\"minimum\":0},\"type\":\"array\"},\"FsList\":{\"type\":\"array\"},\"Os\":{\"type\":\"array\"},\"OsList\":{\"type\":\"array\"}},\"type\":\"object\"}",
             },
             new object[] {
                 typeof(HasRequiredItems),
-                "{\"type\":\"object\",\"required\":[\"Xs\"],\"properties\":{\"Xs\":{\"type\":\"array\",\"items\":{\"minimum\":0},\"minItems\":1}}}",
+                "{\"properties\":{\"Xs\":{\"items\":{\"minimum\":0},\"minItems\":1,\"type\":\"array\"}},\"required\":[\"Xs\"],\"type\":\"object\"}",
             },
             new object[] {
                 typeof(HasRequiredString),
-                "{\"type\":\"object\",\"required\":[\"S\"],\"properties\":{\"S\":{\"type\":\"string\"}}}",
+                "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
             },
             new object[] {
                 typeof(HasRequiredButIgnorableString),
-                "{\"type\":\"object\",\"required\":[\"S\"],\"properties\":{\"S\":{\"type\":\"string\"}}}",
+                "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
             },
         };
     }
