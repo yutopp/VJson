@@ -24,6 +24,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasRequiredStringArgs")]
         [TestCaseSource("HasRequiredButIgnorableStringArgs")]
         [TestCaseSource("HasDepsArgs")]
+        [TestCaseSource("HasNestedArgs")]
         public void ValidationTest<T>(T o, string expectedMsg)
         {
             var schema = JsonSchema.CreateFromClass<T>();
@@ -48,6 +49,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasRequiredStringArgs")]
         [TestCaseSource("HasRequiredButIgnorableStringArgs")]
         [TestCaseSource("HasDepsArgs")]
+        [TestCaseSource("HasNestedArgs")]
         public void SerializationTest<T>(T o, string expected)
         {
             /*
@@ -73,6 +75,7 @@ namespace VJson.Schema.UnitTests
             Assert.AreEqual(expected, schema.ToString());
         }
 
+        [JsonSchema(Id = "not_required_object.json")]
         public class NotRequiredObject
         {
             [JsonSchema(Minimum = 1)]
@@ -248,10 +251,43 @@ namespace VJson.Schema.UnitTests
             },
         };
 
+        public class HasNestedChild
+        {
+            [JsonSchema(MinLength=1)]
+            public string X;
+        }
+
+        public class HasNested
+        {
+            [JsonSchemaRequired]
+            public HasNestedChild C;
+        }
+
+        public static object[] HasNestedArgs = new object[] {
+            new object[] {
+                new HasNested(),
+                "Object.Property.[\"C\"]: Type is not matched(Actual: Null; Expected: object).",
+            },
+            new object[] {
+                new HasNested() {
+                    C = new HasNestedChild(),
+                },
+                "Object.Property.Object.Property.[\"C\"][\"X\"]: Type is not matched(Actual: Null; Expected: string).",
+            },
+            new object[] {
+                new HasNested() {
+                    C = new HasNestedChild {
+                        X = "",
+                    },
+                },
+                "Object.Property.Object.Property.String.[\"C\"][\"X\"]: MinLength assertion !(0 >= 1).",
+            },
+        };
+
         public static object[] SchemaStringArgs = new object[] {
             new object[] {
                 typeof(NotRequiredObject),
-                "{\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
+                "{\"$id\":\"not_required_object.json\",\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
             },
             new object[] {
                 typeof(NotRequiredObjectWithIgnorable),
@@ -280,6 +316,10 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 typeof(HasDeps),
                 "{\"dependencies\":{\"Y\":[\"X\"]},\"properties\":{\"X\":{\"minimum\":0,\"type\":\"integer\"},\"Y\":{\"type\":\"integer\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(HasNested),
+                "{\"properties\":{\"C\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+HasNestedChild\"}},\"required\":[\"C\"],\"type\":\"object\"}",
             },
         };
     }

@@ -22,11 +22,25 @@ namespace VJson.Schema
             _schema = j;
         }
 
-        public ConstraintsViolationException Validate(object o) {
-            return Validate(o, new State());
+        public ConstraintsViolationException Validate(object o, JsonSchemaRegistory reg = null)
+        {
+            return Validate(o, new State(), reg);
         }
 
-        internal ConstraintsViolationException Validate(object o, State state) {
+        internal ConstraintsViolationException Validate(object o, State state, JsonSchemaRegistory reg)
+        {
+            if (_schema.Ref != null) {
+                if (reg == null) {
+                    reg = JsonSchemaRegistory.GetDefault();
+                }
+                var schema = reg.Resolve(_schema.Ref);
+                if (schema == null) {
+                    // TODO:
+                    throw new NotSupportedException();
+                }
+                return schema.Validate(o, state, reg);
+            }
+
             ConstraintsViolationException ex = null;
 
             var kind = Node.KindOfValue(o);
@@ -76,7 +90,7 @@ namespace VJson.Schema
             }
 
             if (_schema.Not != null) {
-                ex = _schema.Not.Validate(o, state);
+                ex = _schema.Not.Validate(o, state, reg);
                 if (ex == null) {
                     return new ConstraintsViolationException("Not", ex);
                 }
@@ -88,7 +102,7 @@ namespace VJson.Schema
 
                 case NodeKind.Float:
                 case NodeKind.Integer:
-                    ex = ValidateNumber(Convert.ToDouble(o), state);
+                    ex = ValidateNumber(Convert.ToDouble(o), state, reg);
 
                     if (ex != null) {
                         return new ConstraintsViolationException("Number", ex);
@@ -96,21 +110,21 @@ namespace VJson.Schema
                     break;
 
                 case NodeKind.String:
-                    ex = ValidateString((string)o, state);
+                    ex = ValidateString((string)o, state, reg);
                     if (ex != null) {
                         return new ConstraintsViolationException("String", ex);
                     }
                     break;
 
                 case NodeKind.Array:
-                    ex = ValidateArray(TypeHelper.ToIEnumerable(o), state);
+                    ex = ValidateArray(TypeHelper.ToIEnumerable(o), state, reg);
                     if (ex != null) {
                         return new ConstraintsViolationException("Array", ex);
                     }
                     break;
 
                 case NodeKind.Object:
-                    ex = ValidateObject(o, state);
+                    ex = ValidateObject(o, state, reg);
                     if (ex != null) {
                         return new ConstraintsViolationException("Object", ex);
                     }
@@ -126,7 +140,8 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateNumber(double v, State state) {
+        ConstraintsViolationException ValidateNumber(double v, State state, JsonSchemaRegistory reg)
+        {
             if (_schema.MultipleOf != double.MinValue) {
                 throw new NotImplementedException();
             }
@@ -166,7 +181,8 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateString(string v, State state) {
+        ConstraintsViolationException ValidateString(string v, State state, JsonSchemaRegistory reg)
+        {
             StringInfo si = null;
 
             if (_schema.MaxLength != int.MinValue) {
@@ -198,7 +214,8 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateArray(IEnumerable<object> v, State state) {
+        ConstraintsViolationException ValidateArray(IEnumerable<object> v, State state, JsonSchemaRegistory reg)
+        {
             var length = v.Count();
 
             if (_schema.MaxItems != int.MinValue) {
@@ -234,7 +251,7 @@ namespace VJson.Schema
                             continue;
                         }
 
-                        var ex = itemSchema.Validate(elem, state.NestAsElem(i));
+                        var ex = itemSchema.Validate(elem, state.NestAsElem(i), reg);
                         if (ex != null) {
                             return new ConstraintsViolationException("Items", ex);
                         }
@@ -246,7 +263,7 @@ namespace VJson.Schema
                     var itemSchema = (JsonSchema)_schema.Items;
                     var i = 0;
                     foreach(var elem in v) {
-                        var ex = itemSchema.Validate(elem, state.NestAsElem(i));
+                        var ex = itemSchema.Validate(elem, state.NestAsElem(i), reg);
                         if (ex != null) {
                             return new ConstraintsViolationException("Items", ex);
                         }
@@ -259,7 +276,7 @@ namespace VJson.Schema
             if (_schema.AdditionalItems != null) {
                 if (extraItems != null) {
                     foreach(var elem in extraItems) {
-                        var ex = _schema.AdditionalItems.Validate(elem, state);
+                        var ex = _schema.AdditionalItems.Validate(elem, state, reg);
                         if (ex != null) {
                             return new ConstraintsViolationException("AdditionalItems", ex);
                         }
@@ -270,12 +287,12 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateObject(object v, State state)
+        ConstraintsViolationException ValidateObject(object v, State state, JsonSchemaRegistory reg)
         {
             var validated = new Dictionary<string, object>();
 
             foreach(var kv in TypeHelper.ToKeyValues(v)) {
-                var ex = ValidateObjectField(kv.Key, kv.Value, state.NestAsElem(kv.Key));
+                var ex = ValidateObjectField(kv.Key, kv.Value, state.NestAsElem(kv.Key), reg);
                 if (ex != null)
                 {
                     return ex;
@@ -333,7 +350,7 @@ namespace VJson.Schema
                     foreach(var va in validated) {
                         JsonSchema ext = null;
                         if (schemaDep.TryGetValue(va.Key, out ext)) {
-                            var ex = ext.Validate(v, new State().NestAsElem(va.Key));
+                            var ex = ext.Validate(v, new State().NestAsElem(va.Key), reg);
                             if (ex != null) {
                                 // TODO:
                                 var msg = state.CreateMessage("Dependencies assertion. Failed to validation for {0}",
@@ -348,7 +365,10 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateObjectField(string key, object value, State state)
+        ConstraintsViolationException ValidateObjectField(string key,
+                                                          object value,
+                                                          State state,
+                                                          JsonSchemaRegistory reg)
         {
             var matched = false;
 
@@ -357,7 +377,7 @@ namespace VJson.Schema
                 if (_schema.Properties.TryGetValue(key, out itemSchema)) {
                     matched = true;
 
-                    var ex = itemSchema.Validate(value, state);
+                    var ex = itemSchema.Validate(value, state, reg);
                     if (ex != null) {
                         return new ConstraintsViolationException("Property", ex);
                     }
@@ -369,7 +389,7 @@ namespace VJson.Schema
                     if (Regex.IsMatch(key, pprop.Key)) {
                         matched = true;
 
-                        var ex = pprop.Value.Validate(value, state);
+                        var ex = pprop.Value.Validate(value, state, reg);
                         if (ex != null) {
                             return new ConstraintsViolationException("PatternProperties", ex);
                         }
@@ -378,7 +398,7 @@ namespace VJson.Schema
             }
 
             if (_schema.AdditionalProperties != null && !matched) {
-                var ex = _schema.AdditionalProperties.Validate(value, state);
+                var ex = _schema.AdditionalProperties.Validate(value, state, reg);
                 if (ex != null) {
                     return new ConstraintsViolationException("AdditionalProperties", ex);
                 }

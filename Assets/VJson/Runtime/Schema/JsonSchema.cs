@@ -19,6 +19,20 @@ namespace VJson.Schema
                     Inherited = false)]
     public class JsonSchema : Attribute
     {
+        #region Core
+        [JsonField(Name="$schema")]
+        [JsonFieldIgnorable]
+        public string Schema;
+
+        [JsonField(Name="$id")]
+        [JsonFieldIgnorable]
+        public string Id;
+
+        [JsonField(Name="$ref")]
+        [JsonFieldIgnorable]
+        public string Ref;
+        #endregion
+
         #region Metadata
         [JsonFieldIgnorable]
         public string Title;
@@ -188,8 +202,6 @@ namespace VJson.Schema
         }
         #endregion
 
-        private bool shouldRef = false;
-
         public JsonSchema()
         {
         }
@@ -234,12 +246,12 @@ namespace VJson.Schema
             }
         }
 
-        public static JsonSchema CreateFromClass<T>()
+        public static JsonSchema CreateFromClass<T>(JsonSchemaRegistory reg = null, bool asRef = false)
         {
-            return CreateFromType(typeof(T));
+            return CreateFromType(typeof(T), reg, asRef);
         }
 
-        public static JsonSchema CreateFromType(Type ty)
+        public static JsonSchema CreateFromType(Type ty, JsonSchemaRegistory reg = null, bool asRef = false)
         {
             var kind = Node.KindOfType(ty);
             switch (kind) {
@@ -281,12 +293,27 @@ namespace VJson.Schema
                     throw new NotImplementedException();
             }
 
+            if (reg == null) {
+                reg = JsonSchemaRegistory.GetDefault();
+            }
+
             var schema = (JsonSchema)Attribute.GetCustomAttribute(ty, typeof(JsonSchema));
             if (schema == null) {
                 schema = new JsonSchema();
             }
             schema.Type = "object";
-            schema.shouldRef = true;
+
+            var schemaId = schema.Id;
+            if (schemaId == null) {
+                schemaId = ty.ToString();
+            }
+            var refSchema = reg.Resolve(schemaId);
+            if (refSchema != null) {
+                schema = refSchema;
+                goto skip;
+            } else {
+                reg.Register(schemaId, schema);
+            }
 
             var properties = new Dictionary<string, JsonSchema>();
             var required = new List<string>();
@@ -325,10 +352,9 @@ namespace VJson.Schema
                     dependencies.Add(elemName, fieldItemDependencies.Dependencies);
                 }
 
-                var fieldTypeSchema = CreateFromType(field.FieldType);
-                if (fieldTypeSchema.shouldRef) {
-                    // TODO:
-                    throw new NotImplementedException();
+                var fieldTypeSchema = CreateFromType(field.FieldType, reg, true);
+                if (fieldTypeSchema.Ref != null) {
+                    fieldSchema = fieldTypeSchema;
 
                 } else {
                     // Update
@@ -348,6 +374,12 @@ namespace VJson.Schema
                 schema.Dependencies = dependencies;
             }
 
+        skip:
+            if (asRef) {
+                return new JsonSchema {
+                    Ref = schemaId,
+                };
+            }
             return schema;
         }
 
@@ -387,16 +419,19 @@ namespace VJson.Schema
 
     public static class JsonSchemaExtensions
     {
-        public static ConstraintsViolationException Validate(this JsonSchema j, object o)
+        public static ConstraintsViolationException Validate(this JsonSchema j,
+                                                             object o,
+                                                             JsonSchemaRegistory reg = null)
         {
-            return (new JsonSchemaValidator(j)).Validate(o);
+            return (new JsonSchemaValidator(j)).Validate(o, reg);
         }
 
         internal static ConstraintsViolationException Validate(this JsonSchema j,
                                                                object o,
-                                                               JsonSchemaValidator.State state)
+                                                               JsonSchemaValidator.State state,
+                                                               JsonSchemaRegistory reg)
         {
-            return (new JsonSchemaValidator(j)).Validate(o, state);
+            return (new JsonSchemaValidator(j)).Validate(o, state, reg);
         }
     }
 }
