@@ -14,4 +14,16 @@ namespace VJson.Schema
     public class JsonSchemaRequired : Attribute
     {
     }
+
+    [AttributeUsage(AttributeTargets.Field,
+                    Inherited = false)]
+    public class JsonSchemaDependencies : Attribute
+    {
+        public string[] Dependencies;
+
+        public JsonSchemaDependencies(string[] deps)
+        {
+            Dependencies = deps;
+        }
+    }
 }

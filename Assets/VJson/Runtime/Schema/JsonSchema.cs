@@ -290,6 +290,7 @@ namespace VJson.Schema
 
             var properties = new Dictionary<string, JsonSchema>();
             var required = new List<string>();
+            var dependencies = new Dictionary<string, string[]>();
 
             var fields = ty.GetFields(BindingFlags.Public|BindingFlags.Instance);
             foreach(var field in fields) {
@@ -299,7 +300,7 @@ namespace VJson.Schema
                 var elemName = JsonField.FieldName(attr, field);
 
                 var fieldSchema =
-                    (JsonSchema)Attribute.GetCustomAttributes(field, typeof(JsonSchema), false)
+                    (JsonSchema)Attribute.GetCustomAttributes(field, typeof(JsonSchema))
                     .Where(f => f.GetType() == typeof(JsonSchema))
                     .FirstOrDefault();
                 if (fieldSchema == null) {
@@ -307,15 +308,21 @@ namespace VJson.Schema
                 }
 
                 var fieldItemsSchema =
-                    (ItemsJsonSchema)Attribute.GetCustomAttribute(field, typeof(ItemsJsonSchema), false);
+                    (ItemsJsonSchema)Attribute.GetCustomAttribute(field, typeof(ItemsJsonSchema));
                 if (fieldItemsSchema != null) {
                     fieldSchema.Items = fieldItemsSchema;
                 }
 
                 var fieldItemRequired =
-                    (JsonSchemaRequired)Attribute.GetCustomAttribute(field, typeof(JsonSchemaRequired), false);
+                    (JsonSchemaRequired)Attribute.GetCustomAttribute(field, typeof(JsonSchemaRequired));
                 if (fieldItemRequired != null) {
                     required.Add(elemName);
+                }
+
+                var fieldItemDependencies =
+                    (JsonSchemaDependencies)Attribute.GetCustomAttribute(field, typeof(JsonSchemaDependencies));
+                if (fieldItemDependencies != null) {
+                    dependencies.Add(elemName, fieldItemDependencies.Dependencies);
                 }
 
                 var fieldTypeSchema = CreateFromType(field.FieldType);
@@ -336,6 +343,9 @@ namespace VJson.Schema
             schema.Properties = properties;
             if (required.Count != 0) {
                 schema.Required = required.ToArray();
+            }
+            if (dependencies.Count != 0) {
+                schema.Dependencies = dependencies;
             }
 
             return schema;

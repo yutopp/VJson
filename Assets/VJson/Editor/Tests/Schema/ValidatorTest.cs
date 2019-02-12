@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace VJson.Schema.UnitTests
 {
-    public class ValidatorTests
+    public class ValidatorWithSerializerTests
     {
         [Test]
         [TestCaseSource("NotRequiredObjectArgs")]
@@ -23,8 +23,34 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasRequiredItemsArgs")]
         [TestCaseSource("HasRequiredStringArgs")]
         [TestCaseSource("HasRequiredButIgnorableStringArgs")]
-        public void ValidationTest<T>(T o, string expected)
+        [TestCaseSource("HasDepsArgs")]
+        public void ValidationTest<T>(T o, string expectedMsg)
         {
+            var schema = JsonSchema.CreateFromClass<T>();
+
+            var ex = schema.Validate(o);
+
+            var message =
+                String.Format("{0} : {1}", new JsonSerializer(typeof(T)).Serialize(o), schema.ToString());
+            if (ex == null) {
+                Assert.AreEqual(null, expectedMsg, message);
+            } else {
+                Assert.AreEqual(expectedMsg, ex.Diagnosis(), message);
+            }
+        }
+
+        [Test]
+        [TestCaseSource("NotRequiredObjectArgs")]
+        [TestCaseSource("NotRequiredObjectWithIgnorableArgs")]
+        [TestCaseSource("HasDictionaryArgs")]
+        [TestCaseSource("HasEnumerableArgs")]
+        [TestCaseSource("HasRequiredItemsArgs")]
+        [TestCaseSource("HasRequiredStringArgs")]
+        [TestCaseSource("HasRequiredButIgnorableStringArgs")]
+        [TestCaseSource("HasDepsArgs")]
+        public void SerializationTest<T>(T o, string expected)
+        {
+            /*
             var schema = JsonSchema.CreateFromClass<T>();
 
             var ex = schema.Validate(o);
@@ -36,6 +62,7 @@ namespace VJson.Schema.UnitTests
             } else {
                 Assert.AreEqual(expected, ex.Diagnosis(), message);
             }
+            */
         }
 
         [Test]
@@ -200,6 +227,26 @@ namespace VJson.Schema.UnitTests
             },
         };
 
+        public class HasDeps
+        {
+            [JsonSchema(Minimum = 0)]
+            [JsonFieldIgnorable(WhenValueIs = -1)]
+            public int X;
+
+            [JsonSchemaDependencies(new string[] {"X"})]
+            public int Y;
+        }
+
+        public static object[] HasDepsArgs = new object[] {
+            new object[] {
+                new HasDeps(),
+                null,
+            },
+            new object[] {
+                new HasDeps {X = -1},
+                "Object.: Dependencies assertion. Lack of depended fields for Y(Actual: []; Expected: [X]).",
+            },
+        };
 
         public static object[] SchemaStringArgs = new object[] {
             new object[] {
@@ -229,6 +276,10 @@ namespace VJson.Schema.UnitTests
             new object[] {
                 typeof(HasRequiredButIgnorableString),
                 "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(HasDeps),
+                "{\"dependencies\":{\"Y\":[\"X\"]},\"properties\":{\"X\":{\"minimum\":0,\"type\":\"integer\"},\"Y\":{\"type\":\"integer\"}},\"type\":\"object\"}",
             },
         };
     }

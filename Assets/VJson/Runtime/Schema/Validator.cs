@@ -320,7 +320,7 @@ namespace VJson.Schema
                         if (strDep.TryGetValue(va.Key, out deps)) {
                             var intersected = ((string[])deps.Clone()).Intersect(validated.Keys);
                             if (intersected.Count() != deps.Count()) {
-                                var actual = String.Join(", ", deps.Except(intersected).ToArray());
+                                var actual = String.Join(", ", intersected.ToArray());
                                 var expected = String.Join(", ", deps);
                                 var msg = state.CreateMessage("Dependencies assertion. Lack of depended fields for {0}(Actual: [{1}]; Expected: [{2}])",
                                                               va.Key, actual, expected);
