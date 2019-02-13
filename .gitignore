@@ -58,7 +58,6 @@ crashlytics-build.properties
 #
 bin/
 .nuget/
-TestResult.xml
+test-results
 lcov.info
 codecov
-junit-results.xml

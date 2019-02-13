@@ -17,6 +17,9 @@ setup:
 setup-net: setup
 	nuget install NUnit.Console -ExcludeVersion -OutputDirectory .nuget
 
+test-results:
+	mkdir test-results
+
 # .NET Framework 3.5
 .PHONY: restore-net35
 restore-net35:
@@ -27,8 +30,8 @@ build-debug-net35: restore-net35
 	msbuild ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj /p:TargetFramework=net35
 
 .PHONY: test-net35
-test-net35: build-debug-net35
-	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net35/${PROJECT_NAME}.Editor.Tests.dll --result=junit-results.xml;transform=nunit-transforms/nunit3-junit.xslt
+test-net35: build-debug-net35 test-results
+	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net35/${PROJECT_NAME}.Editor.Tests.dll --result=test-results/results.xml;transform=nunit-transforms/nunit3-junit.xslt
 
 # .NET Framework 4.5
 .PHONY: restore-net45
@@ -40,8 +43,8 @@ build-debug-net45: restore-net45
 	msbuild ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj /p:TargetFramework=net45
 
 .PHONY: test-net45
-test-net45: build-debug-net45
-	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net45/${PROJECT_NAME}.Editor.Tests.dll --result=junit-results.xml;transform=nunit-transforms/nunit3-junit.xslt
+test-net45: build-debug-net45 test-results
+	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net45/${PROJECT_NAME}.Editor.Tests.dll --result=test-results/results.xml;transform=nunit-transforms/nunit3-junit.xslt
 
 # .NET Core 2.0
 .PHONY: restore-netcore20
@@ -53,8 +56,8 @@ build-debug-netcore20: restore-netcore20
 	dotnet build ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj -f netcoreapp2.0
 
 .PHONY: test-netcore20
-test-netcore20: build-debug-netcore20
-	dotnet test ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj -f netcoreapp2.0
+test-netcore20: build-debug-netcore20 test-results
+	dotnet test ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj -f netcoreapp2.0 -r test-results
 
 .PHONY: coverage-netcore20
 coverage-netcore20: build-debug-netcore20
