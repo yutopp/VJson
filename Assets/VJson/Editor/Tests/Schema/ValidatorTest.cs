@@ -33,9 +33,12 @@ namespace VJson.Schema.UnitTests
 
             var message =
                 String.Format("{0} : {1}", new JsonSerializer(typeof(T)).Serialize(o), schema.ToString());
-            if (ex == null) {
+            if (ex == null)
+            {
                 Assert.AreEqual(null, expectedMsg, message);
-            } else {
+            }
+            else
+            {
                 Assert.AreEqual(expectedMsg, ex.Diagnosis(), message);
             }
         }
@@ -53,7 +56,8 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasNestedArgs")]
         public void SerializationTest<T>(T o, string _expectedMsg, string expectedContent)
         {
-            if (_expectedMsg != null) {
+            if (_expectedMsg != null)
+            {
                 return;
             }
 
@@ -129,7 +133,7 @@ namespace VJson.Schema.UnitTests
         {
             [ItemsJsonSchema(Minimum = 0.0, Maximum = 1.0)]
             public float[] Fs;
-            public object[] Os = new object[] {};
+            public object[] Os = new object[] { };
 
             public List<float> FsList = new List<float>();
             public List<object> OsList = new List<object>();
@@ -240,7 +244,7 @@ namespace VJson.Schema.UnitTests
             [JsonFieldIgnorable(WhenValueIs = -1)]
             public int X;
 
-            [JsonSchemaDependencies(new string[] {"X"})]
+            [JsonSchemaDependencies(new string[] { "X" })]
             public int Y;
         }
 
@@ -259,7 +263,7 @@ namespace VJson.Schema.UnitTests
 
         public class HasNestedChild
         {
-            [JsonSchema(MinLength=1)]
+            [JsonSchema(MinLength = 1)]
             public string X;
         }
 

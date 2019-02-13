@@ -18,7 +18,8 @@ namespace VJson.Schema
     {
         JsonSchema _schema;
 
-        public JsonSchemaValidator(JsonSchema j) {
+        public JsonSchemaValidator(JsonSchema j)
+        {
             _schema = j;
         }
 
@@ -29,12 +30,15 @@ namespace VJson.Schema
 
         internal ConstraintsViolationException Validate(object o, State state, JsonSchemaRegistory reg)
         {
-            if (_schema.Ref != null) {
-                if (reg == null) {
+            if (_schema.Ref != null)
+            {
+                if (reg == null)
+                {
                     reg = JsonSchemaRegistory.GetDefault();
                 }
                 var schema = reg.Resolve(_schema.Ref);
-                if (schema == null) {
+                if (schema == null)
+                {
                     // TODO:
                     throw new NotSupportedException();
                 }
@@ -45,17 +49,22 @@ namespace VJson.Schema
 
             var kind = Node.KindOfValue(o);
 
-            if (_schema.Type != null) {
-                if (_schema.Type.GetType().IsArray) {
+            if (_schema.Type != null)
+            {
+                if (_schema.Type.GetType().IsArray)
+                {
                     var ts = (string[])_schema.Type;
                     var found = false;
-                    foreach(var t in ts) {
-                        if (ValidateKind(kind, t)) {
+                    foreach (var t in ts)
+                    {
+                        if (ValidateKind(kind, t))
+                        {
                             found = true;
                             break;
                         }
                     }
-                    if (!found) {
+                    if (!found)
+                    {
                         var actual = kind.ToString();
                         var expected = String.Join(", ", ts);
                         var msg = state.CreateMessage("Type is not contained(Actual: {0}; Expected: [{1}])",
@@ -63,9 +72,12 @@ namespace VJson.Schema
                         return new ConstraintsViolationException(msg);
                     }
 
-                } else {
+                }
+                else
+                {
                     var t = (string)_schema.Type;
-                    if (!ValidateKind(kind, t)) {
+                    if (!ValidateKind(kind, t))
+                    {
                         var actual = kind.ToString();
                         var expected = t.ToString();
                         var msg = state.CreateMessage("Type is not matched(Actual: {0}; Expected: {1})",
@@ -75,28 +87,35 @@ namespace VJson.Schema
                 }
             }
 
-            if (_schema.Enum != null) {
+            if (_schema.Enum != null)
+            {
                 var found = false;
-                foreach(var e in _schema.Enum) {
-                    if (TypeHelper.DeepEquals(o, e)) {
+                foreach (var e in _schema.Enum)
+                {
+                    if (TypeHelper.DeepEquals(o, e))
+                    {
                         found = true;
                         break;
                     }
                 }
-                if (!found) {
+                if (!found)
+                {
                     var msg = state.CreateMessage("Enum is not matched");
                     return new ConstraintsViolationException(msg);
                 }
             }
 
-            if (_schema.Not != null) {
+            if (_schema.Not != null)
+            {
                 ex = _schema.Not.Validate(o, state, reg);
-                if (ex == null) {
+                if (ex == null)
+                {
                     return new ConstraintsViolationException("Not", ex);
                 }
             }
 
-            switch(kind) {
+            switch (kind)
+            {
                 case NodeKind.Boolean:
                     break;
 
@@ -104,28 +123,32 @@ namespace VJson.Schema
                 case NodeKind.Integer:
                     ex = ValidateNumber(Convert.ToDouble(o), state, reg);
 
-                    if (ex != null) {
+                    if (ex != null)
+                    {
                         return new ConstraintsViolationException("Number", ex);
                     }
                     break;
 
                 case NodeKind.String:
                     ex = ValidateString((string)o, state, reg);
-                    if (ex != null) {
+                    if (ex != null)
+                    {
                         return new ConstraintsViolationException("String", ex);
                     }
                     break;
 
                 case NodeKind.Array:
                     ex = ValidateArray(TypeHelper.ToIEnumerable(o), state, reg);
-                    if (ex != null) {
+                    if (ex != null)
+                    {
                         return new ConstraintsViolationException("Array", ex);
                     }
                     break;
 
                 case NodeKind.Object:
                     ex = ValidateObject(o, state, reg);
-                    if (ex != null) {
+                    if (ex != null)
+                    {
                         return new ConstraintsViolationException("Object", ex);
                     }
                     break;
@@ -142,36 +165,45 @@ namespace VJson.Schema
 
         ConstraintsViolationException ValidateNumber(double v, State state, JsonSchemaRegistory reg)
         {
-            if (_schema.MultipleOf != double.MinValue) {
+            if (_schema.MultipleOf != double.MinValue)
+            {
                 throw new NotImplementedException();
             }
 
-            if (_schema.Maximum != double.MinValue) {
-                if (!(v <= _schema.Maximum)) {
+            if (_schema.Maximum != double.MinValue)
+            {
+                if (!(v <= _schema.Maximum))
+                {
                     var msg = state.CreateMessage("Maximum assertion !({0} <= {1})",
                                                   v, _schema.Maximum);
                     return new ConstraintsViolationException(msg);
                 }
             }
 
-            if (_schema.ExclusiveMaximum != double.MinValue) {
-                if (!(v < _schema.ExclusiveMaximum)) {
+            if (_schema.ExclusiveMaximum != double.MinValue)
+            {
+                if (!(v < _schema.ExclusiveMaximum))
+                {
                     var msg = state.CreateMessage("ExclusiveMaximum assertion !({0} < {1})",
                                                   v, _schema.ExclusiveMaximum);
                     return new ConstraintsViolationException(msg);
                 }
             }
 
-            if (_schema.Minimum != double.MaxValue) {
-                if (!(v >= _schema.Minimum)) {
+            if (_schema.Minimum != double.MaxValue)
+            {
+                if (!(v >= _schema.Minimum))
+                {
                     var msg = state.CreateMessage("Minimum assertion !({0} >= {1})",
                                                   v, _schema.Minimum);
                     return new ConstraintsViolationException(msg);
                 }
             }
 
-            if (_schema.ExclusiveMinimum != double.MaxValue) {
-                if (!(v > _schema.ExclusiveMinimum)) {
+            if (_schema.ExclusiveMinimum != double.MaxValue)
+            {
+                if (!(v > _schema.ExclusiveMinimum))
+                {
                     var msg = state.CreateMessage("ExclusiveMinimum assertion !({0} > {1})",
                                                   v, _schema.ExclusiveMinimum);
                     return new ConstraintsViolationException(msg);
@@ -185,26 +217,32 @@ namespace VJson.Schema
         {
             StringInfo si = null;
 
-            if (_schema.MaxLength != int.MinValue) {
+            if (_schema.MaxLength != int.MinValue)
+            {
                 si = si ?? new StringInfo(v);
-                if (!(si.LengthInTextElements <= _schema.MaxLength)) {
+                if (!(si.LengthInTextElements <= _schema.MaxLength))
+                {
                     var msg = state.CreateMessage("MaxLength assertion !({0} <= {1})",
                                                   si.LengthInTextElements, _schema.MaxLength);
                     return new ConstraintsViolationException(msg);
                 }
             }
 
-            if (_schema.MinLength != int.MaxValue) {
+            if (_schema.MinLength != int.MaxValue)
+            {
                 si = si ?? new StringInfo(v);
-                if (!(si.LengthInTextElements >= _schema.MinLength)) {
+                if (!(si.LengthInTextElements >= _schema.MinLength))
+                {
                     var msg = state.CreateMessage("MinLength assertion !({0} >= {1})",
                                                   si.LengthInTextElements, _schema.MinLength);
                     return new ConstraintsViolationException(msg);
                 }
             }
 
-            if (_schema.Pattern != null) {
-                if (!Regex.IsMatch(v, _schema.Pattern)) {
+            if (_schema.Pattern != null)
+            {
+                if (!Regex.IsMatch(v, _schema.Pattern))
+                {
                     var msg = state.CreateMessage("Pattern assertion !(\"{0}\" matched \"{1}\")",
                                                   v, _schema.Pattern);
                     return new ConstraintsViolationException(msg);
@@ -218,16 +256,20 @@ namespace VJson.Schema
         {
             var length = v.Count();
 
-            if (_schema.MaxItems != int.MinValue) {
-                if (!(length <= _schema.MaxItems)) {
+            if (_schema.MaxItems != int.MinValue)
+            {
+                if (!(length <= _schema.MaxItems))
+                {
                     var msg = state.CreateMessage("MaxItems assertion !({0} <= {1})",
                                                   length, _schema.MaxItems);
                     return new ConstraintsViolationException(msg);
                 }
             }
 
-            if (_schema.MinItems != int.MaxValue) {
-                if (!(length >= _schema.MinItems)) {
+            if (_schema.MinItems != int.MaxValue)
+            {
+                if (!(length >= _schema.MinItems))
+                {
                     var msg = state.CreateMessage("MinItems assertion !({0} >= {1})",
                                                   length, _schema.MinItems);
                     return new ConstraintsViolationException(msg);
@@ -236,15 +278,20 @@ namespace VJson.Schema
 
             List<object> extraItems = null;
 
-            if (_schema.Items != null) {
-                if (_schema.Items.GetType().IsArray) {
+            if (_schema.Items != null)
+            {
+                if (_schema.Items.GetType().IsArray)
+                {
                     var itemSchemas = (JsonSchema[])_schema.Items;
 
                     var i = 0;
-                    foreach(var elem in v) {
+                    foreach (var elem in v)
+                    {
                         var itemSchema = itemSchemas.ElementAtOrDefault(i);
-                        if (itemSchema == null) {
-                            if (extraItems == null) {
+                        if (itemSchema == null)
+                        {
+                            if (extraItems == null)
+                            {
                                 extraItems = new List<object>();
                             }
                             extraItems.Add(elem);
@@ -252,19 +299,24 @@ namespace VJson.Schema
                         }
 
                         var ex = itemSchema.Validate(elem, state.NestAsElem(i), reg);
-                        if (ex != null) {
+                        if (ex != null)
+                        {
                             return new ConstraintsViolationException("Items", ex);
                         }
 
                         ++i;
                     }
 
-                } else {
+                }
+                else
+                {
                     var itemSchema = (JsonSchema)_schema.Items;
                     var i = 0;
-                    foreach(var elem in v) {
+                    foreach (var elem in v)
+                    {
                         var ex = itemSchema.Validate(elem, state.NestAsElem(i), reg);
-                        if (ex != null) {
+                        if (ex != null)
+                        {
                             return new ConstraintsViolationException("Items", ex);
                         }
 
@@ -273,11 +325,15 @@ namespace VJson.Schema
                 }
             }
 
-            if (_schema.AdditionalItems != null) {
-                if (extraItems != null) {
-                    foreach(var elem in extraItems) {
+            if (_schema.AdditionalItems != null)
+            {
+                if (extraItems != null)
+                {
+                    foreach (var elem in extraItems)
+                    {
                         var ex = _schema.AdditionalItems.Validate(elem, state, reg);
-                        if (ex != null) {
+                        if (ex != null)
+                        {
                             return new ConstraintsViolationException("AdditionalItems", ex);
                         }
                     }
@@ -291,7 +347,8 @@ namespace VJson.Schema
         {
             var validated = new Dictionary<string, object>();
 
-            foreach(var kv in TypeHelper.ToKeyValues(v)) {
+            foreach (var kv in TypeHelper.ToKeyValues(v))
+            {
                 var ex = ValidateObjectField(kv.Key, kv.Value, state.NestAsElem(kv.Key), reg);
                 if (ex != null)
                 {
@@ -301,11 +358,13 @@ namespace VJson.Schema
                 validated.Add(kv.Key, kv.Value);
             }
 
-            if (_schema.Required != null) {
+            if (_schema.Required != null)
+            {
                 var req = new HashSet<string>(_schema.Required);
                 req.IntersectWith(validated.Keys);
 
-                if (req.Count != _schema.Required.Count()) {
+                if (req.Count != _schema.Required.Count())
+                {
                     var actual = String.Join(", ", req.ToArray());
                     var expected = String.Join(", ", _schema.Required);
                     var msg = state.CreateMessage("Lack of required fields(Actual: [{0}]; Expected: [{1}])",
@@ -314,16 +373,20 @@ namespace VJson.Schema
                 }
             }
 
-            if (_schema.MaxProperties != int.MinValue) {
-                if (!(validated.Count <= _schema.MaxProperties)) {
+            if (_schema.MaxProperties != int.MinValue)
+            {
+                if (!(validated.Count <= _schema.MaxProperties))
+                {
                     var msg = state.CreateMessage("MaxProperties assertion !({0} <= {1})",
                                                   validated.Count, _schema.MaxProperties);
                     return new ConstraintsViolationException(msg);
                 }
             }
 
-            if (_schema.MinProperties != int.MaxValue) {
-                if (!(validated.Count >= _schema.MinProperties)) {
+            if (_schema.MinProperties != int.MaxValue)
+            {
+                if (!(validated.Count >= _schema.MinProperties))
+                {
                     var msg = state.CreateMessage("MaxProperties assertion !({0} >= {1})",
                                                   validated.Count, _schema.MinProperties);
                     return new ConstraintsViolationException(msg);
@@ -333,12 +396,16 @@ namespace VJson.Schema
             if (_schema.Dependencies != null)
             {
                 var strDep = _schema.Dependencies as Dictionary<string, string[]>;
-                if (strDep != null) {
-                    foreach(var va in validated) {
+                if (strDep != null)
+                {
+                    foreach (var va in validated)
+                    {
                         string[] deps = null;
-                        if (strDep.TryGetValue(va.Key, out deps)) {
+                        if (strDep.TryGetValue(va.Key, out deps))
+                        {
                             var intersected = ((string[])deps.Clone()).Intersect(validated.Keys);
-                            if (intersected.Count() != deps.Count()) {
+                            if (intersected.Count() != deps.Count())
+                            {
                                 var actual = String.Join(", ", intersected.ToArray());
                                 var expected = String.Join(", ", deps);
                                 var msg = state.CreateMessage("Dependencies assertion. Lack of depended fields for {0}(Actual: [{1}]; Expected: [{2}])",
@@ -351,12 +418,16 @@ namespace VJson.Schema
                 }
 
                 var schemaDep = _schema.Dependencies as Dictionary<string, JsonSchema>;
-                if (schemaDep != null) {
-                    foreach(var va in validated) {
+                if (schemaDep != null)
+                {
+                    foreach (var va in validated)
+                    {
                         JsonSchema ext = null;
-                        if (schemaDep.TryGetValue(va.Key, out ext)) {
+                        if (schemaDep.TryGetValue(va.Key, out ext))
+                        {
                             var ex = ext.Validate(v, new State().NestAsElem(va.Key), reg);
-                            if (ex != null) {
+                            if (ex != null)
+                            {
                                 // TODO:
                                 var msg = state.CreateMessage("Dependencies assertion. Failed to validation for {0}",
                                                               va.Key);
@@ -380,34 +451,43 @@ namespace VJson.Schema
         {
             var matched = false;
 
-            if (_schema.Properties != null) {
+            if (_schema.Properties != null)
+            {
                 JsonSchema itemSchema = null;
-                if (_schema.Properties.TryGetValue(key, out itemSchema)) {
+                if (_schema.Properties.TryGetValue(key, out itemSchema))
+                {
                     matched = true;
 
                     var ex = itemSchema.Validate(value, state, reg);
-                    if (ex != null) {
+                    if (ex != null)
+                    {
                         return new ConstraintsViolationException("Property", ex);
                     }
                 }
             }
 
-            if (_schema.PatternProperties != null) {
-                foreach(var pprop in _schema.PatternProperties) {
-                    if (Regex.IsMatch(key, pprop.Key)) {
+            if (_schema.PatternProperties != null)
+            {
+                foreach (var pprop in _schema.PatternProperties)
+                {
+                    if (Regex.IsMatch(key, pprop.Key))
+                    {
                         matched = true;
 
                         var ex = pprop.Value.Validate(value, state, reg);
-                        if (ex != null) {
+                        if (ex != null)
+                        {
                             return new ConstraintsViolationException("PatternProperties", ex);
                         }
                     }
                 }
             }
 
-            if (_schema.AdditionalProperties != null && !matched) {
+            if (_schema.AdditionalProperties != null && !matched)
+            {
                 var ex = _schema.AdditionalProperties.Validate(value, state, reg);
-                if (ex != null) {
+                if (ex != null)
+                {
                     return new ConstraintsViolationException("AdditionalProperties", ex);
                 }
             }
@@ -454,14 +534,16 @@ namespace VJson.Schema
 
             internal State NestAsElem(int elem)
             {
-                return new State() {
+                return new State()
+                {
                     _elemName = String.Format("{0}[{1}]", _elemName, elem),
                 };
             }
 
             internal State NestAsElem(string elem)
             {
-                return new State() {
+                return new State()
+                {
                     _elemName = String.Format("{0}[\"{1}\"]", _elemName, elem),
                 };
             }
@@ -487,12 +569,13 @@ namespace VJson.Schema
 
         public string Diagnosis()
         {
-            return DiagnosisAcc(new List<string>() {Message});
+            return DiagnosisAcc(new List<string>() { Message });
         }
 
         string DiagnosisAcc(List<string> acc)
         {
-            if (InnerException != null) {
+            if (InnerException != null)
+            {
                 var inner = (ConstraintsViolationException)InnerException;
                 acc.Add(inner.Message);
                 return inner.DiagnosisAcc(acc);

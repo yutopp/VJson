@@ -9,9 +9,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 
-namespace VJson {
+namespace VJson
+{
     public class JsonDeserializer
     {
         private Type _expectedInitialType = null;
@@ -31,7 +31,8 @@ namespace VJson {
 
         public object Deserialize(string text)
         {
-            using(var textReader = new StringReader(text)) {
+            using (var textReader = new StringReader(text))
+            {
                 return Deserialize(textReader);
             }
         }
@@ -73,15 +74,18 @@ namespace VJson {
 
         object DeserializeToBoolean(INode node, NodeKind targetKind, Type targetType)
         {
-            if (node is NullNode) {
-                if (!(targetType is object)) {
+            if (node is NullNode)
+            {
+                if (!(targetType is object))
+                {
                     throw new NotImplementedException();
                 }
                 return null;
             }
 
             var bNode = node as BooleanNode;
-            if (bNode != null) {
+            if (bNode != null)
+            {
                 return CreateInstanceIfConstrucutable<bool>(targetType, bNode.Value);
             }
 
@@ -91,19 +95,22 @@ namespace VJson {
 
         object DeserializeToNumber(INode node, NodeKind targetKind, Type targetType)
         {
-            if (node is NullNode) {
+            if (node is NullNode)
+            {
                 // TODO: type check of targetType
                 return default(int);
             }
 
             var iNode = node as IntegerNode;
-            if (iNode != null) {
+            if (iNode != null)
+            {
                 // TODO: type check of targetType
                 return iNode.Value;
             }
 
             var fNode = node as FloatNode;
-            if (fNode != null) {
+            if (fNode != null)
+            {
                 // TODO: type check of targetType
                 return fNode.Value;
             }
@@ -114,13 +121,15 @@ namespace VJson {
 
         object DeserializeToString(INode node, NodeKind targetKind, Type targetType)
         {
-            if (node is NullNode) {
+            if (node is NullNode)
+            {
                 // TODO: type check of targetType
                 return default(string);
             }
 
             var sNode = node as StringNode;
-            if (sNode != null) {
+            if (sNode != null)
+            {
                 // TODO: type check of targetType
                 return sNode.Value;
             }
@@ -136,36 +145,44 @@ namespace VJson {
                 || (targetType.IsArray)
                 || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(List<>))
                 ;
-            if (!isConvertible) {
+            if (!isConvertible)
+            {
                 // TODO: raise suitable errors
                 throw new NotImplementedException();
             }
 
-            if (node is NullNode) {
+            if (node is NullNode)
+            {
                 return null;
             }
 
             var aNode = node as ArrayNode;
-            if (aNode != null) {
-                if (targetType.IsArray || targetType == typeof(object)) {
+            if (aNode != null)
+            {
+                if (targetType.IsArray || targetType == typeof(object))
+                {
                     // To Array
                     var conteinerTy = targetType;
-                    if (conteinerTy == typeof(object)) {
+                    if (conteinerTy == typeof(object))
+                    {
                         conteinerTy = typeof(object[]);
                     }
 
                     var len = aNode.Elems != null ? aNode.Elems.Count : 0;
-                    var container = (Array)Activator.CreateInstance(conteinerTy, new object[] {len});
+                    var container = (Array)Activator.CreateInstance(conteinerTy, new object[] { len });
 
                     var elemType = conteinerTy.GetElementType();
-                    for(int i=0; i<len; ++i) {
+                    for (int i = 0; i < len; ++i)
+                    {
                         var v = DeserializeValue(aNode.Elems[i], elemType);
                         container.SetValue(v, i);
                     }
 
                     return container;
 
-                } else {
+                }
+                else
+                {
                     // To List
                     var conteinerTy = targetType;
 
@@ -173,7 +190,8 @@ namespace VJson {
                     var container = (IList)Activator.CreateInstance(conteinerTy);
 
                     var elemType = conteinerTy.GetGenericArguments()[0];
-                    for(int i=0; i<len; ++i) {
+                    for (int i = 0; i < len; ++i)
+                    {
                         var v = DeserializeValue(aNode.Elems[i], elemType);
                         container.Add(v);
                     }
@@ -188,41 +206,49 @@ namespace VJson {
 
         object DeserializeToObject(INode node, NodeKind targetKind, Type targetType)
         {
-            if (targetKind != NodeKind.Object) {
+            if (targetKind != NodeKind.Object)
+            {
                 // TODO: raise suitable errors
                 throw new NotImplementedException();
             }
 
-            if (node is NullNode) {
+            if (node is NullNode)
+            {
                 return null;
             }
 
             var oNode = node as ObjectNode;
-            if (oNode != null) {
+            if (oNode != null)
+            {
                 bool asDictionary =
                     targetType == typeof(object)
                     || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     ;
-                if (asDictionary) {
+                if (asDictionary)
+                {
                     // To Dictionary
                     Type containerTy = targetType;
-                    if (containerTy == typeof(object)) {
+                    if (containerTy == typeof(object))
+                    {
                         containerTy = typeof(Dictionary<string, object>);
                     }
 
                     var keyType = containerTy.GetGenericArguments()[0];
-                    if (keyType != typeof(string)) {
+                    if (keyType != typeof(string))
+                    {
                         throw new NotImplementedException();
                     }
 
                     var container = (IDictionary)Activator.CreateInstance(containerTy);
 
-                    if (oNode.Elems == null) {
+                    if (oNode.Elems == null)
+                    {
                         goto dictionaryDecoded;
                     }
 
                     var elemType = containerTy.GetGenericArguments()[1];
-                    foreach(var elem in oNode.Elems) {
+                    foreach (var elem in oNode.Elems)
+                    {
                         // TODO: duplication check
                         var v = DeserializeValue(elem.Value, elemType);
                         container.Add(elem.Key, v);
@@ -231,27 +257,33 @@ namespace VJson {
                 dictionaryDecoded:
                     return container;
 
-                } else {
+                }
+                else
+                {
                     // Mapping to the structure
 
                     // TODO: add type check
                     var container = Activator.CreateInstance(targetType);
                     var fields = targetType.GetFields();
-                    foreach(var field in fields) {
+                    foreach (var field in fields)
+                    {
                         var attr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
 
                         // TODO: duplication check
                         var elemName = JsonField.FieldName(attr, field);
 
                         INode elem = null;
-                        if (oNode.Elems == null || !oNode.Elems.TryGetValue(elemName, out elem)) {
+                        if (oNode.Elems == null || !oNode.Elems.TryGetValue(elemName, out elem))
+                        {
                             // TODO: ignore or raise errors?
                             continue;
                         }
 
-                        if (attr != null && attr.TypeHints != null) {
+                        if (attr != null && attr.TypeHints != null)
+                        {
                             bool resolved = false;
-                            foreach(var hint in attr.TypeHints) {
+                            foreach (var hint in attr.TypeHints)
+                            {
                                 var elemType = hint;
                                 try
                                 {
@@ -260,15 +292,20 @@ namespace VJson {
 
                                     resolved = true;
                                     break;
-                                } catch(Exception e) {
+                                }
+                                catch (Exception e)
+                                {
                                     // TODO: handle exceptions
                                 }
                             }
-                            if (!resolved) {
+                            if (!resolved)
+                            {
                                 throw new NotImplementedException();
                             }
 
-                        } else {
+                        }
+                        else
+                        {
                             var elemType = field.FieldType;
 
                             var v = DeserializeValue(elem, elemType);
@@ -287,7 +324,8 @@ namespace VJson {
 
         object DeserializeToNull(INode node, NodeKind targetKind, Type targetType)
         {
-            if (node is NullNode) {
+            if (node is NullNode)
+            {
                 // TODO: type check of targetType
                 return null;
             }
@@ -299,26 +337,30 @@ namespace VJson {
         static object CreateInstanceIfConstrucutable<T>(Type targetType, T value)
         {
             // Raw
-            if (targetType == typeof(T) || targetType == typeof(object)) {
+            if (targetType == typeof(T) || targetType == typeof(object))
+            {
                 return value;
             }
 
             // Try to convert value implicitly
             var attr = (Json)Attribute.GetCustomAttribute(targetType, typeof(Json));
-            if (attr == null) {
+            if (attr == null)
+            {
                 throw new NotImplementedException(targetType.ToString());
             }
 
-            if (!attr.ImplicitConstructable) {
+            if (!attr.ImplicitConstructable)
+            {
                 throw new NotImplementedException(targetType.ToString());
             }
 
-            var ctor = targetType.GetConstructor(new[] {typeof(T)});
-            if (ctor == null) {
+            var ctor = targetType.GetConstructor(new[] { typeof(T) });
+            if (ctor == null)
+            {
                 throw new NotImplementedException();
             }
 
-            return ctor.Invoke(new object[] {value});
+            return ctor.Invoke(new object[] { value });
         }
     }
 }

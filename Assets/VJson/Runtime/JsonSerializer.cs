@@ -11,7 +11,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace VJson {
+namespace VJson
+{
     public class JsonSerializer
     {
         private Type _type;
@@ -30,7 +31,8 @@ namespace VJson {
 
         public string Serialize<T>(T o)
         {
-            using(var textWriter = new StringWriter()) {
+            using (var textWriter = new StringWriter())
+            {
                 Serialize(textWriter, o);
                 return textWriter.ToString();
             }
@@ -62,15 +64,16 @@ namespace VJson {
 
         void SerializePrimitive<T>(JsonWriter writer, T o)
         {
-            var write = typeof(JsonWriter).GetMethod("WriteValue", new []{o.GetType()});
-            write.Invoke(writer, new object[] {o});
+            var write = typeof(JsonWriter).GetMethod("WriteValue", new[] { o.GetType() });
+            write.Invoke(writer, new object[] { o });
         }
 
         void SerializeArray<T>(JsonWriter writer, T o)
         {
             writer.WriteArrayStart();
 
-            foreach(var elem in TypeHelper.ToIEnumerable(o)) {
+            foreach (var elem in TypeHelper.ToIEnumerable(o))
+            {
                 SerializeValue(writer, elem);
             }
 
@@ -81,7 +84,8 @@ namespace VJson {
         {
             writer.WriteObjectStart();
 
-            foreach(var kv in TypeHelper.ToKeyValues(o)) {
+            foreach (var kv in TypeHelper.ToKeyValues(o))
+            {
                 writer.WriteObjectKey(kv.Key);
                 SerializeValue(writer, kv.Value);
             }

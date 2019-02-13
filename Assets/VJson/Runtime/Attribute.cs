@@ -25,7 +25,8 @@ namespace VJson
 
         public static string FieldName(JsonField f, FieldInfo fi)
         {
-            if (f != null && f.Name != null) {
+            if (f != null && f.Name != null)
+            {
                 return f.Name;
             }
 
@@ -41,23 +42,27 @@ namespace VJson
 
         public static bool IsIgnorable<T>(JsonFieldIgnorable f, T o)
         {
-            if (f == null) {
+            if (f == null)
+            {
                 return false;
             }
 
             // Value
-            if (Object.Equals(o, f.WhenValueIs)) {
+            if (Object.Equals(o, f.WhenValueIs))
+            {
                 return true;
             }
 
             // Length
             var a = o as Array;
-            if (a != null) {
+            if (a != null)
+            {
                 return a.Length == f.WhenLengthIs;
             }
 
             var l = o as IList;
-            if (l != null) {
+            if (l != null)
+            {
                 return l.Count == f.WhenLengthIs;
             }
 

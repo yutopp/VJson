@@ -21,16 +21,19 @@ namespace VJson.UnitTests
         public int X;
         public string Y;
 
-        public override bool Equals(object rhsObj) {
+        public override bool Equals(object rhsObj)
+        {
             var rhs = rhsObj as SomeObject;
-            if (rhs == null) {
+            if (rhs == null)
+            {
                 return false;
             }
 
             return _p == rhs._p && X == rhs.X && Y == rhs.Y;
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             throw new NotImplementedException();
         }
     }
@@ -39,61 +42,72 @@ namespace VJson.UnitTests
     {
         public bool D;
 
-        public override bool Equals(object rhsObj) {
+        public override bool Equals(object rhsObj)
+        {
             var rhs = rhsObj as DerivedSomeObject;
-            if (rhs == null) {
+            if (rhs == null)
+            {
                 return false;
             }
 
             return D == rhs.D && base.Equals(rhsObj);
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             throw new NotImplementedException();
         }
     }
 
     class CustomObject
     {
-        [JsonField(TypeHints=new Type[] {typeof(bool), typeof(SomeObject)})]
+        [JsonField(TypeHints = new Type[] { typeof(bool), typeof(SomeObject) })]
         public object Obj = default(object);
 
-        public override bool Equals(object rhsObj) {
+        public override bool Equals(object rhsObj)
+        {
             var rhs = rhsObj as CustomObject;
-            if (rhs == null) {
+            if (rhs == null)
+            {
                 return false;
             }
 
             return object.Equals(Obj, rhs.Obj);
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             throw new NotImplementedException();
         }
     }
 
     class CustomObjectHasArray
     {
-        [JsonField(TypeHints=new Type[] {typeof(SomeObject), typeof(SomeObject[])})]
+        [JsonField(TypeHints = new Type[] { typeof(SomeObject), typeof(SomeObject[]) })]
         public object Obj = default(object);
 
-        public override bool Equals(object rhsObj) {
+        public override bool Equals(object rhsObj)
+        {
             var rhs = rhsObj as CustomObjectHasArray;
-            if (rhs == null) {
+            if (rhs == null)
+            {
                 return false;
             }
 
-            if (Obj == null && rhs.Obj == null) {
+            if (Obj == null && rhs.Obj == null)
+            {
                 return true;
             }
 
-            if (Obj == null || rhs.Obj == null) {
+            if (Obj == null || rhs.Obj == null)
+            {
                 return false;
             }
 
             var lhsArr = Obj as SomeObject[];
             var rhsArr = rhs.Obj as SomeObject[];
-            if (lhsArr != null && rhsArr != null) {
+            if (lhsArr != null && rhsArr != null)
+            {
                 return lhsArr.SequenceEqual(rhsArr);
             }
 
@@ -102,26 +116,30 @@ namespace VJson.UnitTests
             return Object.Equals(lhsSgt, rhsAgt);
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             throw new NotImplementedException();
         }
     }
 
     class RenamedObject
     {
-        [JsonField(Name="renamed")]
+        [JsonField(Name = "renamed")]
         public int Actual;
 
-        public override bool Equals(object rhsObj) {
+        public override bool Equals(object rhsObj)
+        {
             var rhs = rhsObj as RenamedObject;
-            if (rhs == null) {
+            if (rhs == null)
+            {
                 return false;
             }
 
             return Actual == rhs.Actual;
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             throw new NotImplementedException();
         }
     }
@@ -134,9 +152,11 @@ namespace VJson.UnitTests
         [JsonFieldIgnorable(WhenLengthIs = 0)]
         public List<int> Ignore1;
 
-        public override bool Equals(object rhsObj) {
+        public override bool Equals(object rhsObj)
+        {
             var rhs = rhsObj as IgnorableObject;
-            if (rhs == null) {
+            if (rhs == null)
+            {
                 return false;
             }
 
@@ -145,15 +165,16 @@ namespace VJson.UnitTests
                     || Ignore1 != null && rhs.Ignore1 != null && Ignore1.SequenceEqual(rhs.Ignore1));
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             throw new NotImplementedException();
         }
     }
 
-    [Json(ImplicitConstructable=true)]
+    [Json(ImplicitConstructable = true)]
     class Hoge
     {
-        public bool B {get; private set;}
+        public bool B { get; private set; }
         public Hoge(bool b)
         {
             B = b;
@@ -169,7 +190,8 @@ namespace VJson.UnitTests
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
 
-            using(var textWriter = new StringWriter()) {
+            using (var textWriter = new StringWriter())
+            {
                 serializer.Serialize(textWriter, obj);
                 var actual = textWriter.ToString();
 
@@ -195,7 +217,8 @@ namespace VJson.UnitTests
         public void DeserializeTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            using(var textReader = new StringReader(expected)) {
+            using (var textReader = new StringReader(expected))
+            {
                 var actual = serializer.Deserialize(textReader);
 
                 Assert.AreEqual(obj, actual);
@@ -332,7 +355,8 @@ namespace VJson.UnitTests
         public void SerializeTest<E>(IEnumerable<E> obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            using(var textWriter = new StringWriter()) {
+            using (var textWriter = new StringWriter())
+            {
                 serializer.Serialize(textWriter, obj);
                 var actual = textWriter.ToString();
 
@@ -345,7 +369,8 @@ namespace VJson.UnitTests
         public void SerializeTest<K, V>(IDictionary<K, V> obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            using(var textWriter = new StringWriter()) {
+            using (var textWriter = new StringWriter())
+            {
                 serializer.Serialize(textWriter, obj);
                 var actual = textWriter.ToString();
 
@@ -358,7 +383,8 @@ namespace VJson.UnitTests
         public void DeserializeTest<E>(IEnumerable<E> expected, string json)
         {
             var serializer = new VJson.JsonSerializer(expected != null ? expected.GetType() : typeof(object));
-            using(var textReader = new StringReader(json)) {
+            using (var textReader = new StringReader(json))
+            {
                 var actual = serializer.Deserialize(textReader);
 
                 Assert.That(actual, Is.EquivalentTo(expected));
@@ -370,7 +396,8 @@ namespace VJson.UnitTests
         public void DeserializeTest<K, V>(IDictionary<K, V> expected, string json)
         {
             var serializer = new VJson.JsonSerializer(expected != null ? expected.GetType() : typeof(object));
-            using(var textReader = new StringReader(json)) {
+            using (var textReader = new StringReader(json))
+            {
                 var actual = serializer.Deserialize(textReader);
 
                 Assert.That(actual, Is.EquivalentTo(expected));
@@ -381,7 +408,8 @@ namespace VJson.UnitTests
         public void DeserializeUntypedTest<E>(IEnumerable<E> expected, string json)
         {
             var serializer = new VJson.JsonSerializer(typeof(object));
-            using(var textReader = new StringReader(json)) {
+            using (var textReader = new StringReader(json))
+            {
                 var actual = serializer.Deserialize(textReader);
 
                 Assert.That(actual, Is.EquivalentTo(expected));
@@ -392,7 +420,8 @@ namespace VJson.UnitTests
         public void DeserializeUntypedTest<K, V>(IDictionary<K, V> expected, string json)
         {
             var serializer = new VJson.JsonSerializer(typeof(object));
-            using(var textReader = new StringReader(json)) {
+            using (var textReader = new StringReader(json))
+            {
                 var actual = serializer.Deserialize(textReader);
 
                 Assert.That(actual, Is.EquivalentTo(expected));
@@ -403,7 +432,8 @@ namespace VJson.UnitTests
         public void DeserializeHasHintFieldsBoolTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(CustomObject));
-            using(var textReader = new StringReader(@"{""Obj"": true}")) {
+            using (var textReader = new StringReader(@"{""Obj"": true}"))
+            {
                 var actual = (CustomObject)serializer.Deserialize(textReader);
 
                 Assert.AreEqual(typeof(bool), actual.Obj.GetType());
@@ -415,13 +445,15 @@ namespace VJson.UnitTests
         public void DeserializeHasHintFieldsClassTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(CustomObject));
-            using(var textReader = new StringReader(@"{""Obj"": {""X"":10}}")) {
+            using (var textReader = new StringReader(@"{""Obj"": {""X"":10}}"))
+            {
                 var actual = (CustomObject)serializer.Deserialize(textReader);
 
                 Assert.AreEqual(typeof(SomeObject), actual.Obj.GetType());
-                Assert.AreEqual(new SomeObject{
-                        X = 10,
-                    }, actual.Obj);
+                Assert.AreEqual(new SomeObject
+                {
+                    X = 10,
+                }, actual.Obj);
             }
         }
 
@@ -429,14 +461,16 @@ namespace VJson.UnitTests
         public void DeserializeHasHintFieldsArrayOrSingletonSgtTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(CustomObjectHasArray));
-            using(var textReader = new StringReader(@"{""Obj"": {""X"":10}}")) {
+            using (var textReader = new StringReader(@"{""Obj"": {""X"":10}}"))
+            {
                 var actual = (CustomObjectHasArray)serializer.Deserialize(textReader);
 
                 Assert.AreEqual(typeof(SomeObject), actual.Obj.GetType());
                 Assert.That(actual.Obj,
-                            Is.EqualTo(new SomeObject {
-                                    X = 10,
-                                })
+                            Is.EqualTo(new SomeObject
+                            {
+                                X = 10,
+                            })
                             );
             }
         }
@@ -445,7 +479,8 @@ namespace VJson.UnitTests
         public void DeserializeImplicitConstructableTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(Hoge));
-            using(var textReader = new StringReader(@"true")) {
+            using (var textReader = new StringReader(@"true"))
+            {
                 var actual = (Hoge)serializer.Deserialize(textReader);
 
                 Assert.That(actual.B, Is.EqualTo(true));

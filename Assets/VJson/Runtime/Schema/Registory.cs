@@ -17,7 +17,8 @@ namespace VJson.Schema
         public JsonSchema Resolve(string id)
         {
             JsonSchema j = null;
-            if (_registory.TryGetValue(id, out j)) {
+            if (_registory.TryGetValue(id, out j))
+            {
                 return j;
             }
 

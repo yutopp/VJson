@@ -7,7 +7,7 @@
 
 namespace VJson
 {
-	public interface IValidator
-	{
-	}
+    public interface IValidator
+    {
+    }
 }

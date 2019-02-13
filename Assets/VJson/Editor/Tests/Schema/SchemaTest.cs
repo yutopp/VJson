@@ -16,17 +16,17 @@ namespace VJson.Schema.UnitTests
     //
     // http://json-schema.org/learn/miscellaneous-examples.html
     //
-    [JsonSchema(Title="Person")]
+    [JsonSchema(Title = "Person")]
     class Person
     {
-        [JsonSchema(Description="The person's first name.")]
+        [JsonSchema(Description = "The person's first name.")]
         public string firstName = default(string);
 
-        [JsonSchema(Description="The person's last name.")]
+        [JsonSchema(Description = "The person's last name.")]
         public string lastName = default(string);
 
-        [JsonSchema(Description="Age in years which must be equal to or greater than zero.",
-                    Minimum=0)]
+        [JsonSchema(Description = "Age in years which must be equal to or greater than zero.",
+                    Minimum = 0)]
         public int age = default(int);
     }
 
@@ -47,25 +47,25 @@ namespace VJson.Schema.UnitTests
 
             Assert.That(schema.Properties["firstName"],
                         Is.EqualTo(new JsonSchema
-                                {
-                                    Description = "The person's first name.",
-                                    Type = "string",
-                                })
+                        {
+                            Description = "The person's first name.",
+                            Type = "string",
+                        })
                         );
             Assert.That(schema.Properties["lastName"],
-                        Is.EqualTo( new JsonSchema
-                                {
-                                    Description = "The person's last name.",
-                                    Type = "string",
-                                })
+                        Is.EqualTo(new JsonSchema
+                        {
+                            Description = "The person's last name.",
+                            Type = "string",
+                        })
                         );
             Assert.That(schema.Properties["age"],
                         Is.EqualTo(new JsonSchema
-                                {
-                                    Description = "Age in years which must be equal to or greater than zero.",
-                                    Type = "integer",
-                                    Minimum = 0,
-                                })
+                        {
+                            Description = "Age in years which must be equal to or greater than zero.",
+                            Type = "integer",
+                            Minimum = 0,
+                        })
                         );
         }
     }
@@ -236,12 +236,15 @@ namespace VJson.Schema.UnitTests
         public void ValidationTest(string casePath)
         {
             var path = Path.Combine(Path.Combine(Path.Combine("JSON-Schema-Test-Suite", "tests"), "draft7"), casePath);
-            using(var sr = new StreamReader(path)) {
+            using (var sr = new StreamReader(path))
+            {
                 var d = new JsonSerializer(typeof(TestCase[]));
                 var cases = (TestCase[])d.Deserialize(sr);
 
-                foreach(var c in cases) {
-                    foreach(var t in c.tests) {
+                foreach (var c in cases)
+                {
+                    foreach (var t in c.tests)
+                    {
                         var ex = c.schema.Validate(t.data);
 
                         Assert.That(ex == null, Is.EqualTo(t.valid),

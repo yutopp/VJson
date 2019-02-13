@@ -15,7 +15,7 @@ namespace VJson.UnitTests
         [Test]
         public void ValueWriteTest()
         {
-            using(var textWriter = new StringWriter())
+            using (var textWriter = new StringWriter())
             {
                 var f = new JsonWriter(textWriter);
                 f.WriteValue(1);
@@ -118,7 +118,7 @@ namespace VJson.UnitTests
         [Test]
         public void SingleTest()
         {
-            using(var textWriter = new StringWriter())
+            using (var textWriter = new StringWriter())
             {
                 var f = new JsonWriter(textWriter);
                 f.WriteArrayStart();
@@ -133,7 +133,7 @@ namespace VJson.UnitTests
         [Test]
         public void MultiTest()
         {
-            using(var textWriter = new StringWriter())
+            using (var textWriter = new StringWriter())
             {
                 var f = new JsonWriter(textWriter);
                 f.WriteArrayStart();
@@ -149,7 +149,7 @@ namespace VJson.UnitTests
         [Test]
         public void NestedTest()
         {
-            using(var textWriter = new StringWriter())
+            using (var textWriter = new StringWriter())
             {
                 var f = new JsonWriter(textWriter);
                 f.WriteArrayStart();

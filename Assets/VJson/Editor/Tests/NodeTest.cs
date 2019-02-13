@@ -11,21 +11,21 @@ using NUnit.Framework;
 
 namespace VJson.UnitTests
 {
-	public class NodeKindTests
-	{
+    public class NodeKindTests
+    {
         [TestCaseSource("ValuesArgs")]
         public void KindOfValueTest<T>(T value, NodeKind expected)
-		{
-			var actual = Node.KindOfValue(value);
-			Assert.AreEqual(expected, actual);
-		}
+        {
+            var actual = Node.KindOfValue(value);
+            Assert.AreEqual(expected, actual);
+        }
 
         [Test]
         public void KindOfNullValueTest()
-		{
-			var actual = Node.KindOfValue<object>(null);
-			Assert.AreEqual(NodeKind.Null, actual);
-		}
+        {
+            var actual = Node.KindOfValue<object>(null);
+            Assert.AreEqual(NodeKind.Null, actual);
+        }
 
         public static object[] ValuesArgs = {
             new object[] { true, NodeKind.Boolean },
@@ -37,44 +37,45 @@ namespace VJson.UnitTests
             new object[] { new List<int>(), NodeKind.Array },
             new object[] { new Dictionary<string, object>(), NodeKind.Object },
         };
-	}
+    }
 
-	[TestFixtureSource("FixtureArgs")]
-	public class NodeComparisonTests
-	{
-		IntegerNode _lhs;
-		IntegerNode _rhs;
-		bool _expected;
+    [TestFixtureSource("FixtureArgs")]
+    public class NodeComparisonTests
+    {
+        IntegerNode _lhs;
+        IntegerNode _rhs;
+        bool _expected;
 
-		public NodeComparisonTests(IntegerNode lhs, IntegerNode rhs, bool expected) {
-			_lhs = lhs;
-			_rhs = rhs;
-			_expected = expected;
-		}
+        public NodeComparisonTests(IntegerNode lhs, IntegerNode rhs, bool expected)
+        {
+            _lhs = lhs;
+            _rhs = rhs;
+            _expected = expected;
+        }
 
-		public void EqualityTest()
-		{
-			var actual = _lhs.Equals(_rhs);
-			Assert.AreEqual(_expected, actual);
-		}
+        public void EqualityTest()
+        {
+            var actual = _lhs.Equals(_rhs);
+            Assert.AreEqual(_expected, actual);
+        }
 
-		//
-		static object [] FixtureArgs = {
+        //
+        static object[] FixtureArgs = {
             new object[] {
                 new IntegerNode("a"),
-             	new IntegerNode("a"),
-             	true
+                 new IntegerNode("a"),
+                 true
             },
-			new object[] {
-				new IntegerNode("a"),
-				new IntegerNode("b"),
-				false
-			},
-			new object[] {
-				new IntegerNode("a"),
-				null,
-				false
-			}
-		};
-	}
+            new object[] {
+                new IntegerNode("a"),
+                new IntegerNode("b"),
+                false
+            },
+            new object[] {
+                new IntegerNode("a"),
+                null,
+                false
+            }
+        };
+    }
 }

@@ -19,28 +19,37 @@ namespace VJson
         public static IEnumerable<object> ToIEnumerable(object o)
         {
             var ty = o.GetType();
-            if (ty.IsArray) {
-                if (ty.HasElementType && ty.GetElementType().IsClass) {
+            if (ty.IsArray)
+            {
+                if (ty.HasElementType && ty.GetElementType().IsClass)
+                {
                     return ((IEnumerable<object>)o);
-                } else {
+                }
+                else
+                {
                     return ((IEnumerable)o).Cast<object>();
                 }
-            } else {
+            }
+            else
+            {
                 return ((IEnumerable)o).Cast<object>();
             }
         }
 
         public static Type ElemTypeOfIEnumerable(Type ty)
         {
-            if (ty.IsArray) {
-                if (ty.HasElementType) {
+            if (ty.IsArray)
+            {
+                if (ty.HasElementType)
+                {
                     return ty.GetElementType();
                 }
 
                 return null;
             }
 
-            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(List<>)) {
+            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(List<>))
+            {
                 return ty.GetGenericArguments()[0];
             }
 
@@ -55,9 +64,11 @@ namespace VJson
         public static IEnumerable<KeyValuePair<string, object>> ToKeyValuesUnordered(object o)
         {
             var ty = o.GetType();
-            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
                 var keyType = ty.GetGenericArguments()[0];
-                if (keyType != typeof(string)) {
+                if (keyType != typeof(string))
+                {
                     // TODO: Should allow them and call `ToString`?
                     throw new NotImplementedException();
                 }
@@ -67,7 +78,9 @@ namespace VJson
                     yield return new KeyValuePair<string, object>((string)elem.Key, elem.Value);
                 }
 
-            } else {
+            }
+            else
+            {
                 var fields = ty.GetFields();
                 foreach (var field in fields)
                 {
@@ -79,7 +92,8 @@ namespace VJson
 
                     var fieldIgnoreAttr =
                         (JsonFieldIgnorable)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnorable));
-                    if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue)) {
+                    if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue))
+                    {
                         continue;
                     }
 
@@ -105,11 +119,13 @@ namespace VJson
         {
             var lhsKind = Node.KindOfValue(lhs);
             var rhsKind = Node.KindOfValue(rhs);
-            if (lhsKind != rhsKind) {
+            if (lhsKind != rhsKind)
+            {
                 return false;
             }
 
-            switch (lhsKind) {
+            switch (lhsKind)
+            {
                 case NodeKind.Boolean:
                 case NodeKind.Integer:
                 case NodeKind.Float:
@@ -122,20 +138,23 @@ namespace VJson
                     return lhsArr.SequenceEqual(rhsArr, new DeepEqualityComparer());
 
                 case NodeKind.Object:
-                    #if NETCOREAPP2_0
+#if NETCOREAPP2_0
                     var lhsKvs = new Dictionary<string, object>(ToKeyValues(lhs));
                     var rhsKvs = new Dictionary<string, object>(ToKeyValues(rhs));
-                    #else
+#else
                     var lhsKvs = new Dictionary<string, object>();
-                    foreach(var kv in ToKeyValues(lhs)) {
+                    foreach (var kv in ToKeyValues(lhs))
+                    {
                         lhsKvs.Add(kv.Key, kv.Value);
                     }
                     var rhsKvs = new Dictionary<string, object>();
-                    foreach(var kv in ToKeyValues(rhs)) {
+                    foreach (var kv in ToKeyValues(rhs))
+                    {
                         rhsKvs.Add(kv.Key, kv.Value);
                     }
-                    #endif
-                    if (!lhsKvs.Keys.SequenceEqual(rhsKvs.Keys)) {
+#endif
+                    if (!lhsKvs.Keys.SequenceEqual(rhsKvs.Keys))
+                    {
                         return false;
                     }
                     return lhsKvs.All(kv => DeepEquals(kv.Value, rhsKvs[kv.Key]));
