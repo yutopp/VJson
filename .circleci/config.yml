@@ -11,6 +11,8 @@ jobs:
       - run: apt-get update -yy && apt-get install -yy make git
       - run: make setup-net
       - run: make test-net35
+      - store_test_results:
+          path: .
 
   test_net45:
     docker:
@@ -21,6 +23,8 @@ jobs:
       - run: apt-get update -yy && apt-get install -yy make git
       - run: make setup-net
       - run: make test-net45
+      - store_test_results:
+          path: .
 
   test_netcoreapp2_0:
     docker:

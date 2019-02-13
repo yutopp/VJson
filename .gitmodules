@@ -4,3 +4,6 @@
 [submodule "JSON-Schema-Test-Suite"]
 	path = JSON-Schema-Test-Suite
 	url = https://github.com/json-schema-org/JSON-Schema-Test-Suite
+[submodule "nunit-transforms"]
+	path = nunit-transforms
+	url = https://github.com/nunit/nunit-transforms.git

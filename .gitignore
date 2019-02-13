@@ -61,3 +61,4 @@ bin/
 TestResult.xml
 lcov.info
 codecov
+junit-results.xml
