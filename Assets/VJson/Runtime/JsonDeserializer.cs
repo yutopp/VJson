@@ -80,7 +80,8 @@ namespace VJson {
                 return null;
             }
 
-            if (node is BooleanNode bNode) {
+            var bNode = node as BooleanNode;
+            if (bNode != null) {
                 return CreateInstanceIfConstrucutable<bool>(targetType, bNode.Value);
             }
 
@@ -95,12 +96,14 @@ namespace VJson {
                 return default(int);
             }
 
-            if (node is IntegerNode iNode) {
+            var iNode = node as IntegerNode;
+            if (iNode != null) {
                 // TODO: type check of targetType
                 return iNode.Value;
             }
 
-            if (node is FloatNode fNode) {
+            var fNode = node as FloatNode;
+            if (fNode != null) {
                 // TODO: type check of targetType
                 return fNode.Value;
             }
@@ -116,7 +119,8 @@ namespace VJson {
                 return default(string);
             }
 
-            if (node is StringNode sNode) {
+            var sNode = node as StringNode;
+            if (sNode != null) {
                 // TODO: type check of targetType
                 return sNode.Value;
             }
@@ -141,7 +145,8 @@ namespace VJson {
                 return null;
             }
 
-            if (node is ArrayNode aNode) {
+            var aNode = node as ArrayNode;
+            if (aNode != null) {
                 if (targetType.IsArray || targetType == typeof(object)) {
                     // To Array
                     var conteinerTy = targetType;
@@ -149,7 +154,7 @@ namespace VJson {
                         conteinerTy = typeof(object[]);
                     }
 
-                    var len = aNode.Elems?.Count ?? 0;
+                    var len = aNode.Elems != null ? aNode.Elems.Count : 0;
                     var container = (Array)Activator.CreateInstance(conteinerTy, new object[] {len});
 
                     var elemType = conteinerTy.GetElementType();
@@ -164,7 +169,7 @@ namespace VJson {
                     // To List
                     var conteinerTy = targetType;
 
-                    var len = aNode.Elems?.Count ?? 0;
+                    var len = aNode.Elems != null ? aNode.Elems.Count : 0;
                     var container = (IList)Activator.CreateInstance(conteinerTy);
 
                     var elemType = conteinerTy.GetGenericArguments()[0];
@@ -192,7 +197,8 @@ namespace VJson {
                 return null;
             }
 
-            if (node is ObjectNode oNode) {
+            var oNode = node as ObjectNode;
+            if (oNode != null) {
                 bool asDictionary =
                     targetType == typeof(object)
                     || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Dictionary<,>))

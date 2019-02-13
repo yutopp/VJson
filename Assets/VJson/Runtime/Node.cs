@@ -32,9 +32,12 @@ namespace VJson
 	{
 		public string Span;
 
-		public NodeKind Kind => NodeKind.Boolean;
+		public NodeKind Kind
+		{
+			get { return NodeKind.Boolean; }
+		}
 
-        public bool Value {
+		public bool Value {
             get {
                 return Boolean.Parse(Span);
             }
@@ -47,12 +50,8 @@ namespace VJson
 
 		public override bool Equals(object rhsObj)
 		{
-			if (rhsObj == null)
-			{
-				return false;
-			}
-
-			if (!(rhsObj is BooleanNode rhs))
+			var rhs = rhsObj as BooleanNode;
+			if (rhs == null)
 			{
 				return false;
 			}
@@ -73,16 +72,15 @@ namespace VJson
 
 	public class NullNode : INode
 	{
-		public NodeKind Kind => NodeKind.Null;
+		public NodeKind Kind
+		{
+			get { return NodeKind.Null; }
+		}
 
 		public override bool Equals(object rhsObj)
 		{
-			if (rhsObj == null)
-			{
-				return false;
-			}
-
-			if (!(rhsObj is NullNode rhs))
+			var rhs = rhsObj as NullNode;
+			if (rhs == null)
 			{
 				return false;
 			}
@@ -105,9 +103,12 @@ namespace VJson
 	{
 		public string Span;
 
-		public NodeKind Kind => NodeKind.Integer;
+		public NodeKind Kind
+		{
+			get { return NodeKind.Integer; }
+		}
 
-        public int Value {
+		public int Value {
             get {
                 return Int32.Parse(Span); // TODO: Fix for large numbers
             }
@@ -120,12 +121,8 @@ namespace VJson
 
 		public override bool Equals(object rhsObj)
 		{
-			if (rhsObj == null)
-			{
-				return false;
-			}
-
-			if (!(rhsObj is IntegerNode rhs))
+			var rhs = rhsObj as IntegerNode;
+			if (rhs == null)
 			{
 				return false;
 			}
@@ -148,9 +145,12 @@ namespace VJson
 	{
 		public string Span;
 
-		public NodeKind Kind => NodeKind.Float;
+		public NodeKind Kind
+		{
+			get { return NodeKind.Float; }
+		}
 
-        public float Value {
+		public float Value {
             get {
                 return Single.Parse(Span); // TODO: Fix for large numbers
             }
@@ -163,12 +163,8 @@ namespace VJson
 
 		public override bool Equals(object rhsObj)
 		{
-			if (rhsObj == null)
-			{
-				return false;
-			}
-
-			if (!(rhsObj is FloatNode rhs))
+			var rhs = rhsObj as FloatNode;
+			if (rhs == null)
 			{
 				return false;
 			}
@@ -191,9 +187,12 @@ namespace VJson
 	{
 		public string Span;
 
-		public NodeKind Kind => NodeKind.String;
+		public NodeKind Kind
+		{
+			get { return NodeKind.String; }
+		}
 
-        public string Value {
+		public string Value {
             get {
                 return Regex.Unescape(Span.Trim());
             }
@@ -206,12 +205,8 @@ namespace VJson
 
 		public override bool Equals(object rhsObj)
 		{
-			if (rhsObj == null)
-			{
-				return false;
-			}
-
-			if (!(rhsObj is StringNode rhs))
+			var rhs = rhsObj as StringNode;
+			if (rhs == null)
 			{
 				return false;
 			}
@@ -234,7 +229,10 @@ namespace VJson
 	{
 		public Dictionary<string, INode> Elems;
 
-		public NodeKind Kind => NodeKind.Object;
+		public NodeKind Kind
+		{
+			get { return NodeKind.Object; }
+		}
 
 		public void AddElement(string key, INode elem)
 		{
@@ -248,12 +246,8 @@ namespace VJson
 
 		public override bool Equals(object rhsObj)
 		{
-			if (rhsObj == null)
-			{
-				return false;
-			}
-
-			if (!(rhsObj is ObjectNode rhs))
+			var rhs = rhsObj as ObjectNode;
+			if (rhs == null)
 			{
 				return false;
 			}
@@ -291,7 +285,10 @@ namespace VJson
 	{
 		public List<INode> Elems;
 
-		public NodeKind Kind => NodeKind.Array;
+		public NodeKind Kind
+		{
+			get { return NodeKind.Array; }
+		}
 
 		public void AddElement(INode elem)
 		{
@@ -305,12 +302,8 @@ namespace VJson
 
 		public override bool Equals(object rhsObj)
 		{
-			if (rhsObj == null)
-			{
-				return false;
-			}
-
-			if (!(rhsObj is ArrayNode rhs))
+			var rhs = rhsObj as ArrayNode;
+			if (rhs == null)
 			{
 				return false;
 			}

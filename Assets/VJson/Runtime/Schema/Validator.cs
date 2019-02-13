@@ -330,8 +330,10 @@ namespace VJson.Schema
                 }
             }
 
-            if (_schema.Dependencies != null) {
-                if (_schema.Dependencies is Dictionary<string, string[]> strDep) {
+            if (_schema.Dependencies != null)
+            {
+                var strDep = _schema.Dependencies as Dictionary<string, string[]>;
+                if (strDep != null) {
                     foreach(var va in validated) {
                         string[] deps = null;
                         if (strDep.TryGetValue(va.Key, out deps)) {
@@ -345,8 +347,11 @@ namespace VJson.Schema
                             }
                         }
                     }
+                    goto depChecked;
+                }
 
-                } else if (_schema.Dependencies is Dictionary<string, JsonSchema> schemaDep) {
+                var schemaDep = _schema.Dependencies as Dictionary<string, JsonSchema>;
+                if (schemaDep != null) {
                     foreach(var va in validated) {
                         JsonSchema ext = null;
                         if (schemaDep.TryGetValue(va.Key, out ext)) {
@@ -360,6 +365,9 @@ namespace VJson.Schema
                         }
                     }
                 }
+
+            depChecked:
+                ;
             }
 
             return null;

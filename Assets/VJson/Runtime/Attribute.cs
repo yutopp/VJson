@@ -51,9 +51,13 @@ namespace VJson
             }
 
             // Length
-            if (o is Array a) {
+            var a = o as Array;
+            if (a != null) {
                 return a.Length == f.WhenLengthIs;
-            } else if (o is IList l) {
+            }
+
+            var l = o as IList;
+            if (l != null) {
                 return l.Count == f.WhenLengthIs;
             }
 

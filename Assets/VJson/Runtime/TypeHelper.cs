@@ -26,11 +26,7 @@ namespace VJson
                     return ((IEnumerable)o).Cast<object>();
                 }
             } else {
-                if (ty.IsGenericType && ty.GetGenericArguments()[0].IsClass) {
-                    return ((IEnumerable<object>)o);
-                } else {
-                    return ((IEnumerable)o).Cast<object>();
-                }
+                return ((IEnumerable)o).Cast<object>();
             }
         }
 
