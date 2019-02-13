@@ -20,14 +20,14 @@ namespace VJson.Schema.UnitTests
     class Person
     {
         [JsonSchema(Description="The person's first name.")]
-        public string firstName;
+        public string firstName = default(string);
 
         [JsonSchema(Description="The person's last name.")]
-        public string lastName;
+        public string lastName = default(string);
 
         [JsonSchema(Description="Age in years which must be equal to or greater than zero.",
                     Minimum=0)]
-        public int age;
+        public int age = default(int);
     }
 
     public class JsonSchemaFromClassTests
@@ -71,16 +71,16 @@ namespace VJson.Schema.UnitTests
 
         class TestCase
         {
-            public string description;
-            public JsonSchema schema;
-            public UnitTest[] tests;
+            public string description = default(string);
+            public JsonSchema schema = default(JsonSchema);
+            public UnitTest[] tests = default(UnitTest[]);
         }
 
         class UnitTest
         {
-            public string description;
-            public object data;
-            public bool valid;
+            public string description = default(string);
+            public object data = default(object);
+            public bool valid = default(bool);
         }
 
         public class JsonSchemaFromTestCasesTests

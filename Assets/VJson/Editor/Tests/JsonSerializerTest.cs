@@ -56,7 +56,7 @@ namespace VJson.UnitTests
     class CustomObject
     {
         [JsonField(TypeHints=new Type[] {typeof(bool), typeof(SomeObject)})]
-        public object Obj;
+        public object Obj = default(object);
 
         public override bool Equals(object rhsObj) {
             var rhs = rhsObj as CustomObject;
@@ -75,7 +75,7 @@ namespace VJson.UnitTests
     class CustomObjectHasArray
     {
         [JsonField(TypeHints=new Type[] {typeof(SomeObject), typeof(SomeObject[])})]
-        public object Obj;
+        public object Obj = default(object);
 
         public override bool Equals(object rhsObj) {
             var rhs = rhsObj as CustomObjectHasArray;
