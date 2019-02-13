@@ -6,10 +6,8 @@
 //
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 using NUnit.Framework;
-using System.Linq;
 
 namespace VJson.Schema.UnitTests
 {
