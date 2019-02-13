@@ -68,7 +68,120 @@ namespace VJson.Schema.UnitTests
                                 })
                         );
         }
+    }
 
+    public class JsonSchemaFormatTests
+    {
+        [Test]
+        [TestCaseSource("SchemaStringArgs")]
+        public void SchemaFormatTest(Type ty, string expected)
+        {
+            var schema = JsonSchema.CreateFromType(ty);
+            Assert.AreEqual(expected, schema.ToString());
+        }
+
+        public static object[] SchemaStringArgs = new object[] {
+            new object[] {
+                typeof(int),
+                "{\"type\":\"integer\"}",
+            },
+            new object[] {
+                typeof(double),
+                "{\"type\":\"number\"}",
+            },
+            new object[] {
+                typeof(bool),
+                "{\"type\":\"boolean\"}",
+            },
+            new object[] {
+                typeof(string),
+                "{\"type\":\"string\"}",
+            },
+            new object[] {
+                typeof(object[]),
+                "{\"items\":{},\"type\":\"array\"}",
+            },
+            new object[] {
+                typeof(int[]),
+                "{\"items\":{\"type\":\"integer\"},\"type\":\"array\"}",
+            },
+            new object[] {
+                typeof(float[]),
+                "{\"items\":{\"type\":\"number\"},\"type\":\"array\"}",
+            },
+            new object[] {
+                typeof(List<object>),
+                "{\"items\":{},\"type\":\"array\"}",
+            },
+            new object[] {
+                typeof(List<int>),
+                "{\"items\":{\"type\":\"integer\"},\"type\":\"array\"}",
+            },
+            new object[] {
+                typeof(List<float>),
+                "{\"items\":{\"type\":\"number\"},\"type\":\"array\"}",
+            },
+            new object[] {
+                typeof(Dictionary<string, string>),
+                "{\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(object),
+                "{}",
+            },
+            new object[] {
+                typeof(JsonSchemaFormatTests),
+                "{\"properties\":{},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(JsonSchemaFormatTests[]),
+                "{\"items\":{\"$ref\":\"VJson.Schema.UnitTests.JsonSchemaFormatTests\"},\"type\":\"array\"}",
+            },
+            new object[] {
+                typeof(List<JsonSchemaFormatTests>),
+                "{\"items\":{\"$ref\":\"VJson.Schema.UnitTests.JsonSchemaFormatTests\"},\"type\":\"array\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.NotRequiredObject),
+                "{\"$id\":\"not_required_object.json\",\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.NotRequiredObjectWithIgnorable),
+                "{\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasDictionary),
+                "{\"properties\":{\"FP\":{\"type\":\"object\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasEnumerable),
+                "{\"properties\":{\"Fs\":{\"items\":{\"maximum\":1,\"minimum\":0,\"type\":\"number\"},\"type\":\"array\"},\"FsList\":{\"items\":{\"type\":\"number\"},\"type\":\"array\"},\"Os\":{\"type\":\"array\"},\"OsList\":{\"type\":\"array\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasRequiredItems),
+                "{\"properties\":{\"Xs\":{\"items\":{\"minimum\":0,\"type\":\"integer\"},\"minItems\":1,\"type\":\"array\"}},\"required\":[\"Xs\"],\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasRequiredString),
+                "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasRequiredButIgnorableString),
+                "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasDeps),
+                "{\"dependencies\":{\"Y\":[\"X\"]},\"properties\":{\"X\":{\"minimum\":0,\"type\":\"integer\"},\"Y\":{\"type\":\"integer\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasNested),
+                "{\"properties\":{\"C\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+HasNestedChild\"}},\"required\":[\"C\"],\"type\":\"object\"}",
+            },
+        };
+    }
+
+    public class JsonSchemaFromTestCasesTests
+    {
         class TestCase
         {
             public string description = default(string);
@@ -83,60 +196,57 @@ namespace VJson.Schema.UnitTests
             public bool valid = default(bool);
         }
 
-        public class JsonSchemaFromTestCasesTests
+        [Test]
+        [TestCase("additionalItems.json")]
+        [TestCase("additionalProperties.json")]
+        //[TestCase("allOf.json")]
+        //[TestCase("anyOf.json")]
+        [TestCase("boolean_schema.json")]
+        //[TestCase("const.json")]
+        //[TestCase("contains.json")]
+        //[TestCase("default.json")]
+        //[TestCase("definitions.json")]
+        [TestCase("dependencies.json")]
+        [TestCase("enum.json")]
+        [TestCase("exclusiveMaximum.json")]
+        [TestCase("exclusiveMinimum.json")]
+        //[TestCase("if-then-else.json")]
+        [TestCase("items.json")]
+        [TestCase("maximum.json")]
+        [TestCase("maxItems.json")]
+        [TestCase("maxLength.json")]
+        [TestCase("maxProperties.json")]
+        [TestCase("minimum.json")]
+        [TestCase("minItems.json")]
+        [TestCase("minLength.json")]
+        [TestCase("minProperties.json")]
+        //[TestCase("multipleOf.json")]
+        [TestCase("not.json")]
+        //[TestCase("oneOf.json")]
+        //[TestCase("optional")]
+        [TestCase("pattern.json")]
+        [TestCase("patternProperties.json")]
+        [TestCase("properties.json")]
+        //[TestCase("propertyNames.json")]
+        //[TestCase("ref.json")]
+        //[TestCase("refRemote.json")]
+        [TestCase("required.json")]
+        [TestCase("type.json")]
+        //[TestCase("uniqueItems.json")]
+        public void ValidationTest(string casePath)
         {
-            [Test]
-            [TestCase("additionalItems.json")]
-            [TestCase("additionalProperties.json")]
-            //[TestCase("allOf.json")]
-            //[TestCase("anyOf.json")]
-            [TestCase("boolean_schema.json")]
-            //[TestCase("const.json")]
-            //[TestCase("contains.json")]
-            //[TestCase("default.json")]
-            //[TestCase("definitions.json")]
-            [TestCase("dependencies.json")]
-            [TestCase("enum.json")]
-            [TestCase("exclusiveMaximum.json")]
-            [TestCase("exclusiveMinimum.json")]
-            //[TestCase("if-then-else.json")]
-            [TestCase("items.json")]
-            [TestCase("maximum.json")]
-            [TestCase("maxItems.json")]
-            [TestCase("maxLength.json")]
-            [TestCase("maxProperties.json")]
-            [TestCase("minimum.json")]
-            [TestCase("minItems.json")]
-            [TestCase("minLength.json")]
-            [TestCase("minProperties.json")]
-            //[TestCase("multipleOf.json")]
-            [TestCase("not.json")]
-            //[TestCase("oneOf.json")]
-            //[TestCase("optional")]
-            [TestCase("pattern.json")]
-            [TestCase("patternProperties.json")]
-            [TestCase("properties.json")]
-            //[TestCase("propertyNames.json")]
-            //[TestCase("ref.json")]
-            //[TestCase("refRemote.json")]
-            [TestCase("required.json")]
-            [TestCase("type.json")]
-            //[TestCase("uniqueItems.json")]
-            public void ValidationTest(string casePath)
-            {
-                var path = Path.Combine(Path.Combine(Path.Combine("JSON-Schema-Test-Suite", "tests"), "draft7"), casePath);
-                using(var sr = new StreamReader(path)) {
-                    var d = new JsonSerializer(typeof(TestCase[]));
-                    var cases = (TestCase[])d.Deserialize(sr);
+            var path = Path.Combine(Path.Combine(Path.Combine("JSON-Schema-Test-Suite", "tests"), "draft7"), casePath);
+            using(var sr = new StreamReader(path)) {
+                var d = new JsonSerializer(typeof(TestCase[]));
+                var cases = (TestCase[])d.Deserialize(sr);
 
-                    foreach(var c in cases) {
-                        foreach(var t in c.tests) {
-                            var ex = c.schema.Validate(t.data);
+                foreach(var c in cases) {
+                    foreach(var t in c.tests) {
+                        var ex = c.schema.Validate(t.data);
 
-                            Assert.That(ex == null, Is.EqualTo(t.valid),
-                                        String.Format("{0} / {1} ({2})", ex, t.description, c.description)
-                                        );
-                        }
+                        Assert.That(ex == null, Is.EqualTo(t.valid),
+                                    String.Format("{0} / {1} ({2})", ex, t.description, c.description)
+                            );
                     }
                 }
             }

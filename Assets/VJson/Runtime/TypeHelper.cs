@@ -30,6 +30,23 @@ namespace VJson
             }
         }
 
+        public static Type ElemTypeOfIEnumerable(Type ty)
+        {
+            if (ty.IsArray) {
+                if (ty.HasElementType) {
+                    return ty.GetElementType();
+                }
+
+                return null;
+            }
+
+            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(List<>)) {
+                return ty.GetGenericArguments()[0];
+            }
+
+            return null;
+        }
+
         public static IEnumerable<KeyValuePair<string, object>> ToKeyValues(object o)
         {
             return ToKeyValuesUnordered(o).OrderBy(kv => kv.Key);

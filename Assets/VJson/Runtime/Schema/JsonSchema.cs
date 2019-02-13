@@ -276,11 +276,17 @@ namespace VJson.Schema
                     };
 
                 case NodeKind.Array:
+                    var elemTy = TypeHelper.ElemTypeOfIEnumerable(ty);
                     return new JsonSchema {
                         Type = "array",
+                        Items = elemTy != null ? CreateFromType(elemTy, reg, true) : null,
                     };
 
                 case NodeKind.Object:
+                    if (ty == typeof(object)) {
+                        return new JsonSchema();
+                    }
+
                     if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
                         return new JsonSchema {
                             Type = "object",
@@ -360,6 +366,24 @@ namespace VJson.Schema
                     // Update
                     if (fieldSchema.Type == null) {
                         fieldSchema.Type = fieldTypeSchema.Type;
+                    }
+
+                    if (fieldTypeSchema.Items != null) {
+                        var fieldTypeSchemaItems = fieldTypeSchema.Items as JsonSchema;
+                        if (fieldTypeSchemaItems.Ref != null) {
+                            fieldSchema.Items = fieldTypeSchemaItems;
+                        } else {
+                            if (fieldTypeSchemaItems.Type != null) {
+                                var fieldSchemaItems = fieldSchema.Items as JsonSchema;
+                                if (fieldSchemaItems != null) {
+                                    fieldSchemaItems.Type = fieldTypeSchemaItems.Type;
+                                } else {
+                                    fieldSchema.Items = new JsonSchema {
+                                        Type = fieldTypeSchemaItems.Type,
+                                    };
+                                }
+                            }
+                        }
                     }
                 }
 

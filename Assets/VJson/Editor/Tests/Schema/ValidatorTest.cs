@@ -61,14 +61,6 @@ namespace VJson.Schema.UnitTests
             Assert.AreEqual(expectedContent, content);
         }
 
-        [Test]
-        [TestCaseSource("SchemaStringArgs")]
-        public void SchemaFormatTest(Type ty, string expected)
-        {
-            var schema = JsonSchema.CreateFromType(ty);
-            Assert.AreEqual(expected, schema.ToString());
-        }
-
         [JsonSchema(Id = "not_required_object.json")]
         public class NotRequiredObject
         {
@@ -133,15 +125,13 @@ namespace VJson.Schema.UnitTests
             },
         };
 
-        class HasEnumerable
+        public class HasEnumerable
         {
             [ItemsJsonSchema(Minimum = 0.0, Maximum = 1.0)]
             public float[] Fs;
-
             public object[] Os = new object[] {};
 
-            public List<int> FsList = new List<int>();
-
+            public List<float> FsList = new List<float>();
             public List<object> OsList = new List<object>();
         }
 
@@ -205,7 +195,7 @@ namespace VJson.Schema.UnitTests
             },
         };
 
-        class HasRequiredString
+        public class HasRequiredString
         {
             [JsonSchemaRequired]
             public string S;
@@ -224,7 +214,7 @@ namespace VJson.Schema.UnitTests
             },
         };
 
-        class HasRequiredButIgnorableString
+        public class HasRequiredButIgnorableString
         {
             [JsonSchemaRequired]
             [JsonFieldIgnorable]
@@ -300,45 +290,6 @@ namespace VJson.Schema.UnitTests
                 },
                 "Object.Property.Object.Property.String.[\"C\"][\"X\"]: MinLength assertion !(0 >= 1).",
                 null,
-            },
-        };
-
-        public static object[] SchemaStringArgs = new object[] {
-            new object[] {
-                typeof(NotRequiredObject),
-                "{\"$id\":\"not_required_object.json\",\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
-            },
-            new object[] {
-                typeof(NotRequiredObjectWithIgnorable),
-                "{\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
-            },
-            new object[] {
-                typeof(HasDictionary),
-                "{\"properties\":{\"FP\":{\"type\":\"object\"}},\"type\":\"object\"}",
-            },
-            new object[] {
-                typeof(HasEnumerable),
-                "{\"properties\":{\"Fs\":{\"items\":{\"maximum\":1,\"minimum\":0},\"type\":\"array\"},\"FsList\":{\"type\":\"array\"},\"Os\":{\"type\":\"array\"},\"OsList\":{\"type\":\"array\"}},\"type\":\"object\"}",
-            },
-            new object[] {
-                typeof(HasRequiredItems),
-                "{\"properties\":{\"Xs\":{\"items\":{\"minimum\":0},\"minItems\":1,\"type\":\"array\"}},\"required\":[\"Xs\"],\"type\":\"object\"}",
-            },
-            new object[] {
-                typeof(HasRequiredString),
-                "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
-            },
-            new object[] {
-                typeof(HasRequiredButIgnorableString),
-                "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
-            },
-            new object[] {
-                typeof(HasDeps),
-                "{\"dependencies\":{\"Y\":[\"X\"]},\"properties\":{\"X\":{\"minimum\":0,\"type\":\"integer\"},\"Y\":{\"type\":\"integer\"}},\"type\":\"object\"}",
-            },
-            new object[] {
-                typeof(HasNested),
-                "{\"properties\":{\"C\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+HasNestedChild\"}},\"required\":[\"C\"],\"type\":\"object\"}",
             },
         };
     }
