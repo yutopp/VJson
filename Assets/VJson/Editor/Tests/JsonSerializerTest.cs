@@ -215,12 +215,9 @@ namespace VJson.UnitTests
         public void DeserializeTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            using (var textReader = new StringReader(expected))
-            {
-                var actual = serializer.Deserialize(textReader);
+            var actual = serializer.Deserialize(expected);
 
-                Assert.AreEqual(obj, actual);
-            }
+            Assert.AreEqual(obj, actual);
         }
 
         [Test]
@@ -381,12 +378,9 @@ namespace VJson.UnitTests
         public void DeserializeTest<E>(IEnumerable<E> expected, string json)
         {
             var serializer = new VJson.JsonSerializer(expected != null ? expected.GetType() : typeof(object));
-            using (var textReader = new StringReader(json))
-            {
-                var actual = serializer.Deserialize(textReader);
+            var actual = serializer.Deserialize(json);
 
-                Assert.That(actual, Is.EquivalentTo(expected));
-            }
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -394,95 +388,74 @@ namespace VJson.UnitTests
         public void DeserializeTest<K, V>(IDictionary<K, V> expected, string json)
         {
             var serializer = new VJson.JsonSerializer(expected != null ? expected.GetType() : typeof(object));
-            using (var textReader = new StringReader(json))
-            {
-                var actual = serializer.Deserialize(textReader);
+            var actual = serializer.Deserialize(json);
 
-                Assert.That(actual, Is.EquivalentTo(expected));
-            }
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [TestCaseSource("ListArgs")]
         public void DeserializeUntypedTest<E>(IEnumerable<E> expected, string json)
         {
             var serializer = new VJson.JsonSerializer(typeof(object));
-            using (var textReader = new StringReader(json))
-            {
-                var actual = serializer.Deserialize(textReader);
+            var actual = serializer.Deserialize(json);
 
-                Assert.That(actual, Is.EquivalentTo(expected));
-            }
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [TestCaseSource("DictArgs")]
         public void DeserializeUntypedTest<K, V>(IDictionary<K, V> expected, string json)
         {
             var serializer = new VJson.JsonSerializer(typeof(object));
-            using (var textReader = new StringReader(json))
-            {
-                var actual = serializer.Deserialize(textReader);
+            var actual = serializer.Deserialize(json);
 
-                Assert.That(actual, Is.EquivalentTo(expected));
-            }
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
         public void DeserializeHasHintFieldsBoolTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(CustomObject));
-            using (var textReader = new StringReader(@"{""Obj"": true}"))
-            {
-                var actual = (CustomObject)serializer.Deserialize(textReader);
+            var actual = (CustomObject)serializer.Deserialize(@"{""Obj"": true}");
 
-                Assert.AreEqual(typeof(bool), actual.Obj.GetType());
-                Assert.AreEqual(true, actual.Obj);
-            }
+            Assert.AreEqual(typeof(bool), actual.Obj.GetType());
+            Assert.AreEqual(true, actual.Obj);
         }
 
         [Test]
         public void DeserializeHasHintFieldsClassTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(CustomObject));
-            using (var textReader = new StringReader(@"{""Obj"": {""X"":10}}"))
-            {
-                var actual = (CustomObject)serializer.Deserialize(textReader);
+            var actual = (CustomObject)serializer.Deserialize(@"{""Obj"": {""X"":10}}");
 
-                Assert.AreEqual(typeof(SomeObject), actual.Obj.GetType());
-                Assert.AreEqual(new SomeObject
+            Assert.AreEqual(typeof(SomeObject), actual.Obj.GetType());
+            Assert.AreEqual(new SomeObject
                 {
                     X = 10,
                 }, actual.Obj);
-            }
         }
 
         [Test]
         public void DeserializeHasHintFieldsArrayOrSingletonSgtTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(CustomObjectHasArray));
-            using (var textReader = new StringReader(@"{""Obj"": {""X"":10}}"))
-            {
-                var actual = (CustomObjectHasArray)serializer.Deserialize(textReader);
+            var actual = (CustomObjectHasArray)serializer.Deserialize(@"{""Obj"": {""X"":10}}");
 
-                Assert.AreEqual(typeof(SomeObject), actual.Obj.GetType());
-                Assert.That(actual.Obj,
-                            Is.EqualTo(new SomeObject
+            Assert.AreEqual(typeof(SomeObject), actual.Obj.GetType());
+            Assert.That(actual.Obj,
+                        Is.EqualTo(new SomeObject
                             {
                                 X = 10,
                             })
-                            );
-            }
+                );
         }
 
         [Test]
         public void DeserializeImplicitConstructableTest()
         {
             var serializer = new VJson.JsonSerializer(typeof(Hoge));
-            using (var textReader = new StringReader(@"true"))
-            {
-                var actual = (Hoge)serializer.Deserialize(textReader);
+            var actual = (Hoge)serializer.Deserialize(@"true");
 
-                Assert.That(actual.B, Is.EqualTo(true));
-            }
+            Assert.That(actual.B, Is.EqualTo(true));
         }
 
         public static object[] ListArgs = {

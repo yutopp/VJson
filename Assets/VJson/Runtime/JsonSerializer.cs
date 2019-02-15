@@ -97,16 +97,16 @@ namespace VJson
         #endregion
 
         #region Deserializer
-        public object Deserialize(TextReader textReader)
-        {
-            var d = new JsonDeserializer(_type);
-            return d.Deserialize(textReader);
-        }
-
         public object Deserialize(String text)
         {
             var d = new JsonDeserializer(_type);
             return d.Deserialize(text);
+        }
+
+        public object Deserialize(Stream s)
+        {
+            var d = new JsonDeserializer(_type);
+            return d.Deserialize(s);
         }
         #endregion
     }

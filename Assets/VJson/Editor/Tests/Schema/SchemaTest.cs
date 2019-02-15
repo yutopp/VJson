@@ -235,10 +235,10 @@ namespace VJson.Schema.UnitTests
         public void ValidationTest(string casePath)
         {
             var path = Path.Combine(Path.Combine(Path.Combine("JSON-Schema-Test-Suite", "tests"), "draft7"), casePath);
-            using (var sr = new StreamReader(path))
+            using (var fs = File.OpenRead(path))
             {
                 var d = new JsonSerializer(typeof(TestCase[]));
-                var cases = (TestCase[])d.Deserialize(sr);
+                var cases = (TestCase[])d.Deserialize(fs);
 
                 foreach (var c in cases)
                 {

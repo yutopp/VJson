@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -27,10 +28,10 @@ namespace VJson.UnitTests
         [Test]
         public void ReadTest()
         {
-            using (var textReader = new StringReader(_src))
+            using (var s = new MemoryStream(Encoding.UTF8.GetBytes(_src)))
+            using (var r = new JsonReader(s))
             {
-                var reader = new JsonReader(textReader);
-                var actual = reader.Read();
+                var actual = r.Read();
 
                 Assert.That(actual, Is.EqualTo(_expected));
             }
@@ -270,10 +271,10 @@ namespace VJson.UnitTests
         [Test]
         public void ReadTest()
         {
-            using (var textReader = new StringReader(_src))
+            using (var s = new MemoryStream(Encoding.UTF8.GetBytes(_src)))
+            using (var r = new JsonReader(s))
             {
-                var reader = new JsonReader(textReader);
-                var ex = Assert.Throws<Exception>(() => reader.Read());
+                var ex = Assert.Throws<Exception>(() => r.Read());
 
                 // TODO: test exceptions
             }

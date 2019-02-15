@@ -11,15 +11,23 @@ using System.Text;
 
 namespace VJson
 {
-    public class JsonReader
+    public class JsonReader : IDisposable
     {
-        private TextReader _reader;
+        private StreamReader _reader;
 
         private StringBuilder _strCache = new StringBuilder();
 
-        public JsonReader(TextReader reader)
+        public JsonReader(Stream s)
         {
-            _reader = reader;
+            _reader = new StreamReader(s, Encoding.UTF8);
+        }
+
+        public void Dispose()
+        {
+            if (_reader != null)
+            {
+                ((IDisposable)_reader).Dispose();
+            }
         }
 
         public INode Read()

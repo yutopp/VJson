@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace VJson
 {
@@ -21,20 +22,26 @@ namespace VJson
             _expectedInitialType = type;
         }
 
-        public object Deserialize(TextReader textReader)
-        {
-            var reader = new JsonReader(textReader);
-            var node = reader.Read();
-
-            return DeserializeValue(node, _expectedInitialType);
-        }
-
         public object Deserialize(string text)
         {
-            using (var textReader = new StringReader(text))
+            using (var s = new MemoryStream(Encoding.UTF8.GetBytes(text)))
             {
-                return Deserialize(textReader);
+                return Deserialize(s);
             }
+        }
+
+        public object Deserialize(Stream s)
+        {
+            using (var r = new JsonReader(s))
+            {
+                var node = r.Read();
+                return Deserialize(node);
+            }
+        }
+
+        public object Deserialize(INode node)
+        {
+            return DeserializeValue(node, _expectedInitialType);
         }
 
         object DeserializeValue(INode node, Type expectedType)
