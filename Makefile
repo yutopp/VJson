@@ -21,7 +21,7 @@ setup-net: setup
 pre-generated-files: Assets/VJson/Runtime/TypeHelper.g.cs
 
 Assets/VJson/Runtime/TypeHelper.g.cs: PreProcess/generator.py PreProcess/TypeHelper.g.template.cs
-	python10 PreProcess/generator.py PreProcess/TypeHelper.g.template.cs > $@
+	python3 PreProcess/generator.py PreProcess/TypeHelper.g.template.cs > $@
 
 test-results:
 	mkdir test-results
