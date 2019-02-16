@@ -252,8 +252,28 @@ namespace VJson.UnitTests
 
             // Numbers
             new object[] {
-                1,
+                (byte)1,
                 @"1",
+            },
+            new object[] {
+                (short)1,
+                @"1",
+            },
+            new object[] {
+                (int)1,
+                @"1",
+            },
+            new object[] {
+                (long)1,
+                @"1",
+            },
+            new object[] {
+                (float)3.14,
+                @"3.14",
+            },
+            new object[] {
+                (double)3.14,
+                @"3.14",
             },
 
             // Strings

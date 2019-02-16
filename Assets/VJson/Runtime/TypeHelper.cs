@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace VJson
 {
-    static class TypeHelper
+    static partial class TypeHelper
     {
         public static IEnumerable<object> ToIEnumerable(object o)
         {

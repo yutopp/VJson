@@ -17,6 +17,12 @@ setup:
 setup-net: setup
 	nuget install NUnit.Console -ExcludeVersion -OutputDirectory .nuget
 
+.PHONY: preprocess
+preprocess: Assets/VJson/Runtime/TypeHelper.g.cs
+
+Assets/VJson/Runtime/TypeHelper.g.cs: PreProcess/generator.py PreProcess/TypeHelper.g.template.cs
+	python3 PreProcess/generator.py PreProcess/TypeHelper.g.template.cs > $@
+
 test-results:
 	mkdir test-results
 
@@ -26,7 +32,7 @@ restore-net35:
 	msbuild ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj /t:restore /p:TargetFramework=net35
 
 .PHONY: build-debug-net35
-build-debug-net35: restore-net35
+build-debug-net35: preprocess restore-net35
 	msbuild ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj /p:TargetFramework=net35
 
 .PHONY: test-net35
@@ -39,7 +45,7 @@ restore-net45:
 	msbuild ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj /t:restore /p:TargetFramework=net45
 
 .PHONY: build-debug-net45
-build-debug-net45: restore-net45
+build-debug-net45: preprocess restore-net45
 	msbuild ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj /p:TargetFramework=net45
 
 .PHONY: test-net45
@@ -52,7 +58,7 @@ restore-netcore20:
 	dotnet restore ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj
 
 .PHONY: build-debug-netcore20
-build-debug-netcore20: restore-netcore20
+build-debug-netcore20: preprocess restore-netcore20
 	dotnet build ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj -f netcoreapp2.0
 
 .PHONY: test-netcore20

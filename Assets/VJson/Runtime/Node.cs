@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace VJson
 {
@@ -30,24 +29,16 @@ namespace VJson
 
     public class BooleanNode : INode
     {
-        public string Span;
-
         public NodeKind Kind
         {
             get { return NodeKind.Boolean; }
         }
 
-        public bool Value
-        {
-            get
-            {
-                return Boolean.Parse(Span);
-            }
-        }
+        public bool Value { get; private set; }
 
-        public BooleanNode(string span)
+        public BooleanNode(bool v)
         {
-            Span = span;
+            Value = v;
         }
 
         public override bool Equals(object rhsObj)
@@ -58,17 +49,17 @@ namespace VJson
                 return false;
             }
 
-            return Span.Equals(rhs.Span);
+            return Value.Equals(rhs.Value);
         }
 
         public override int GetHashCode()
         {
-            return Span.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "BOOLEAN: " + Span;
+            return "BOOLEAN: " + Value;
         }
     }
 
@@ -103,24 +94,16 @@ namespace VJson
 
     public class IntegerNode : INode
     {
-        public string Span;
-
         public NodeKind Kind
         {
             get { return NodeKind.Integer; }
         }
 
-        public int Value
-        {
-            get
-            {
-                return Int32.Parse(Span); // TODO: Fix for large numbers
-            }
-        }
+        public long Value {get; private set;}
 
-        public IntegerNode(string span)
+        public IntegerNode(long v)
         {
-            Span = span;
+            Value = v;
         }
 
         public override bool Equals(object rhsObj)
@@ -131,40 +114,32 @@ namespace VJson
                 return false;
             }
 
-            return Span.Equals(rhs.Span);
+            return Value.Equals(rhs.Value);
         }
 
         public override int GetHashCode()
         {
-            return Span.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "NUMBER(Int): " + Span;
+            return "NUMBER(Int): " + Value;
         }
     }
 
     public class FloatNode : INode
     {
-        public string Span;
-
         public NodeKind Kind
         {
             get { return NodeKind.Float; }
         }
 
-        public float Value
-        {
-            get
-            {
-                return Single.Parse(Span); // TODO: Fix for large numbers
-            }
-        }
+        public double Value { get; private set; }
 
-        public FloatNode(string span)
+        public FloatNode(double v)
         {
-            Span = span;
+            Value = v;
         }
 
         public override bool Equals(object rhsObj)
@@ -175,40 +150,32 @@ namespace VJson
                 return false;
             }
 
-            return Span.Equals(rhs.Span);
+            return Value.Equals(rhs.Value);
         }
 
         public override int GetHashCode()
         {
-            return Span.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "NUMBER(Float): " + Span;
+            return "NUMBER(Float): " + Value;
         }
     }
 
     public class StringNode : INode
     {
-        public string Span;
-
         public NodeKind Kind
         {
             get { return NodeKind.String; }
         }
 
-        public string Value
-        {
-            get
-            {
-                return Regex.Unescape(Span.Trim());
-            }
-        }
+        public string Value { get; private set; }
 
-        public StringNode(string span)
+        public StringNode(string v)
         {
-            Span = span;
+            Value = v;
         }
 
         public override bool Equals(object rhsObj)
@@ -219,17 +186,17 @@ namespace VJson
                 return false;
             }
 
-            return Span.Equals(rhs.Span);
+            return Value.Equals(rhs.Value);
         }
 
         public override int GetHashCode()
         {
-            return Span.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "STRING: " + Span;
+            return "STRING: " + Value;
         }
     }
 

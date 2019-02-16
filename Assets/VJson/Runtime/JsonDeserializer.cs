@@ -104,22 +104,23 @@ namespace VJson
         {
             if (node is NullNode)
             {
-                // TODO: type check of targetType
-                return default(int);
+                if (!(targetType is object))
+                {
+                    throw new NotImplementedException();
+                }
+                return null;
             }
 
             var iNode = node as IntegerNode;
             if (iNode != null)
             {
-                // TODO: type check of targetType
-                return iNode.Value;
+                return CreateInstanceIfConstrucutable<long>(targetType, iNode.Value);
             }
 
             var fNode = node as FloatNode;
             if (fNode != null)
             {
-                // TODO: type check of targetType
-                return fNode.Value;
+                return CreateInstanceIfConstrucutable<double>(targetType, fNode.Value);
             }
 
             // TODO: Should raise error?
@@ -309,7 +310,6 @@ namespace VJson
                             {
                                 throw new NotImplementedException();
                             }
-
                         }
                         else
                         {
@@ -344,9 +344,14 @@ namespace VJson
         static object CreateInstanceIfConstrucutable<T>(Type targetType, T value)
         {
             // Raw
-            if (targetType == typeof(T) || targetType == typeof(object))
+            if (targetType == typeof(object))
             {
                 return value;
+            }
+
+            var convFunc = TypeHelper.GetConverter(typeof(T), targetType);
+            if (convFunc != null) {
+                return convFunc(value);
             }
 
             // Try to convert value implicitly

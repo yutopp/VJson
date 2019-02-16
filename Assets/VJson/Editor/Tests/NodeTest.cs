@@ -61,17 +61,17 @@ namespace VJson.UnitTests
         //
         static object[] FixtureArgs = {
             new object[] {
-                new IntegerNode("a"),
-                 new IntegerNode("a"),
+                new IntegerNode(42),
+                 new IntegerNode(42),
                  true
             },
             new object[] {
-                new IntegerNode("a"),
-                new IntegerNode("b"),
+                new IntegerNode(42),
+                new IntegerNode(72),
                 false
             },
             new object[] {
-                new IntegerNode("a"),
+                new IntegerNode(42),
                 null,
                 false
             }

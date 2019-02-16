@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace VJson
 {
@@ -250,7 +251,8 @@ namespace VJson
                         _reader.Read(); // Discard
 
                         var span = CommitBuffer();
-                        return new StringNode(span);
+                        var str = Regex.Unescape(span).Replace("\\/", "/");
+                        return new StringNode(str);
 
                     case '\\':
                         SaveToBuffer(_reader.Read());
@@ -376,9 +378,12 @@ namespace VJson
             var span = CommitBuffer();
             if (isFloat)
             {
-                return new FloatNode(span);
+                var v = double.Parse(span); // TODO: Fix for large numbers
+                return new FloatNode(v);
+            } else {
+                var v = long.Parse(span);   // TODO: Fix for large numbers
+                return new IntegerNode(v);
             }
-            return new IntegerNode(span);
         }
 
         bool ReadInt()
@@ -463,9 +468,9 @@ namespace VJson
 
             SaveToBuffer(_reader.Read());
 
-            if (!ReadDigit())
+            if (!ReadDigits())
             {
-                throw NodeExpectedError("digit");
+                throw NodeExpectedError("digits");
             }
 
             return true;
@@ -483,9 +488,9 @@ namespace VJson
 
             ReadSign();
 
-            if (!ReadDigit())
+            if (!ReadDigits())
             {
-                throw NodeExpectedError("digit");
+                throw NodeExpectedError("digits");
             }
 
             return true;
@@ -518,7 +523,7 @@ namespace VJson
                     {
                         throw NodeExpectedError("true");
                     }
-                    return new BooleanNode(s);
+                    return new BooleanNode(true);
 
                 case 'f':
                     // Maybe false
@@ -527,7 +532,7 @@ namespace VJson
                     {
                         throw NodeExpectedError("false");
                     }
-                    return new BooleanNode(s);
+                    return new BooleanNode(false);
 
                 case 'n':
                     // Maybe null

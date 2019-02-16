@@ -32,19 +32,19 @@ namespace VJson.UnitTests
         static object[] FixtureArgs = {
             // Boolean
 			new object[] {
-                new BooleanNode("true"),
+                new BooleanNode(true),
                 @"true",
             },
             new object[] {
-                new BooleanNode("false"),
+                new BooleanNode(false),
                 @"false",
             },
             new object[] {
-                new BooleanNode("true"),
+                new BooleanNode(true),
                 @"  true  ",
             },
             new object[] {
-                new BooleanNode("false"),
+                new BooleanNode(false),
                 @"  false  ",
             },
 
@@ -60,60 +60,72 @@ namespace VJson.UnitTests
 
 			// Numbers
 			new object[] {
-                new IntegerNode("123"),
+                new IntegerNode(123),
                 @"123",
             },
             new object[] {
-                new IntegerNode("123"),
+                new IntegerNode(123),
                 @"  123  ",
             },
             new object[] {
-                new IntegerNode("0"),
+                new IntegerNode(0),
                 @"0",
             },
             new object[] {
-                new IntegerNode("9"),
+                new IntegerNode(9),
                 @"9",
             },
             new object[] {
-                new IntegerNode("-123"),
+                new IntegerNode(-123),
                 @"-123",
             },
             new object[] {
-                new IntegerNode("-0"),
+                new IntegerNode(-0),
                 @"-0",
             },
             new object[] {
-                new IntegerNode("-9"),
+                new IntegerNode(-9),
                 @"-9",
             },
             new object[] {
-                new FloatNode("-9.0"),
+                new FloatNode(-9.0),
                 @"-9.0",
             },
             new object[] {
-                new FloatNode("-9.0e0"),
+                new FloatNode(-9.0e0),
                 @"-9.0e0",
             },
             new object[] {
-                new FloatNode("-9.0e+0"),
+                new FloatNode(-9.0e+0),
                 @"-9.0e+0",
             },
             new object[] {
-                new FloatNode("-9.0e-0"),
+                new FloatNode(-9.0e-0),
                 @"-9.0e-0",
             },
             new object[] {
-                new FloatNode("-9e0"),
+                new FloatNode(-9e0),
                 @"-9e0",
             },
             new object[] {
-                new FloatNode("-9e+0"),
+                new FloatNode(-9e+0),
                 @"-9e+0",
             },
             new object[] {
-                new FloatNode("-9e-0"),
+                new FloatNode(-9e-0),
                 @"-9e-0",
+            },
+            new object[] {
+                new FloatNode(3.14),
+                @"3.14",
+            },
+            new object[] {
+                new FloatNode(-3.14),
+                @"-3.14",
+            },
+            new object[] {
+                new FloatNode(3.14e12),
+                @"3.14e12",
             },
 
 			// Strings
@@ -134,16 +146,40 @@ namespace VJson.UnitTests
                 @"""あいうえお""",
             },
             new object[] {
-                new StringNode("\\n"),
+                new StringNode("\""),
+                "\"\\\"\"",
+            },
+            new object[] {
+                new StringNode("\\"),
+                "\"\\\\\"",
+            },
+            new object[] {
+                new StringNode("/"),
+                "\"\\/\"",
+            },
+            new object[] {
+                new StringNode("\b"),
+                @"""\b""",
+            },
+            new object[] {
+                new StringNode("\n"),
                 @"""\n""",
+            },
+            new object[] {
+                new StringNode("\r"),
+                @"""\r""",
+            },
+            new object[] {
+                new StringNode("\t"),
+                @"""\t""",
+            },
+            new object[] {
+                new StringNode("あ"),
+                @"""\u3042""",
             },
             new object[] {
                 new StringNode("http://"),
                 @"""http:\/\/""",
-            },
-            new object[] {
-                new StringNode("\\u3042"),
-                @"""\u3042""",
             },
             new object[] {
                 new StringNode("🍣"),
@@ -160,7 +196,7 @@ namespace VJson.UnitTests
                 {
                     Elems = new Dictionary<string, INode>
                     {
-                        {"abc", new IntegerNode("1")},
+                        {"abc", new IntegerNode(1)},
                     }
                 },
                 @"{""abc"":1}",
@@ -169,8 +205,8 @@ namespace VJson.UnitTests
                 new ObjectNode() {
                     Elems = new Dictionary<string, INode>
                     {
-                        {"abc", new IntegerNode("1")},
-                        {"def", new IntegerNode("2")},
+                        {"abc", new IntegerNode(1)},
+                        {"def", new IntegerNode(2)},
                     }
                 },
                 @"{""abc"":1,""def"":2}",
@@ -179,8 +215,8 @@ namespace VJson.UnitTests
                 new ObjectNode() {
                     Elems = new Dictionary<string, INode>
                     {
-                        {"abc", new IntegerNode("1")},
-                        {"def", new IntegerNode("2")},
+                        {"abc", new IntegerNode(1)},
+                        {"def", new IntegerNode(2)},
                     }
                 },
                 @"  {  ""abc""  :  1  ,  ""def""  :  2  }  ",
@@ -206,7 +242,7 @@ namespace VJson.UnitTests
                     Elems = new List<INode>
                     {
                         new StringNode("abc"),
-                        new IntegerNode("1"),
+                        new IntegerNode(1),
                     }
                 },
                 @"[""abc"",1]",
@@ -216,7 +252,7 @@ namespace VJson.UnitTests
                     Elems = new List<INode>
                     {
                         new StringNode("abc"),
-                        new IntegerNode("1"),
+                        new IntegerNode(1),
                     }
                 },
                 @"  [  ""abc""  ,  1   ]  ",
@@ -234,7 +270,7 @@ namespace VJson.UnitTests
                                             {"b",  new ArrayNode {
                                                     Elems = new List<INode>{
                                                         new NullNode(),
-                                                        new IntegerNode("1"),
+                                                        new IntegerNode(1),
                                                         new StringNode("🍣"),
                                                     },
                                                 }
