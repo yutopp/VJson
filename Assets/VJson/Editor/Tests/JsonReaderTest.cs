@@ -13,27 +13,18 @@ using NUnit.Framework;
 
 namespace VJson.UnitTests
 {
-    [TestFixtureSource("FixtureArgs")]
     class JsonReaderPassTests
     {
-        INode _expected;
-        string _src;
-
-        public JsonReaderPassTests(INode expected, string src)
-        {
-            _expected = expected;
-            _src = src;
-        }
-
         [Test]
-        public void ReadTest()
+        [TestCaseSource("FixtureArgs")]
+        public void ReadTest(INode expected, string src)
         {
-            using (var s = new MemoryStream(Encoding.UTF8.GetBytes(_src)))
+            using (var s = new MemoryStream(Encoding.UTF8.GetBytes(src)))
             using (var r = new JsonReader(s))
             {
                 var actual = r.Read();
 
-                Assert.That(actual, Is.EqualTo(_expected));
+                Assert.That(actual, Is.EqualTo(expected));
             }
         }
 
@@ -147,6 +138,10 @@ namespace VJson.UnitTests
                 @"""\n""",
             },
             new object[] {
+                new StringNode("http://"),
+                @"""http:\/\/""",
+            },
+            new object[] {
                 new StringNode("\\u3042"),
                 @"""\u3042""",
             },
@@ -256,27 +251,17 @@ namespace VJson.UnitTests
         };
     }
 
-    [TestFixtureSource("FixtureArgs")]
     class JsonReaderFailTests
     {
-        INode _expected;
-        string _src;
-
-        public JsonReaderFailTests(INode expected, string src)
-        {
-            _expected = expected;
-            _src = src;
-        }
-
         [Test]
-        public void ReadTest()
+        [TestCaseSource("FixtureArgs")]
+        public void ReadTest(string expectedMsg, string src)
         {
-            using (var s = new MemoryStream(Encoding.UTF8.GetBytes(_src)))
+            using (var s = new MemoryStream(Encoding.UTF8.GetBytes(src)))
             using (var r = new JsonReader(s))
             {
-                var ex = Assert.Throws<Exception>(() => r.Read());
-
-                // TODO: test exceptions
+                var ex = Assert.Throws<ParseFailedException>(() => r.Read());
+                Assert.AreEqual(expectedMsg, ex.Message);
             }
         }
 
@@ -284,7 +269,7 @@ namespace VJson.UnitTests
         static object[] FixtureArgs = {
 			// Numbers
 			new object[] {
-                new IntegerNode("123"),
+                "A node \"EOS\" is expected but a charactor '1' is provided (at position 3)",
                 @"  012  ",
             },
         };

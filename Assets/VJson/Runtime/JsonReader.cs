@@ -13,13 +13,60 @@ namespace VJson
 {
     public class JsonReader : IDisposable
     {
-        private StreamReader _reader;
+        private class ReaderWrapper : IDisposable
+        {
+            private StreamReader _reader;
+
+            public ulong Position
+            {
+                get; private set;
+            }
+
+            private int _lastToken;
+            public char LastToken
+            {
+                get
+                {
+                    return (char)_lastToken;
+                }
+            }
+
+            public ReaderWrapper(Stream s)
+            {
+                _reader = new StreamReader(s, Encoding.UTF8);
+                Position = 0;
+            }
+
+            public void Dispose()
+            {
+                if (_reader != null)
+                {
+                    ((IDisposable)_reader).Dispose();
+                }
+            }
+
+            public int Peek()
+            {
+                _lastToken = _reader.Peek();
+                return _lastToken;
+            }
+
+            public int Read()
+            {
+                ++Position;
+
+                _lastToken = _reader.Read();
+                return _lastToken;
+            }
+        }
+
+        private ReaderWrapper _reader;
 
         private StringBuilder _strCache = new StringBuilder();
 
         public JsonReader(Stream s)
         {
-            _reader = new StreamReader(s, Encoding.UTF8);
+            _reader = new ReaderWrapper(s);
         }
 
         public void Dispose()
@@ -37,7 +84,7 @@ namespace VJson
             var next = _reader.Peek();
             if (next != -1)
             {
-                throw new Exception("Not EOS: " + next);
+                throw NodeExpectedError("EOS");
             }
 
             return node;
@@ -110,7 +157,7 @@ namespace VJson
                 {
                     if (next != ',')
                     {
-                        throw new Exception("");
+                        throw TokenExpectedError(',');
                     }
                     _reader.Read(); // Discard
                 }
@@ -119,21 +166,21 @@ namespace VJson
                 INode keyNode = ReadString();
                 if (keyNode == null)
                 {
-                    throw new Exception("");
+                    throw NodeExpectedError("string");
                 }
                 SkipWS();
 
                 next = _reader.Peek();
                 if (next != ':')
                 {
-                    throw new Exception("");
+                    throw TokenExpectedError(':');
                 }
                 _reader.Read(); // Discard
 
                 INode elemNode = ReadElement();
                 if (elemNode == null)
                 {
-                    throw new Exception("");
+                    throw NodeExpectedError("element");
                 }
 
                 node.AddElement(((StringNode)keyNode).Value, elemNode);
@@ -168,7 +215,7 @@ namespace VJson
                 {
                     if (next != ',')
                     {
-                        throw new Exception("");
+                        throw TokenExpectedError(',');
                     }
                     _reader.Read(); // Discard
                 }
@@ -176,7 +223,7 @@ namespace VJson
                 INode elemNode = ReadElement();
                 if (elemNode == null)
                 {
-                    throw new Exception("");
+                    throw NodeExpectedError("element");
                 }
 
                 node.AddElement(elemNode);
@@ -209,7 +256,7 @@ namespace VJson
                         SaveToBuffer(_reader.Read());
                         if (!ReadEscape())
                         {
-                            throw new Exception("");
+                            throw NodeExpectedError("escape");
                         };
                         break;
 
@@ -222,14 +269,14 @@ namespace VJson
                             next = _reader.Read();  // Consume
                             if (!char.IsLowSurrogate((char)next))
                             {
-                                throw new Exception("");
+                                throw NodeExpectedError("low-surrogate");
                             }
                             codePoint = char.ConvertToUtf32((char)c, (char)next);
                         }
 
                         if (codePoint < 0x20 || codePoint > 0x10ffff)
                         {
-                            throw new Exception("");
+                            throw NodeExpectedError("unicode char (0x20 <= char <= 0x10ffff");
                         }
 
                         SaveToBuffer(c);
@@ -256,6 +303,10 @@ namespace VJson
                     SaveToBuffer(_reader.Read());
                     return true;
 
+                case '/':
+                    SaveToBuffer(_reader.Read());
+                    return true;
+
                 case 'b':
                     SaveToBuffer(_reader.Read());
                     return true;
@@ -278,7 +329,7 @@ namespace VJson
                     {
                         if (!ReadHex())
                         {
-                            throw new Exception("");
+                            throw NodeExpectedError("hex");
                         }
                     }
                     return true;
@@ -362,7 +413,7 @@ namespace VJson
                 return true;
             }
 
-            throw new Exception("");
+            throw NodeExpectedError("number");
         }
 
         bool ReadDigits()
@@ -414,7 +465,7 @@ namespace VJson
 
             if (!ReadDigit())
             {
-                throw new Exception("");
+                throw NodeExpectedError("digit");
             }
 
             return true;
@@ -434,7 +485,7 @@ namespace VJson
 
             if (!ReadDigit())
             {
-                throw new Exception("");
+                throw NodeExpectedError("digit");
             }
 
             return true;
@@ -465,7 +516,7 @@ namespace VJson
                     s = ConsumeChars(4);
                     if (s.ToLower() != "true")
                     {
-                        throw new Exception("T: " + s);
+                        throw NodeExpectedError("true");
                     }
                     return new BooleanNode(s);
 
@@ -474,7 +525,7 @@ namespace VJson
                     s = ConsumeChars(5);
                     if (s.ToLower() != "false")
                     {
-                        throw new Exception("F: " + s);
+                        throw NodeExpectedError("false");
                     }
                     return new BooleanNode(s);
 
@@ -483,7 +534,7 @@ namespace VJson
                     s = ConsumeChars(4);
                     if (s.ToLower() != "null")
                     {
-                        throw new Exception("N: " + s);
+                        throw NodeExpectedError("null");
                     }
                     return new NullNode();
 
@@ -533,6 +584,26 @@ namespace VJson
                 SaveToBuffer(c);
             }
             return CommitBuffer();
+        }
+
+        ParseFailedException NodeExpectedError(string expected)
+        {
+            var msg = String.Format("A node \"{0}\" is expected but a charactor '{1}' is provided", expected, _reader.LastToken);
+            return new ParseFailedException(msg, _reader.Position);
+        }
+
+        ParseFailedException TokenExpectedError(char expected)
+        {
+            var msg = String.Format("A charactor '{0}' is expected but a charactor '{1}' is provided", expected, _reader.LastToken);
+            return new ParseFailedException(msg, _reader.Position);
+        }
+    }
+
+    public class ParseFailedException : Exception
+    {
+        public ParseFailedException(string message, ulong pos)
+        : base(String.Format("{0} (at position {1})", message, pos))
+        {
         }
     }
 }
