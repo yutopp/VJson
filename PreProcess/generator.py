@@ -32,6 +32,7 @@ def main(args):
         "ulong",
         "short",
         "ushort",
+        "string",
     ]
     kinds = {
         "bool": "bool",
@@ -47,9 +48,10 @@ def main(args):
         "ulong": "integer",
         "short": "integer",
         "ushort": "integer",
+        "string": "string",
     }
 
-    from_types = ["bool", "long", "double"]
+    from_types = ["bool", "long", "double", "string"]
 
     # Generate convertion tables
     # FromType -> (ToType -> ConversionFunction)

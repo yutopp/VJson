@@ -449,9 +449,9 @@ namespace VJson.UnitTests
 
             Assert.AreEqual(typeof(SomeObject), actual.Obj.GetType());
             Assert.AreEqual(new SomeObject
-                {
-                    X = 10,
-                }, actual.Obj);
+            {
+                X = 10,
+            }, actual.Obj);
         }
 
         [Test]
@@ -463,9 +463,9 @@ namespace VJson.UnitTests
             Assert.AreEqual(typeof(SomeObject), actual.Obj.GetType());
             Assert.That(actual.Obj,
                         Is.EqualTo(new SomeObject
-                            {
-                                X = 10,
-                            })
+                        {
+                            X = 10,
+                        })
                 );
         }
 
@@ -522,6 +522,103 @@ namespace VJson.UnitTests
                     {"Y", "abab"},
                 },
                 @"{""X"":10,""Y"":""abab""}",
+            },
+        };
+    }
+
+    class JsonSerializerErrorCaseTests
+    {
+        [Test]
+        [TestCaseSource("CommonArgs")]
+        public void DeserializeFailureTest(Type ty, string json, string errorMsg)
+        {
+            var s = new JsonSerializer(ty);
+            var ex = Assert.Throws<DeserializeFailureException>(() => s.Deserialize(json));
+
+            Assert.AreEqual(errorMsg, ex.Message);
+        }
+
+        //
+        static object[] CommonArgs = {
+            new object[] {
+                typeof(bool),
+                "1",
+                "(root): Integer cannot convert to System.Boolean.",
+            },
+            new object[] {
+                typeof(bool),
+                "null",
+                "(root): Null cannot convert to non-nullable value(System.Boolean).",
+            },
+            new object[] {
+                typeof(int),
+                "true",
+                "(root): Boolean cannot convert to System.Int32.",
+            },
+            new object[] {
+                typeof(int),
+                "3.14",
+                "(root): System.Double cannot convert to System.Int32.",
+            },
+            new object[] {
+                typeof(int),
+                "null",
+                "(root): Null cannot convert to non-nullable value(System.Int32).",
+            },
+            new object[] {
+                typeof(string),
+                "true",
+                "(root): Boolean cannot convert to System.String.",
+            },
+            new object[] {
+                typeof(string[]),
+                "true",
+                "(root): Boolean cannot convert to System.String[].",
+            },
+            new object[] {
+                typeof(List<string>),
+                "true",
+                "(root): Boolean cannot convert to System.Collections.Generic.List`1[System.String].",
+            },
+            new object[] {
+                typeof(string[]),
+                "[\"\", 1]",
+                "(root)[1]: Integer cannot convert to System.String.",
+            },
+            new object[] {
+                typeof(List<string>),
+                "[\"\", 1]",
+                "(root)[1]: Integer cannot convert to System.String.",
+            },
+            new object[] {
+                typeof(Dictionary<string, int>),
+                "true",
+                "(root): System.Boolean cannot convert to System.Collections.Generic.Dictionary`2[System.String,System.Int32].",
+            },
+            new object[] {
+                typeof(Dictionary<string, int>),
+                "{\"a\": 1, \"b\": \"bo\"}",
+                "(root)[\"b\"]: String cannot convert to System.Int32.",
+            },
+            new object[] {
+                typeof(SomeObject),
+                "true",
+                "(root): System.Boolean cannot convert to VJson.UnitTests.SomeObject.",
+            },
+            new object[] {
+                typeof(SomeObject),
+                "{\"X\": \"bo\"}",
+                "(root)[\"X\"]: String cannot convert to System.Int32.",
+            },
+            new object[] {
+                typeof(CustomObject),
+                "{\"Obj\": \"bo\"}",
+                "(root)[\"Obj\"]: String cannot convert to one of [System.Boolean, VJson.UnitTests.SomeObject].",
+            },
+            new object[] {
+                typeof(Hoge),
+                "42",
+                "(root): System.Int64 cannot convert implicitly to VJson.UnitTests.Hoge.",
             },
         };
     }

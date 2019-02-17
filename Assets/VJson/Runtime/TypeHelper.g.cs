@@ -48,6 +48,12 @@ namespace VJson
                         { typeof(ushort), o => ConvertFromLongToUshort((long)o) },
                     }
                 },
+                {
+                    typeof(string), new Dictionary<Type, Func<object, object>>
+                    {
+                        { typeof(string), o => o },
+                    }
+                },
             };
 
         private static object ConvertFromDoubleToDecimal(double o) {

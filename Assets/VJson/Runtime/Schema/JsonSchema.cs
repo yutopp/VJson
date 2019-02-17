@@ -503,7 +503,7 @@ namespace VJson.Schema
 
         internal static ConstraintsViolationException Validate(this JsonSchema j,
                                                                object o,
-                                                               JsonSchemaValidator.State state,
+                                                               Internal.State state,
                                                                JsonSchemaRegistory reg)
         {
             return (new JsonSchemaValidator(j)).Validate(o, state, reg);

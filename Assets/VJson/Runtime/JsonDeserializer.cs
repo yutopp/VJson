@@ -10,9 +10,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace VJson
 {
+    using Internal;
+
     public class JsonDeserializer
     {
         private Type _expectedInitialType = null;
@@ -41,112 +44,123 @@ namespace VJson
 
         public object Deserialize(INode node)
         {
-            return DeserializeValue(node, _expectedInitialType);
+            return DeserializeValue(node, _expectedInitialType, new State());
         }
 
-        object DeserializeValue(INode node, Type expectedType)
+        object DeserializeValue(INode node, Type expectedType, State state)
         {
             var expectedKind = Node.KindOfType(expectedType);
 
-            return DeserializeValueAs(node, expectedKind, expectedType);
+            return DeserializeValueAs(node, expectedKind, expectedType, state);
         }
 
-        object DeserializeValueAs(INode node, NodeKind targetKind, Type targetType)
+        object DeserializeValueAs(INode node, NodeKind targetKind, Type targetType, State state)
         {
             switch (targetKind)
             {
                 case NodeKind.Boolean:
-                    return DeserializeToBoolean(node, targetKind, targetType);
+                    return DeserializeToBoolean(node, targetKind, targetType, state);
 
                 case NodeKind.Integer:
                 case NodeKind.Float:
-                    return DeserializeToNumber(node, targetKind, targetType);
+                    return DeserializeToNumber(node, targetKind, targetType, state);
 
                 case NodeKind.String:
-                    return DeserializeToString(node, targetKind, targetType);
+                    return DeserializeToString(node, targetKind, targetType, state);
 
                 case NodeKind.Array:
-                    return DeserializeToArray(node, targetKind, targetType);
+                    return DeserializeToArray(node, targetKind, targetType, state);
 
                 case NodeKind.Object:
-                    return DeserializeToObject(node, targetKind, targetType);
+                    return DeserializeToObject(node, targetKind, targetType, state);
 
                 case NodeKind.Null:
-                    return DeserializeToNull(node, targetKind, targetType);
+                    return DeserializeToNull(node, targetKind, targetType, state);
 
                 default:
-                    throw new NotImplementedException("default");
+                    throw new NotImplementedException("default: " + targetKind);
             }
         }
 
-        object DeserializeToBoolean(INode node, NodeKind targetKind, Type targetType)
+        object DeserializeToBoolean(INode node, NodeKind targetKind, Type targetType, State state)
         {
             if (node is NullNode)
             {
-                if (!(targetType is object))
+                if (!targetType.IsClass)
                 {
-                    throw new NotImplementedException();
+                    var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
+                    throw new DeserializeFailureException(msg);
                 }
+
                 return null;
             }
 
             var bNode = node as BooleanNode;
             if (bNode != null)
             {
-                return CreateInstanceIfConstrucutable<bool>(targetType, bNode.Value);
+                return CreateInstanceIfConstrucutable<bool>(targetType, bNode.Value, state);
             }
 
             // TODO: Should raise error?
-            throw new NotImplementedException();
+            var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+            throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToNumber(INode node, NodeKind targetKind, Type targetType)
+        object DeserializeToNumber(INode node, NodeKind targetKind, Type targetType, State state)
         {
             if (node is NullNode)
             {
-                if (!(targetType is object))
+                if (!targetType.IsClass)
                 {
-                    throw new NotImplementedException();
+                    var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
+                    throw new DeserializeFailureException(msg);
                 }
+
                 return null;
             }
 
             var iNode = node as IntegerNode;
             if (iNode != null)
             {
-                return CreateInstanceIfConstrucutable<long>(targetType, iNode.Value);
+                return CreateInstanceIfConstrucutable<long>(targetType, iNode.Value, state);
             }
 
             var fNode = node as FloatNode;
             if (fNode != null)
             {
-                return CreateInstanceIfConstrucutable<double>(targetType, fNode.Value);
+                return CreateInstanceIfConstrucutable<double>(targetType, fNode.Value, state);
             }
 
             // TODO: Should raise error?
-            throw new NotImplementedException();
+            var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+            throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToString(INode node, NodeKind targetKind, Type targetType)
+        object DeserializeToString(INode node, NodeKind targetKind, Type targetType, State state)
         {
             if (node is NullNode)
             {
-                // TODO: type check of targetType
-                return default(string);
+                if (!targetType.IsClass)
+                {
+                    var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
+                    throw new DeserializeFailureException(msg);
+                }
+
+                return null;
             }
 
             var sNode = node as StringNode;
             if (sNode != null)
             {
-                // TODO: type check of targetType
-                return sNode.Value;
+                return CreateInstanceIfConstrucutable<string>(targetType, sNode.Value, state);
             }
 
             // TODO: Should raise error?
-            throw new NotImplementedException();
+            var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+            throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToArray(INode node, NodeKind targetKind, Type targetType)
+        object DeserializeToArray(INode node, NodeKind targetKind, Type targetType, State state)
         {
             bool isConvertible =
                 targetType == typeof(object)
@@ -155,8 +169,8 @@ namespace VJson
                 ;
             if (!isConvertible)
             {
-                // TODO: raise suitable errors
-                throw new NotImplementedException();
+                var msg = state.CreateMessage("Array cannot convert to non-iterable value({0})", targetType);
+                throw new DeserializeFailureException(msg);
             }
 
             if (node is NullNode)
@@ -182,12 +196,11 @@ namespace VJson
                     var elemType = conteinerTy.GetElementType();
                     for (int i = 0; i < len; ++i)
                     {
-                        var v = DeserializeValue(aNode.Elems[i], elemType);
+                        var v = DeserializeValue(aNode.Elems[i], elemType, state.NestAsElem(i));
                         container.SetValue(v, i);
                     }
 
                     return container;
-
                 }
                 else
                 {
@@ -200,7 +213,7 @@ namespace VJson
                     var elemType = conteinerTy.GetGenericArguments()[0];
                     for (int i = 0; i < len; ++i)
                     {
-                        var v = DeserializeValue(aNode.Elems[i], elemType);
+                        var v = DeserializeValue(aNode.Elems[i], elemType, state.NestAsElem(i));
                         container.Add(v);
                     }
 
@@ -209,15 +222,16 @@ namespace VJson
             }
 
             // TODO: Should raise error?
-            throw new NotImplementedException();
+            var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+            throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToObject(INode node, NodeKind targetKind, Type targetType)
+        object DeserializeToObject(INode node, NodeKind targetKind, Type targetType, State state)
         {
             if (targetKind != NodeKind.Object)
             {
-                // TODO: raise suitable errors
-                throw new NotImplementedException();
+                var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+                throw new DeserializeFailureException(msg0);
             }
 
             if (node is NullNode)
@@ -258,13 +272,12 @@ namespace VJson
                     foreach (var elem in oNode.Elems)
                     {
                         // TODO: duplication check
-                        var v = DeserializeValue(elem.Value, elemType);
+                        var v = DeserializeValue(elem.Value, elemType, state.NestAsElem(elem.Key));
                         container.Add(elem.Key, v);
                     }
 
                 dictionaryDecoded:
                     return container;
-
                 }
                 else
                 {
@@ -287,6 +300,8 @@ namespace VJson
                             continue;
                         }
 
+                        var elemState = state.NestAsElem(elemName);
+
                         if (attr != null && attr.TypeHints != null)
                         {
                             Exception lastEx = null;
@@ -296,7 +311,7 @@ namespace VJson
                                 var elemType = hint;
                                 try
                                 {
-                                    var v = DeserializeValue(elem, elemType);
+                                    var v = DeserializeValue(elem, elemType, elemState);
                                     field.SetValue(container, v);
 
                                     resolved = true;
@@ -309,14 +324,17 @@ namespace VJson
                             }
                             if (!resolved)
                             {
-                                throw new NotImplementedException();
+                                var msg = elemState.CreateMessage("{0} cannot convert to one of [{1}]",
+                                                                  elem.Kind,
+                                                                  string.Join(", ", attr.TypeHints.Select(t => t.ToString()).ToArray()));
+                                throw new DeserializeFailureException(msg);
                             }
                         }
                         else
                         {
                             var elemType = field.FieldType;
 
-                            var v = DeserializeValue(elem, elemType);
+                            var v = DeserializeValue(elem, elemType, elemState);
                             field.SetValue(container, v);
                         }
                     }
@@ -327,10 +345,10 @@ namespace VJson
 
             // A json node type is NOT an object but the target type is an object.
             // Thus, change a target kind and retry.
-            return DeserializeValueAs(node, node.Kind, targetType);
+            return DeserializeValueAs(node, node.Kind, targetType, state);
         }
 
-        object DeserializeToNull(INode node, NodeKind targetKind, Type targetType)
+        object DeserializeToNull(INode node, NodeKind targetKind, Type targetType, State state)
         {
             if (node is NullNode)
             {
@@ -342,7 +360,7 @@ namespace VJson
             throw new NotImplementedException();
         }
 
-        static object CreateInstanceIfConstrucutable<T>(Type targetType, T value)
+        static object CreateInstanceIfConstrucutable<T>(Type targetType, T value, State state)
         {
             // Raw
             if (targetType == typeof(object))
@@ -351,7 +369,8 @@ namespace VJson
             }
 
             var convFunc = TypeHelper.GetConverter(typeof(T), targetType);
-            if (convFunc != null) {
+            if (convFunc != null)
+            {
                 return convFunc(value);
             }
 
@@ -359,7 +378,8 @@ namespace VJson
             var attr = (Json)Attribute.GetCustomAttribute(targetType, typeof(Json));
             if (attr == null)
             {
-                throw new NotImplementedException(targetType.ToString());
+                var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                throw new DeserializeFailureException(msg);
             }
 
             if (!attr.ImplicitConstructable)
@@ -370,10 +390,24 @@ namespace VJson
             var ctor = targetType.GetConstructor(new[] { typeof(T) });
             if (ctor == null)
             {
-                throw new NotImplementedException();
+                var msg = state.CreateMessage("{0} cannot convert implicitly to {1}", typeof(T), targetType);
+                throw new DeserializeFailureException(msg);
             }
 
             return ctor.Invoke(new object[] { value });
+        }
+    }
+
+    public class DeserializeFailureException : Exception
+    {
+        public DeserializeFailureException(string message)
+            : base(message)
+        {
+        }
+
+        public DeserializeFailureException(string message, DeserializeFailureException inner)
+            : base(String.Format("{0}.{1}", message, inner.Message))
+        {
         }
     }
 }

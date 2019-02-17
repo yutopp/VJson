@@ -13,6 +13,8 @@ using System.Linq;
 
 namespace VJson.Schema
 {
+    using Internal;
+
     public class JsonSchemaValidator
     {
         JsonSchema _schema;
@@ -109,7 +111,8 @@ namespace VJson.Schema
                 ex = _schema.Not.Validate(o, state, reg);
                 if (ex == null)
                 {
-                    return new ConstraintsViolationException("Not", ex);
+                    var msg = state.CreateMessage("Not");
+                    return new ConstraintsViolationException(msg);
                 }
             }
 
@@ -526,32 +529,6 @@ namespace VJson.Schema
                     throw new NotImplementedException();
             }
         }
-
-        internal struct State
-        {
-            string _elemName;
-
-            internal State NestAsElem(int elem)
-            {
-                return new State()
-                {
-                    _elemName = String.Format("{0}[{1}]", _elemName, elem),
-                };
-            }
-
-            internal State NestAsElem(string elem)
-            {
-                return new State()
-                {
-                    _elemName = String.Format("{0}[\"{1}\"]", _elemName, elem),
-                };
-            }
-
-            internal string CreateMessage(string format, params object[] args)
-            {
-                return String.Format("{0}: {1}.", _elemName, String.Format(format, args));
-            }
-        }
     }
 
     public class ConstraintsViolationException : Exception
@@ -562,24 +539,8 @@ namespace VJson.Schema
         }
 
         public ConstraintsViolationException(string message, ConstraintsViolationException inner)
-            : base(message, inner)
+            : base(String.Format("{0}.{1}", message, inner.Message))
         {
-        }
-
-        public string Diagnosis()
-        {
-            return DiagnosisAcc(new List<string>() { Message });
-        }
-
-        string DiagnosisAcc(List<string> acc)
-        {
-            if (InnerException != null)
-            {
-                var inner = (ConstraintsViolationException)InnerException;
-                acc.Add(inner.Message);
-                return inner.DiagnosisAcc(acc);
-            }
-            return String.Join(".", acc.ToArray());
         }
     }
 }
