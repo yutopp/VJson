@@ -289,6 +289,7 @@ namespace VJson
 
                         if (attr != null && attr.TypeHints != null)
                         {
+                            Exception lastEx = null;
                             bool resolved = false;
                             foreach (var hint in attr.TypeHints)
                             {
@@ -303,7 +304,7 @@ namespace VJson
                                 }
                                 catch (Exception e)
                                 {
-                                    // TODO: handle exceptions
+                                    lastEx = e;
                                 }
                             }
                             if (!resolved)

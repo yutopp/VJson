@@ -100,14 +100,14 @@ namespace VJson
             }
         }
 
-        class DeepEqualityComparer : IEqualityComparer<object>
+        class DeepEqualityComparer : EqualityComparer<object>
         {
-            public bool Equals(object a, object b)
+            public override bool Equals(object a, object b)
             {
                 return DeepEquals(a, b);
             }
 
-            public int GetHashCode(object a)
+            public override int GetHashCode(object a)
             {
                 return a.GetHashCode();
             }
