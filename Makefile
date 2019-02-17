@@ -1,6 +1,7 @@
 PROJECT_NAME:=VJson
 
-PROJECT_TEST_DIR:=${PROJECT_NAME}.standalone/${PROJECT_NAME}.Editor.Tests
+PROJECT_DIR:=${PROJECT_NAME}.standalone
+PROJECT_TEST_DIR:=${PROJECT_DIR}/${PROJECT_NAME}.Editor.Tests
 NUNIT_CONSOLE:=.nuget/NUnit.ConsoleRunner/tools/nunit3-console.exe
 
 .PHONY: all
@@ -69,3 +70,7 @@ test-netcore20: build-debug-netcore20 test-results
 coverage-netcore20: build-debug-netcore20
 	dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput='./lcov.info' ${PROJECT_TEST_DIR}/${PROJECT_NAME}.Editor.Tests.csproj -f netcoreapp2.0
 	cp VJson.standalone/VJson.Editor.Tests/lcov.info coverage/.
+
+.PHONY: benchmark-netcore20
+benchmark-netcore20:
+	dotnet run -p ${PROJECT_DIR}/Benchmarks/Benchmarks.csproj -c Release -f netcoreapp2.0 -- --job short --runtimes core

@@ -61,3 +61,4 @@ bin/
 test-results
 lcov.info
 codecov
+BenchmarkDotNet.Artifacts

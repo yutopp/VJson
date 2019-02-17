@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VJson", "VJson\VJson.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VJson.Editor.Tests", "VJson.Editor.Tests\VJson.Editor.Tests.csproj", "{A500B2F2-CF5C-4E8A-B52B-05ACCD6BCDB6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{63222FEC-933E-4219-A3F4-246FD2AD024F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,5 +70,17 @@ Global
 		{63EFA01F-793A-486D-A65F-39029DF64C6F}.Release|x64.Build.0 = Release|Any CPU
 		{63EFA01F-793A-486D-A65F-39029DF64C6F}.Release|x86.ActiveCfg = Release|Any CPU
 		{63EFA01F-793A-486D-A65F-39029DF64C6F}.Release|x86.Build.0 = Release|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Debug|x64.Build.0 = Debug|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Debug|x86.Build.0 = Debug|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Release|x64.ActiveCfg = Release|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Release|x64.Build.0 = Release|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Release|x86.ActiveCfg = Release|Any CPU
+		{63222FEC-933E-4219-A3F4-246FD2AD024F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
