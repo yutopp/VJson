@@ -103,6 +103,9 @@ private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>>
             if not is_convertible(kinds[from_ty], kinds[to_ty]):
                 continue
 
+            if from_ty == to_ty:
+                continue
+
             output_funcs += textwrap.indent("""
 private static object ConvertFrom{2}To{3}({0} o) {{
     return ({1})o;

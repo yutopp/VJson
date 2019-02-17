@@ -50,16 +50,8 @@ namespace VJson
                 },
             };
 
-        private static object ConvertFromBoolToBool(bool o) {
-            return (bool)o;
-        }
-
         private static object ConvertFromDoubleToDecimal(double o) {
             return (decimal)o;
-        }
-
-        private static object ConvertFromDoubleToDouble(double o) {
-            return (double)o;
         }
 
         private static object ConvertFromDoubleToFloat(double o) {
@@ -96,10 +88,6 @@ namespace VJson
 
         private static object ConvertFromLongToUint(long o) {
             return (uint)o;
-        }
-
-        private static object ConvertFromLongToLong(long o) {
-            return (long)o;
         }
 
         private static object ConvertFromLongToUlong(long o) {
