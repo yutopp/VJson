@@ -49,16 +49,21 @@ def main(args):
         "ushort": "integer",
     }
 
+    from_types = ["bool", "long", "double"]
+
     # Generate convertion tables
     # FromType -> (ToType -> ConversionFunction)
     output_tables = ""
     output_tables += textwrap.indent("""
-private static readonly new Dictionary<Type, Dictionary<Type, Func<object, object>>> _convTable =
+private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> _convTable =
     new Dictionary<Type, Dictionary<Type, Func<object, object>>>
     {
 """.lstrip(), mk_indent(2))
 
     for from_ty in types:
+        if from_ty not in from_types:
+            continue
+
         output_tables += textwrap.indent("""
 {{
     typeof({0}), new Dictionary<Type, Func<object, object>>
@@ -69,8 +74,13 @@ private static readonly new Dictionary<Type, Dictionary<Type, Func<object, objec
             if not is_convertible(kinds[from_ty], kinds[to_ty]):
                 continue
 
-            output_tables += textwrap.indent("""
+            if from_ty != to_ty:
+                output_tables += textwrap.indent("""
 {{ typeof({1}), o => ConvertFrom{2}To{3}(({0})o) }},
+""".format(from_ty, to_ty, from_ty.capitalize(), to_ty.capitalize()).lstrip(), mk_indent(6))
+            else:
+                output_tables += textwrap.indent("""
+{{ typeof({1}), o => o }},
 """.format(from_ty, to_ty, from_ty.capitalize(), to_ty.capitalize()).lstrip(), mk_indent(6))
             # print(from_ty, to_ty, is_convertible(kinds[from_ty], kinds[to_ty]))
 
@@ -86,6 +96,9 @@ private static readonly new Dictionary<Type, Dictionary<Type, Func<object, objec
     # Generate conversion functions
     output_funcs = ""
     for from_ty in types:
+        if from_ty not in from_types:
+            continue
+
         for to_ty in types:
             if not is_convertible(kinds[from_ty], kinds[to_ty]):
                 continue
