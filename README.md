@@ -1,7 +1,7 @@
 # VJson 🍣
 > A JSON serializer/deserializer library written in pure C#.
 
-[![CircleCI](https://circleci.com/gh/yutopp/VJson.svg?style=svg)](https://circleci.com/gh/yutopp/VJson)  [![codecov](https://codecov.io/gh/yutopp/VJson/branch/master/graph/badge.svg)](https://codecov.io/gh/yutopp/VJson)  [![license](https://img.shields.io/github/license/yutopp/VJson.svg)](https://github.com/yutopp/VJson/blob/master/LICENSE_1_0.txt)
+[![CircleCI](https://circleci.com/gh/yutopp/VJson.svg?style=svg)](https://circleci.com/gh/yutopp/VJson)  [![NuGet Badge](https://buildstats.info/nuget/vjson)](https://www.nuget.org/packages/VJson/)  [![codecov](https://codecov.io/gh/yutopp/VJson/branch/master/graph/badge.svg)](https://codecov.io/gh/yutopp/VJson)  [![license](https://img.shields.io/github/license/yutopp/VJson.svg)](https://github.com/yutopp/VJson/blob/master/LICENSE_1_0.txt)
 
 (WIP)
 

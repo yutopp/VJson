@@ -3,9 +3,26 @@
   <PropertyGroup>
     <TargetFrameworks>net35;net45;netcoreapp2.0</TargetFrameworks>
     <LangVersion>4</LangVersion>
+
+    <PackageId>VJson</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>yutopp</Authors>
+
+    <PackageLicenseUrl>https://github.com/yutopp/VJson/blob/master/LICENSE_1_0.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/yutopp/VJson/</PackageProjectUrl>
+    <PackageTags>csharp;json;json-schema;serialization;unity</PackageTags>
+
+    <Description>A JSON serializer/deserializer library written in pure C#.</Description>
+    <Copyright>Copyright 2019</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="../../Assets/VJson/Runtime/**/*.cs" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <FrameworkPathOverride Condition="'$(OS)' == 'Unix' and '$(TargetFramework)' == 'net35'">/usr/lib/mono/2.0-api/</FrameworkPathOverride>
+    <FrameworkPathOverride Condition="'$(OS)' == 'Unix' and '$(TargetFramework)' == 'net45'">/usr/lib/mono/4.5/</FrameworkPathOverride>
+  </PropertyGroup>
+
 </Project>
