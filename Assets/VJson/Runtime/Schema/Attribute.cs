@@ -21,7 +21,7 @@ namespace VJson.Schema
     {
         public string[] Dependencies;
 
-        public JsonSchemaDependencies(string[] deps)
+        public JsonSchemaDependencies(params string[] deps)
         {
             Dependencies = deps;
         }
