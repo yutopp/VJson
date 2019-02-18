@@ -61,7 +61,7 @@ namespace VJson
 
         void SerializePrimitive<T>(JsonWriter writer, T o)
         {
-            var write = typeof(JsonWriter).GetMethod("WriteValue", new[] { o.GetType() });
+            var write = TypeHelper.TypeWrap(typeof(JsonWriter)).GetMethod("WriteValue", new[] { o.GetType() });
             write.Invoke(writer, new object[] { o });
         }
 

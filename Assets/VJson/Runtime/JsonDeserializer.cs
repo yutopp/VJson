@@ -86,7 +86,7 @@ namespace VJson
         {
             if (node is NullNode)
             {
-                if (!targetType.IsClass)
+                if (!TypeHelper.TypeWrap(targetType).IsClass)
                 {
                     var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
                     throw new DeserializeFailureException(msg);
@@ -110,7 +110,7 @@ namespace VJson
         {
             if (node is NullNode)
             {
-                if (!targetType.IsClass)
+                if (!TypeHelper.TypeWrap(targetType).IsClass)
                 {
                     var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
                     throw new DeserializeFailureException(msg);
@@ -140,7 +140,7 @@ namespace VJson
         {
             if (node is NullNode)
             {
-                if (!targetType.IsClass)
+                if (!TypeHelper.TypeWrap(targetType).IsClass)
                 {
                     var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
                     throw new DeserializeFailureException(msg);
@@ -165,7 +165,7 @@ namespace VJson
             bool isConvertible =
                 targetType == typeof(object)
                 || (targetType.IsArray)
-                || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(List<>))
+                || (TypeHelper.TypeWrap(targetType).IsGenericType && targetType.GetGenericTypeDefinition() == typeof(List<>))
                 ;
             if (!isConvertible)
             {
@@ -210,7 +210,7 @@ namespace VJson
                     var len = aNode.Elems != null ? aNode.Elems.Count : 0;
                     var container = (IList)Activator.CreateInstance(conteinerTy);
 
-                    var elemType = conteinerTy.GetGenericArguments()[0];
+                    var elemType = TypeHelper.TypeWrap(conteinerTy).GetGenericArguments()[0];
                     for (int i = 0; i < len; ++i)
                     {
                         var v = DeserializeValue(aNode.Elems[i], elemType, state.NestAsElem(i));
@@ -244,7 +244,7 @@ namespace VJson
             {
                 bool asDictionary =
                     targetType == typeof(object)
-                    || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    || (TypeHelper.TypeWrap(targetType).IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     ;
                 if (asDictionary)
                 {
@@ -255,7 +255,7 @@ namespace VJson
                         containerTy = typeof(Dictionary<string, object>);
                     }
 
-                    var keyType = containerTy.GetGenericArguments()[0];
+                    var keyType = TypeHelper.TypeWrap(containerTy).GetGenericArguments()[0];
                     if (keyType != typeof(string))
                     {
                         throw new NotImplementedException();
@@ -268,7 +268,7 @@ namespace VJson
                         goto dictionaryDecoded;
                     }
 
-                    var elemType = containerTy.GetGenericArguments()[1];
+                    var elemType = TypeHelper.TypeWrap(containerTy).GetGenericArguments()[1];
                     foreach (var elem in oNode.Elems)
                     {
                         // TODO: duplication check
@@ -285,10 +285,10 @@ namespace VJson
 
                     // TODO: add type check
                     var container = Activator.CreateInstance(targetType);
-                    var fields = targetType.GetFields();
+                    var fields = TypeHelper.TypeWrap(targetType).GetFields();
                     foreach (var field in fields)
                     {
-                        var attr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
+                        var attr = TypeHelper.GetCustomAttribute<JsonField>(field);
 
                         // TODO: duplication check
                         var elemName = JsonField.FieldName(attr, field);
@@ -373,7 +373,7 @@ namespace VJson
             }
 
             // Try to convert value implicitly
-            var attr = (Json)Attribute.GetCustomAttribute(targetType, typeof(Json));
+            var attr = TypeHelper.GetCustomAttribute<Json>(targetType);
             if (attr == null)
             {
                 var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
@@ -385,7 +385,7 @@ namespace VJson
                 throw new NotImplementedException(targetType.ToString());
             }
 
-            var ctor = targetType.GetConstructor(new[] { typeof(T) });
+            var ctor = TypeHelper.TypeWrap(targetType).GetConstructor(new[] { typeof(T) });
             if (ctor == null)
             {
                 var msg = state.CreateMessage("{0} cannot convert implicitly to {1}", typeof(T), targetType);

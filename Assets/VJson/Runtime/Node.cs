@@ -339,7 +339,7 @@ namespace VJson
             {
                 return NodeKind.Array;
             }
-            if (ty.IsGenericType)
+            if (TypeHelper.TypeWrap(ty).IsGenericType)
             {
                 var containerTy = ty.GetGenericTypeDefinition();
                 if (containerTy == typeof(List<>))

@@ -9,17 +9,44 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace VJson
 {
     static partial class TypeHelper
     {
+#if !(NET20 || NET35 || NET40 || NET_2_0 || NET_2_0_SUBSET)
+        public static TypeInfo TypeWrap(Type ty)
+        {
+            return ty.GetTypeInfo();
+        }
+#else
+        public static Type TypeWrap(Type ty)
+        {
+            return ty;
+        }
+#endif
+
+        public static T GetCustomAttribute<T>(FieldInfo fi) where T : Attribute
+        {
+            return (T)fi.GetCustomAttributes(typeof(T), false)
+                .Where(a => a.GetType() == typeof(T))
+                .FirstOrDefault();
+        }
+
+        public static T GetCustomAttribute<T>(Type ty) where T : Attribute
+        {
+            return (T)TypeWrap(ty).GetCustomAttributes(typeof(T), false)
+                .Where(a => a.GetType() == typeof(T))
+                .FirstOrDefault();
+        }
+
         public static IEnumerable<object> ToIEnumerable(object o)
         {
             var ty = o.GetType();
             if (ty.IsArray)
             {
-                if (ty.HasElementType && ty.GetElementType().IsClass)
+                if (ty.HasElementType && TypeWrap(ty.GetElementType()).IsClass)
                 {
                     return ((IEnumerable<object>)o);
                 }
@@ -46,9 +73,9 @@ namespace VJson
                 return null;
             }
 
-            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(List<>))
+            if (TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(List<>))
             {
-                return ty.GetGenericArguments()[0];
+                return TypeWrap(ty).GetGenericArguments()[0];
             }
 
             return null;
@@ -62,9 +89,9 @@ namespace VJson
         public static IEnumerable<KeyValuePair<string, object>> ToKeyValuesUnordered(object o)
         {
             var ty = o.GetType();
-            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            if (TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                var keyType = ty.GetGenericArguments()[0];
+                var keyType = TypeWrap(ty).GetGenericArguments()[0];
                 if (keyType != typeof(string))
                 {
                     // TODO: Should allow them and call `ToString`?
@@ -75,21 +102,19 @@ namespace VJson
                 {
                     yield return new KeyValuePair<string, object>((string)elem.Key, elem.Value);
                 }
-
             }
             else
             {
-                var fields = ty.GetFields();
+                var fields = TypeWrap(ty).GetFields();
                 foreach (var field in fields)
                 {
-                    var fieldAttr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField));
+                    var fieldAttr = GetCustomAttribute<JsonField>(field);
 
                     // TODO: duplication check
                     var elemName = JsonField.FieldName(fieldAttr, field);
                     var elemValue = field.GetValue(o);
 
-                    var fieldIgnoreAttr =
-                        (JsonFieldIgnorable)Attribute.GetCustomAttribute(field, typeof(JsonFieldIgnorable));
+                    var fieldIgnoreAttr = GetCustomAttribute<JsonFieldIgnorable>(field);
                     if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue))
                     {
                         continue;

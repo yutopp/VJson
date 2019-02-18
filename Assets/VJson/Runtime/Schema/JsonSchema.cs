@@ -304,7 +304,7 @@ namespace VJson.Schema
                         return new JsonSchema();
                     }
 
-                    if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    if (TypeHelper.TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     {
                         return new JsonSchema
                         {
@@ -323,7 +323,7 @@ namespace VJson.Schema
                 reg = JsonSchemaRegistory.GetDefault();
             }
 
-            var schema = (JsonSchema)Attribute.GetCustomAttribute(ty, typeof(JsonSchema));
+            var schema = TypeHelper.GetCustomAttribute<JsonSchema>(ty);
             if (schema == null)
             {
                 schema = new JsonSchema();
@@ -350,39 +350,33 @@ namespace VJson.Schema
             var required = new List<string>();
             var dependencies = new Dictionary<string, string[]>();
 
-            var fields = ty.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            var fields = TypeHelper.TypeWrap(ty).GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (var field in fields)
             {
-                var attr = (JsonField)Attribute.GetCustomAttribute(field, typeof(JsonField), false);
+                var attr = TypeHelper.GetCustomAttribute<JsonField>(field);
 
                 // TODO: duplication check
                 var elemName = JsonField.FieldName(attr, field);
 
-                var fieldSchema =
-                    (JsonSchema)Attribute.GetCustomAttributes(field, typeof(JsonSchema))
-                    .Where(f => f.GetType() == typeof(JsonSchema))
-                    .FirstOrDefault();
+                var fieldSchema = TypeHelper.GetCustomAttribute<JsonSchema>(field);
                 if (fieldSchema == null)
                 {
                     fieldSchema = new JsonSchema();
                 }
 
-                var fieldItemsSchema =
-                    (ItemsJsonSchema)Attribute.GetCustomAttribute(field, typeof(ItemsJsonSchema));
+                var fieldItemsSchema = TypeHelper.GetCustomAttribute<ItemsJsonSchema>(field);
                 if (fieldItemsSchema != null)
                 {
                     fieldSchema.Items = fieldItemsSchema;
                 }
 
-                var fieldItemRequired =
-                    (JsonSchemaRequired)Attribute.GetCustomAttribute(field, typeof(JsonSchemaRequired));
+                var fieldItemRequired = TypeHelper.GetCustomAttribute<JsonSchemaRequired>(field);
                 if (fieldItemRequired != null)
                 {
                     required.Add(elemName);
                 }
 
-                var fieldItemDependencies =
-                    (JsonSchemaDependencies)Attribute.GetCustomAttribute(field, typeof(JsonSchemaDependencies));
+                var fieldItemDependencies = TypeHelper.GetCustomAttribute<JsonSchemaDependencies>(field);
                 if (fieldItemDependencies != null)
                 {
                     dependencies.Add(elemName, fieldItemDependencies.Dependencies);
