@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net35;net45;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;net45;net35</TargetFrameworks>
     <LangVersion>4</LangVersion>
 
     <PackageId>VJson</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.0.0</Version>
     <Authors>yutopp</Authors>
 
     <PackageLicenseUrl>https://github.com/yutopp/VJson/blob/master/LICENSE_1_0.txt</PackageLicenseUrl>
