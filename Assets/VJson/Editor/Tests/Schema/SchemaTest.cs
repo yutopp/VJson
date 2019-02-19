@@ -180,6 +180,10 @@ namespace VJson.Schema.UnitTests
                 typeof(VJson.UnitTests.EnumAsInt),
                 "{\"enum\":[0,1,100],\"type\":\"integer\"}",
             },
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsString),
+                "{\"enum\":[\"NameA\",\"NameB\",\"OtherName\"],\"type\":\"string\"}",
+            },
         };
     }
 

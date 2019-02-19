@@ -186,11 +186,14 @@ namespace VJson.UnitTests
         C = 100,
     }
 
+    [Json(EnumConversion = EnumConversionType.AsString)]
     enum EnumAsString
     {
-        A,
-        B,
-        C = 100,
+        NameA,
+        NameB,
+
+        [JsonField(Name = "OtherName")]
+        NameC = 100,
     }
 
     class JsonSerializerTests
@@ -362,6 +365,8 @@ namespace VJson.UnitTests
                 },
                 @"{""Ignore1"":[1]}",
             },
+
+            // Enums
             new object[] {
                 EnumAsInt.A,
                 @"0",
@@ -373,6 +378,18 @@ namespace VJson.UnitTests
             new object[] {
                 EnumAsInt.C,
                 @"100",
+            },
+            new object[] {
+                EnumAsString.NameA,
+                @"""NameA""",
+            },
+            new object[] {
+                EnumAsString.NameB,
+                @"""NameB""",
+            },
+            new object[] {
+                EnumAsString.NameC,
+                @"""OtherName""",
             },
         };
 
@@ -650,6 +667,26 @@ namespace VJson.UnitTests
                 typeof(EnumAsInt),
                 "42",
                 "(root): System.Int64 cannot convert to VJson.UnitTests.EnumAsInt.",
+            },
+            new object[] {
+                typeof(EnumAsInt),
+                "\"A\"",
+                "(root): String cannot convert to VJson.UnitTests.EnumAsInt.",
+            },
+            new object[] {
+                typeof(EnumAsString),
+                "1",
+                "(root): Integer cannot convert to VJson.UnitTests.EnumAsString.",
+            },
+            new object[] {
+                typeof(EnumAsString),
+                "\"HogeHoge\"",
+                "(root): System.String cannot convert to VJson.UnitTests.EnumAsString.",
+            },
+            new object[] {
+                typeof(EnumAsString),
+                "\"NameC\"",
+                "(root): System.String cannot convert to VJson.UnitTests.EnumAsString.",
             },
         };
     }

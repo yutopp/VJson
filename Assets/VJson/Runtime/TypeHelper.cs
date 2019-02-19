@@ -41,6 +41,28 @@ namespace VJson
                 .FirstOrDefault();
         }
 
+        // TODO: implement cache
+        public static string[] GetStringEnumNames(Type ty)
+        {
+            var enumFields = TypeWrap(ty).GetFields(BindingFlags.Static|BindingFlags.Public);
+            return enumFields.Select(fi => {
+                    var attr = GetCustomAttribute<JsonField>(fi);
+                    if (attr != null && attr.Name != null) {
+                        return attr.Name;
+                    }
+
+                    return fi.Name;
+                }).ToArray();
+        }
+
+        public static string GetStringEnumNameOf(object e)
+        {
+            var eTy = e.GetType();
+            var enumIndex = Array.IndexOf(Enum.GetValues(eTy), e);
+
+            return GetStringEnumNames(eTy)[enumIndex];
+        }
+
         public static IEnumerable<object> ToIEnumerable(object o)
         {
             var ty = o.GetType();

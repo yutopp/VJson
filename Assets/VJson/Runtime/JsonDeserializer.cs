@@ -373,24 +373,40 @@ namespace VJson
                 return convFunc(value);
             }
 
-            // TODO: Enum
             if (TypeHelper.TypeWrap(targetType).IsEnum)
             {
-                var enumUnderlyingType = Enum.GetUnderlyingType(targetType);
-                var enumConvFunc = TypeHelper.GetConverter(typeof(T), enumUnderlyingType);
-                if (enumConvFunc == null)
+                var enumAttr = TypeHelper.GetCustomAttribute<Json>(targetType);
+                switch (enumAttr != null ? enumAttr.EnumConversion : EnumConversionType.AsInt)
                 {
-                    var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
-                    throw new DeserializeFailureException(msg);
-                }
-                var enumValue = enumConvFunc(value);
+                    case EnumConversionType.AsInt:
+                        var enumUnderlyingType = Enum.GetUnderlyingType(targetType);
+                        var enumConvFunc = TypeHelper.GetConverter(typeof(T), enumUnderlyingType);
+                        if (enumConvFunc == null)
+                        {
+                            var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                            throw new DeserializeFailureException(msg);
+                        }
+                        var enumValue = enumConvFunc(value);
 
-                if (!Enum.IsDefined(targetType, enumValue)) {
-                    var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
-                    throw new DeserializeFailureException(msg);
-                }
+                        if (!Enum.IsDefined(targetType, enumValue))
+                        {
+                            var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                            throw new DeserializeFailureException(msg);
+                        }
 
-                return Enum.ToObject(targetType, enumValue);
+                        return Enum.ToObject(targetType, enumValue);
+
+                    case EnumConversionType.AsString:
+                        var stringEnumNames = TypeHelper.GetStringEnumNames(targetType);
+                        var enumIndex = Array.IndexOf(stringEnumNames, value);
+                        if (enumIndex == -1)
+                        {
+                            var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                            throw new DeserializeFailureException(msg);
+                        }
+
+                        return Enum.GetValues(targetType).GetValue(enumIndex);
+                }
             }
 
             // Try to convert value implicitly

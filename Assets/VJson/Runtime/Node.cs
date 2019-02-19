@@ -337,8 +337,10 @@ namespace VJson
             // Enum(integer or string)
             if (TypeHelper.TypeWrap(ty).IsEnum)
             {
-                // TODO: support string
-                return NodeKind.Integer;
+                var attr = TypeHelper.GetCustomAttribute<Json>(ty);
+                return attr != null && attr.EnumConversion == EnumConversionType.AsString
+                    ? NodeKind.String
+                    : NodeKind.Integer;
             }
 
             // Arrays

@@ -291,9 +291,15 @@ namespace VJson.Schema
                     };
 
                 case NodeKind.String:
+                    object[] enumsForString = null;
+                    if (TypeHelper.TypeWrap(ty).IsEnum)
+                    {
+                        enumsForString = TypeHelper.GetStringEnumNames(ty);
+                    }
                     return new JsonSchema
                     {
                         Type = "string",
+                        Enum = enumsForString,
                     };
 
                 case NodeKind.Array:

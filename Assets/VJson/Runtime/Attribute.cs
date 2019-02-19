@@ -11,10 +11,17 @@ using System.Reflection;
 
 namespace VJson
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    public enum EnumConversionType
+    {
+        AsInt,
+        AsString,
+    }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum)]
     public class Json : System.Attribute
     {
-        public bool ImplicitConstructable;
+        public bool ImplicitConstructable; // Only for classes
+        public EnumConversionType EnumConversion; // Only for enums
     }
 
     [AttributeUsage(AttributeTargets.Field)]

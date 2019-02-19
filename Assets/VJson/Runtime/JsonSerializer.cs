@@ -63,7 +63,19 @@ namespace VJson
         {
             if (TypeHelper.TypeWrap(o.GetType()).IsEnum)
             {
-                SerializeValue(writer, Convert.ChangeType(o, Enum.GetUnderlyingType(o.GetType())));
+                var attr = TypeHelper.GetCustomAttribute<Json>(o.GetType());
+                switch (attr != null ? attr.EnumConversion : EnumConversionType.AsInt)
+                {
+                    case EnumConversionType.AsInt:
+                        // Convert to simple integer
+                        SerializeValue(writer, Convert.ChangeType(o, Enum.GetUnderlyingType(o.GetType())));
+                        break;
+
+                    case EnumConversionType.AsString:
+                        SerializeValue(writer, TypeHelper.GetStringEnumNameOf(o));
+                        break;
+                }
+
                 return;
             }
 
