@@ -15,15 +15,15 @@ namespace VJson
 {
     static partial class TypeHelper
     {
-#if !(NET20 || NET35 || NET40 || NET_2_0 || NET_2_0_SUBSET)
-        public static TypeInfo TypeWrap(Type ty)
-        {
-            return ty.GetTypeInfo();
-        }
-#else
+#if NET20 || NET35 || NET40 || NET_2_0 || NET_2_0_SUBSET
         public static Type TypeWrap(Type ty)
         {
             return ty;
+        }
+#else
+        public static TypeInfo TypeWrap(Type ty)
+        {
+            return ty.GetTypeInfo();
         }
 #endif
 
