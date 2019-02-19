@@ -62,8 +62,6 @@ restore-dotnet:
 
 .PHONY: build-debug-netcore20
 build-debug-netcore20: restore-dotnet
-	dotnet build ${PROJECT_TEST_DIR} -f netstandard1.6
-	dotnet build ${PROJECT_TEST_DIR} -f netcoreapp1.0
 	dotnet build ${PROJECT_TEST_DIR} -f netcoreapp2.0
 
 .PHONY: test-netcore20
