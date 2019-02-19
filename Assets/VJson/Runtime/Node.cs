@@ -99,7 +99,7 @@ namespace VJson
             get { return NodeKind.Integer; }
         }
 
-        public long Value {get; private set;}
+        public long Value { get; private set; }
 
         public IntegerNode(long v)
         {
@@ -334,18 +334,19 @@ namespace VJson
                 return k;
             }
 
+            // Enum(integer or string)
+            if (TypeHelper.TypeWrap(ty).IsEnum)
+            {
+                // TODO: support string
+                return NodeKind.Integer;
+            }
+
             // Arrays
-            if (ty.IsArray)
+            // If elem type exists, it can treat as Array(IEnumerable)
+            var elemTy = TypeHelper.ElemTypeOfIEnumerable(ty);
+            if (elemTy != null)
             {
                 return NodeKind.Array;
-            }
-            if (TypeHelper.TypeWrap(ty).IsGenericType)
-            {
-                var containerTy = ty.GetGenericTypeDefinition();
-                if (containerTy == typeof(List<>))
-                {
-                    return NodeKind.Array;
-                }
             }
 
             // Others

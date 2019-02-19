@@ -61,6 +61,12 @@ namespace VJson
 
         void SerializePrimitive<T>(JsonWriter writer, T o)
         {
+            if (TypeHelper.TypeWrap(o.GetType()).IsEnum)
+            {
+                SerializeValue(writer, Convert.ChangeType(o, Enum.GetUnderlyingType(o.GetType())));
+                return;
+            }
+
             var write = TypeHelper.TypeWrap(typeof(JsonWriter)).GetMethod("WriteValue", new[] { o.GetType() });
             write.Invoke(writer, new object[] { o });
         }

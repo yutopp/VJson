@@ -179,6 +179,20 @@ namespace VJson.UnitTests
         }
     }
 
+    enum EnumAsInt
+    {
+        A,
+        B,
+        C = 100,
+    }
+
+    enum EnumAsString
+    {
+        A,
+        B,
+        C = 100,
+    }
+
     class JsonSerializerTests
     {
         [Test]
@@ -347,7 +361,19 @@ namespace VJson.UnitTests
                     Ignore1 = new List<int> {1},
                 },
                 @"{""Ignore1"":[1]}",
-            }
+            },
+            new object[] {
+                EnumAsInt.A,
+                @"0",
+            },
+            new object[] {
+                EnumAsInt.B,
+                @"1",
+            },
+            new object[] {
+                EnumAsInt.C,
+                @"100",
+            },
         };
 
         static object[] OnlySerializeArgs = {
@@ -619,6 +645,11 @@ namespace VJson.UnitTests
                 typeof(Hoge),
                 "42",
                 "(root): System.Int64 cannot convert implicitly to VJson.UnitTests.Hoge.",
+            },
+            new object[] {
+                typeof(EnumAsInt),
+                "42",
+                "(root): System.Int64 cannot convert to VJson.UnitTests.EnumAsInt.",
             },
         };
     }

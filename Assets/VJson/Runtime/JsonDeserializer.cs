@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Reflection;
 
 namespace VJson
 {
@@ -370,6 +371,26 @@ namespace VJson
             if (convFunc != null)
             {
                 return convFunc(value);
+            }
+
+            // TODO: Enum
+            if (TypeHelper.TypeWrap(targetType).IsEnum)
+            {
+                var enumUnderlyingType = Enum.GetUnderlyingType(targetType);
+                var enumConvFunc = TypeHelper.GetConverter(typeof(T), enumUnderlyingType);
+                if (enumConvFunc == null)
+                {
+                    var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                    throw new DeserializeFailureException(msg);
+                }
+                var enumValue = enumConvFunc(value);
+
+                if (!Enum.IsDefined(targetType, enumValue)) {
+                    var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                    throw new DeserializeFailureException(msg);
+                }
+
+                return Enum.ToObject(targetType, enumValue);
             }
 
             // Try to convert value implicitly

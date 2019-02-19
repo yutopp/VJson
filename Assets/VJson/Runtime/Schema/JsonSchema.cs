@@ -273,9 +273,15 @@ namespace VJson.Schema
                     };
 
                 case NodeKind.Integer:
+                    object[] enumsForInteger = null;
+                    if (TypeHelper.TypeWrap(ty).IsEnum)
+                    {
+                        enumsForInteger = System.Enum.GetValues(ty).Cast<object>().ToArray();
+                    }
                     return new JsonSchema
                     {
                         Type = "integer",
+                        Enum = enumsForInteger,
                     };
 
                 case NodeKind.Float:

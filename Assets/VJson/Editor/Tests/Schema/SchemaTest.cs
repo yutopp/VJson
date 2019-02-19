@@ -176,6 +176,10 @@ namespace VJson.Schema.UnitTests
                 typeof(ValidatorWithSerializerTests.HasNested),
                 "{\"properties\":{\"C\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+HasNestedChild\"}},\"required\":[\"C\"],\"type\":\"object\"}",
             },
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsInt),
+                "{\"enum\":[0,1,100],\"type\":\"integer\"}",
+            },
         };
     }
 
