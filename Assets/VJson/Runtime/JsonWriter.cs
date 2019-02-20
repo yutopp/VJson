@@ -185,6 +185,11 @@ namespace VJson
             _writer.Write("null");
         }
 
+        void WritePrimitive(char v)
+        {
+            WritePrimitive<int>((int)v);
+        }
+
         void WritePrimitive<T>(T v)
         {
             WriteDelimiter();

@@ -273,11 +273,39 @@ namespace VJson.UnitTests
                 @"1",
             },
             new object[] {
-                (short)1,
+                (sbyte)1,
+                @"1",
+            },
+            new object[] {
+                (char)1,
+                @"1",
+            },
+            new object[] {
+                (decimal)1,
+                @"1",
+            },
+            new object[] {
+                (double)1,
+                @"1",
+            },
+            new object[] {
+                (float)1,
                 @"1",
             },
             new object[] {
                 (int)1,
+                @"1",
+            },
+            new object[] {
+                (uint)1,
+                @"1",
+            },
+            new object[] {
+                (short)1,
+                @"1",
+            },
+            new object[] {
+                (ushort)1,
                 @"1",
             },
             new object[] {
@@ -290,6 +318,10 @@ namespace VJson.UnitTests
             },
             new object[] {
                 (double)3.14,
+                @"3.14",
+            },
+            new object[] {
+                (decimal)3.14,
                 @"3.14",
             },
 
