@@ -313,6 +313,10 @@ namespace VJson.UnitTests
                 @"1",
             },
             new object[] {
+                (ulong)1,
+                @"1",
+            },
+            new object[] {
                 (float)3.14,
                 @"3.14",
             },
