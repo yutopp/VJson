@@ -227,7 +227,7 @@ namespace VJson.Schema.UnitTests
         [TestCase("minItems.json")]
         [TestCase("minLength.json")]
         [TestCase("minProperties.json")]
-        //[TestCase("multipleOf.json")]
+        [TestCase("multipleOf.json")]
         [TestCase("not.json")]
         //[TestCase("oneOf.json")]
         //[TestCase("optional")]
@@ -254,9 +254,9 @@ namespace VJson.Schema.UnitTests
                     {
                         var ex = c.schema.Validate(t.data);
 
-                        Assert.That(ex == null, Is.EqualTo(t.valid),
-                                    String.Format("{0} / {1} ({2})", ex, t.description, c.description)
-                            );
+                        Assert.That(ex == null,
+                                    Is.EqualTo(t.valid),
+                                    String.Format("{0} / {1} ({2})", ex, t.description, c.description));
                     }
                 }
             }

@@ -169,7 +169,18 @@ namespace VJson.Schema
         {
             if (_schema.MultipleOf != double.MinValue)
             {
-                throw new NotImplementedException();
+                if (_schema.MultipleOf <= 0)
+                {
+                    throw new InvalidOperationException("MultipleOf must be greater than 0: Value = " + _schema.MultipleOf);
+                }
+
+                var b = v / _schema.MultipleOf;
+                if (b != Math.Truncate(b))
+                {
+                    var msg = state.CreateMessage("MultipleOf assertion !({0} % {1} == 0)",
+                                                  v, _schema.MultipleOf);
+                    return new ConstraintsViolationException(msg);
+                }
             }
 
             if (_schema.Maximum != double.MinValue)
