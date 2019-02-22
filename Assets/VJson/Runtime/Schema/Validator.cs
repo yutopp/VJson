@@ -124,11 +124,38 @@ namespace VJson.Schema
                     ex = jsonSchema.Validate(o, state, reg);
                     if (ex != null)
                     {
-                        var msg = state.CreateMessage("AllOf at {0}", i);
+                        var msg = state.CreateMessage("AllOf: Failed at {0}", i);
                         return new ConstraintsViolationException(msg, ex);
                     }
 
                     ++i;
+                }
+            }
+
+            if (_schema.OneOf != null)
+            {
+                var checkedI = -1;
+                var i = 0;
+                foreach (var jsonSchema in _schema.OneOf)
+                {
+                    ex = jsonSchema.Validate(o, state, reg);
+                    if (ex == null)
+                    {
+                        if (checkedI != -1)
+                        {
+                            var msg = state.CreateMessage("OneOf: Schemas at {0} and {1} are matched", checkedI, i);
+                            return new ConstraintsViolationException(msg);
+                        }
+
+                        checkedI = i;
+                    }
+
+                    ++i;
+                }
+                if (checkedI == -1)
+                {
+                    var msg = state.CreateMessage("OneOf: No schemas are matched");
+                    return new ConstraintsViolationException(msg);
                 }
             }
 

@@ -229,7 +229,7 @@ namespace VJson.Schema.UnitTests
         [TestCase("minProperties.json")]
         [TestCase("multipleOf.json")]
         [TestCase("not.json")]
-        //[TestCase("oneOf.json")]
+        [TestCase("oneOf.json")]
         //[TestCase("optional")]
         [TestCase("pattern.json")]
         [TestCase("patternProperties.json")]
