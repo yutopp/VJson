@@ -278,6 +278,21 @@ namespace VJson.Schema
                 }
             }
 
+            if (_schema.UniqueItems)
+            {
+                // O(N^2) to use DeepEquals...
+                var i = 0;
+                foreach (var elem in v)
+                {
+                    if (v.Where((_, j) => j != i).Any(o => TypeHelper.DeepEquals(o, elem)))
+                    {
+                        return new ConstraintsViolationException("a");
+                    }
+
+                    ++i;
+                }
+            }
+
             List<object> extraItems = null;
 
             if (_schema.Items != null)

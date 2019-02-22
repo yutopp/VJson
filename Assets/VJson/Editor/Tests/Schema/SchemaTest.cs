@@ -239,7 +239,7 @@ namespace VJson.Schema.UnitTests
         //[TestCase("refRemote.json")]
         [TestCase("required.json")]
         [TestCase("type.json")]
-        //[TestCase("uniqueItems.json")]
+        [TestCase("uniqueItems.json")]
         public void ValidationTest(string casePath)
         {
             var path = Path.Combine(Path.Combine(Path.Combine("JSON-Schema-Test-Suite", "tests"), "draft7"), casePath);

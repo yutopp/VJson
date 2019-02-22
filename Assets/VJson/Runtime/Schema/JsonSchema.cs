@@ -133,7 +133,10 @@ namespace VJson.Schema
         [JsonFieldIgnorable(WhenValueIs = int.MaxValue)]
         public int MinItems = int.MaxValue;
 
-        // uniqueItems
+        [JsonField(Name = "uniqueItems")]
+        [JsonFieldIgnorable(WhenValueIs = false)]
+        public bool UniqueItems = false;
+
         // contains
 
         bool EqualsOnlyArray(JsonSchema rhs)
@@ -142,6 +145,7 @@ namespace VJson.Schema
                 && Object.Equals(AdditionalItems, rhs.AdditionalItems)
                 && MaxItems == rhs.MaxItems
                 && MinItems == rhs.MinItems
+                && UniqueItems == rhs.UniqueItems
                 ;
         }
         #endregion
