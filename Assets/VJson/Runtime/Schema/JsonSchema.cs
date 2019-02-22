@@ -197,16 +197,28 @@ namespace VJson.Schema
         #endregion
 
         #region 6.7: Subschemas With Boolean Logic
-        // allOf
-        // anyOf
-        // oneOf
+        [JsonField(Name = "allOf")]
+        [JsonFieldIgnorable]
+        public JsonSchema[] AllOf;
+
+        [JsonField(Name = "anyOf")]
+        [JsonFieldIgnorable]
+        public JsonSchema[] AnyOf;
+
+        [JsonField(Name = "oneOf")]
+        [JsonFieldIgnorable]
+        public JsonSchema[] OneOf;
+
         [JsonField(Name = "not")]
         [JsonFieldIgnorable]
         public JsonSchema Not;
 
         bool EqualsOnlySubBool(JsonSchema rhs)
         {
-            return Object.Equals(Not, rhs.Not)
+            return EqualsEnumerable(AllOf, rhs.AllOf)
+                && EqualsEnumerable(AnyOf, rhs.AnyOf)
+                && EqualsEnumerable(OneOf, rhs.OneOf)
+                && Object.Equals(Not, rhs.Not)
                 ;
         }
         #endregion
@@ -480,7 +492,7 @@ namespace VJson.Schema
             var rhsArr = rhs as T[];
             if (lhsArr != null && rhsArr != null)
             {
-                return EqualsSingletonOrArray<T>(lhsArr, rhsArr);
+                return EqualsEnumerable<T>(lhsArr, rhsArr);
             }
 
             var lhsSgt = lhs as T;
