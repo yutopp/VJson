@@ -295,9 +295,22 @@ namespace VJson.Schema
                 var i = 0;
                 foreach (var elem in v)
                 {
-                    if (v.Where((_, j) => j != i).Any(o => TypeHelper.DeepEquals(o, elem)))
+                    var j = 0;
+                    foreach (var elemS in v)
                     {
-                        return new ConstraintsViolationException("a");
+                        if (i == j)
+                        {
+                            continue;
+                        }
+
+                        if (TypeHelper.DeepEquals(elem, elemS))
+                        {
+                            var msg = state.CreateMessage("UniqueItems assertion: Elements at {0} and {1} are duplicated",
+                                                          i, j);
+                            return new ConstraintsViolationException(msg);
+                        }
+
+                        ++j;
                     }
 
                     ++i;
