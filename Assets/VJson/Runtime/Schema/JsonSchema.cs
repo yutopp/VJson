@@ -185,7 +185,7 @@ namespace VJson.Schema
                        typeof(Dictionary<string, JsonSchema>)
                    })]
         [JsonFieldIgnorable]
-        public object Dependencies;
+        public object Dependencies; // Use [JsonSchemaDependencies] instead when specify with attributes.
 
         // propertyNames
 
