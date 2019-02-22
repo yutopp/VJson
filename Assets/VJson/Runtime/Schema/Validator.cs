@@ -116,6 +116,22 @@ namespace VJson.Schema
                 }
             }
 
+            if (_schema.AllOf != null)
+            {
+                var i = 0;
+                foreach (var jsonSchema in _schema.AllOf)
+                {
+                    ex = jsonSchema.Validate(o, state, reg);
+                    if (ex != null)
+                    {
+                        var msg = state.CreateMessage("AllOf at {0}", i);
+                        return new ConstraintsViolationException(msg, ex);
+                    }
+
+                    ++i;
+                }
+            }
+
             switch (kind)
             {
                 case NodeKind.Boolean:
