@@ -207,7 +207,7 @@ namespace VJson.Schema.UnitTests
         [TestCase("additionalItems.json")]
         [TestCase("additionalProperties.json")]
         [TestCase("allOf.json")]
-        //[TestCase("anyOf.json")]
+        [TestCase("anyOf.json")]
         [TestCase("boolean_schema.json")]
         //[TestCase("const.json")]
         //[TestCase("contains.json")]

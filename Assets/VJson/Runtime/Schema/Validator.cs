@@ -132,6 +132,25 @@ namespace VJson.Schema
                 }
             }
 
+            if (_schema.AnyOf != null)
+            {
+                var schemaChecked = false;
+                foreach (var jsonSchema in _schema.AnyOf)
+                {
+                    ex = jsonSchema.Validate(o, state, reg);
+                    if (ex == null)
+                    {
+                        schemaChecked = true;
+                        break;
+                    }
+                }
+                if (!schemaChecked)
+                {
+                    var msg = state.CreateMessage("AnyOf: No schemas are matched");
+                    return new ConstraintsViolationException(msg);
+                }
+            }
+
             if (_schema.OneOf != null)
             {
                 var checkedI = -1;
