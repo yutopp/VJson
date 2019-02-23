@@ -302,6 +302,12 @@ namespace VJson.Schema.UnitTests
             public string Y;
         }
 
+        public class MoreDeriving : Deriving
+        {
+            [JsonSchema(MinLength = 3)]
+            public string Z;
+        }
+
         public static object[] DerivingArgs = new object[] {
             new object[] {
                 new Deriving(),
@@ -336,6 +342,23 @@ namespace VJson.Schema.UnitTests
                     Y = "",
                 },
                 "Object.Property.String.(root)[\"Y\"]: MinLength assertion !(0 >= 2).",
+                null,
+            },
+            new object[] {
+                new MoreDeriving() {
+                    X = "a",
+                    Y = "",
+                },
+                "(root): AllOf: Failed at 0..Object.Property.String.(root)[\"Y\"]: MinLength assertion !(0 >= 2).",
+                null,
+            },
+            new object[] {
+                new MoreDeriving() {
+                    X = "a",
+                    Y = "ab",
+                    Z = "",
+                },
+                "Object.Property.String.(root)[\"Z\"]: MinLength assertion !(0 >= 3).",
                 null,
             },
         };

@@ -185,6 +185,10 @@ namespace VJson.Schema.UnitTests
                 "{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+DerivingBase\"}],\"properties\":{\"X\":{},\"Y\":{\"minLength\":2,\"type\":\"string\"}},\"type\":\"object\"}",
             },
             new object[] {
+                typeof(ValidatorWithSerializerTests.MoreDeriving),
+                "{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+Deriving\"}],\"properties\":{\"X\":{},\"Y\":{},\"Z\":{\"minLength\":3,\"type\":\"string\"}},\"type\":\"object\"}",
+            },
+            new object[] {
                 typeof(VJson.UnitTests.EnumAsInt),
                 "{\"enum\":[0,1,100],\"type\":\"integer\"}",
             },
