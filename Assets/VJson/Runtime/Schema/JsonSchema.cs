@@ -161,7 +161,7 @@ namespace VJson.Schema
 
         [JsonField(Name = "required")]
         [JsonFieldIgnorable]
-        public string[] Required;
+        public string[] Required; // Use [JsonSchemaRequired] instead when specify it by attributes.
 
         [JsonField(Name = "properties")]
         [JsonFieldIgnorable]
@@ -185,7 +185,7 @@ namespace VJson.Schema
                        typeof(Dictionary<string, JsonSchema>)
                    })]
         [JsonFieldIgnorable]
-        public object Dependencies; // Use [JsonSchemaDependencies] instead when specify with attributes.
+        public object Dependencies; // Use [JsonSchemaDependencies] instead when specify it by attributes.
 
         // propertyNames
 
@@ -199,15 +199,15 @@ namespace VJson.Schema
         #region 6.7: Subschemas With Boolean Logic
         [JsonField(Name = "allOf")]
         [JsonFieldIgnorable]
-        public JsonSchema[] AllOf;
+        public List<JsonSchema> AllOf;
 
         [JsonField(Name = "anyOf")]
         [JsonFieldIgnorable]
-        public JsonSchema[] AnyOf;
+        public List<JsonSchema> AnyOf;
 
         [JsonField(Name = "oneOf")]
         [JsonFieldIgnorable]
-        public JsonSchema[] OneOf;
+        public List<JsonSchema> OneOf;
 
         [JsonField(Name = "not")]
         [JsonFieldIgnorable]
@@ -374,6 +374,24 @@ namespace VJson.Schema
                 reg.Register(schemaId, schema);
             }
 
+            var baseType = TypeHelper.TypeWrap(ty).BaseType;
+            HashSet<string> baseFieldNames = null;
+            if (baseType != null)
+            {
+                var baseSchema = CreateFromType(baseType, reg, true);
+                if (baseSchema != null && baseSchema.Ref != null)
+                {
+                    if (schema.AllOf == null)
+                    {
+                        schema.AllOf = new List<JsonSchema>();
+                    }
+                    schema.AllOf.Add(baseSchema);
+
+                    var baseFields = TypeHelper.TypeWrap(baseType).GetFields(BindingFlags.Public | BindingFlags.Instance);
+                    baseFieldNames = new HashSet<string>(baseFields.Select(f => f.Name));
+                }
+            }
+
             var properties = new Dictionary<string, JsonSchema>();
             var required = new List<string>();
             var dependencies = new Dictionary<string, string[]>();
@@ -381,12 +399,17 @@ namespace VJson.Schema
             var fields = TypeHelper.TypeWrap(ty).GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (var field in fields)
             {
+                JsonSchema fieldSchema = null;
                 var attr = TypeHelper.GetCustomAttribute<JsonField>(field);
+                var elemName = JsonField.FieldName(attr, field); // TODO: duplication check
 
-                // TODO: duplication check
-                var elemName = JsonField.FieldName(attr, field);
+                if (baseFieldNames != null && baseFieldNames.Contains(field.Name))
+                {
+                    fieldSchema = new JsonSchema();
+                    goto skipField;
+                }
 
-                var fieldSchema = TypeHelper.GetCustomAttribute<JsonSchema>(field);
+                fieldSchema = TypeHelper.GetCustomAttribute<JsonSchema>(field);
                 if (fieldSchema == null)
                 {
                     fieldSchema = new JsonSchema();
@@ -452,6 +475,7 @@ namespace VJson.Schema
                     }
                 }
 
+            skipField:
                 properties.Add(elemName, fieldSchema);
             }
 
@@ -473,6 +497,7 @@ namespace VJson.Schema
                     Ref = schemaId,
                 };
             }
+
             return schema;
         }
 

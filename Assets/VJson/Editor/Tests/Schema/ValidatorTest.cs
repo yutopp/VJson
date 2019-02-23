@@ -23,6 +23,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasRequiredButIgnorableStringArgs")]
         [TestCaseSource("HasDepsArgs")]
         [TestCaseSource("HasNestedArgs")]
+        [TestCaseSource("DerivingArgs")]
         public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
         {
             var schema = JsonSchema.CreateFromClass<T>();
@@ -31,14 +32,7 @@ namespace VJson.Schema.UnitTests
 
             var message =
                 String.Format("{0} : {1}", new JsonSerializer(typeof(T)).Serialize(o), schema.ToString());
-            if (ex == null)
-            {
-                Assert.AreEqual(null, expectedMsg, message);
-            }
-            else
-            {
-                Assert.AreEqual(expectedMsg, ex.Message, message);
-            }
+            Assert.AreEqual(expectedMsg, ex != null ? ex.Message : null, message);
         }
 
         // TODO: Move to elsewhere
@@ -52,6 +46,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasRequiredButIgnorableStringArgs")]
         [TestCaseSource("HasDepsArgs")]
         [TestCaseSource("HasNestedArgs")]
+        [TestCaseSource("DerivingArgs")]
         public void SerializationTest<T>(T o, string _expectedMsg, string expectedContent)
         {
             if (_expectedMsg != null)
@@ -291,6 +286,56 @@ namespace VJson.Schema.UnitTests
                     },
                 },
                 "Object.Property.Object.Property.String.(root)[\"C\"][\"X\"]: MinLength assertion !(0 >= 1).",
+                null,
+            },
+        };
+
+        public class DerivingBase
+        {
+            [JsonSchema(MinLength = 1)]
+            public string X;
+        }
+
+        public class Deriving : DerivingBase
+        {
+            [JsonSchema(MinLength = 2)]
+            public string Y;
+        }
+
+        public static object[] DerivingArgs = new object[] {
+            new object[] {
+                new Deriving(),
+                "(root): AllOf: Failed at 0..Object.Property.(root)[\"X\"]: Type is not matched(Actual: Null; Expected: string).",
+                null,
+            },
+            new object[] {
+                new Deriving() {
+                    Y = "abc",
+                },
+                "(root): AllOf: Failed at 0..Object.Property.(root)[\"X\"]: Type is not matched(Actual: Null; Expected: string).",
+                null,
+            },
+            new object[] {
+                new Deriving() {
+                    X = "abc",
+                },
+                "Object.Property.(root)[\"Y\"]: Type is not matched(Actual: Null; Expected: string).",
+                null,
+            },
+            new object[] {
+                new Deriving() {
+                    X = "",
+                    Y = "",
+                },
+                "(root): AllOf: Failed at 0..Object.Property.String.(root)[\"X\"]: MinLength assertion !(0 >= 1).",
+                null,
+            },
+            new object[] {
+                new Deriving() {
+                    X = "a",
+                    Y = "",
+                },
+                "Object.Property.String.(root)[\"Y\"]: MinLength assertion !(0 >= 2).",
                 null,
             },
         };

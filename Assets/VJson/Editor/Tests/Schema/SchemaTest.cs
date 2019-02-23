@@ -177,6 +177,14 @@ namespace VJson.Schema.UnitTests
                 "{\"properties\":{\"C\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+HasNestedChild\"}},\"required\":[\"C\"],\"type\":\"object\"}",
             },
             new object[] {
+                typeof(ValidatorWithSerializerTests.DerivingBase),
+                "{\"properties\":{\"X\":{\"minLength\":1,\"type\":\"string\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.Deriving),
+                "{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+DerivingBase\"}],\"properties\":{\"X\":{},\"Y\":{\"minLength\":2,\"type\":\"string\"}},\"type\":\"object\"}",
+            },
+            new object[] {
                 typeof(VJson.UnitTests.EnumAsInt),
                 "{\"enum\":[0,1,100],\"type\":\"integer\"}",
             },
