@@ -24,6 +24,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasDepsArgs")]
         [TestCaseSource("HasNestedArgs")]
         [TestCaseSource("DerivingArgs")]
+        [TestCaseSource("HasNullableArgs")]
         public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
         {
             var schema = JsonSchema.CreateFromClass<T>();
@@ -47,6 +48,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasDepsArgs")]
         [TestCaseSource("HasNestedArgs")]
         [TestCaseSource("DerivingArgs")]
+        [TestCaseSource("HasNullableArgs")]
         public void SerializationTest<T>(T o, string _expectedMsg, string expectedContent)
         {
             if (_expectedMsg != null)
@@ -360,6 +362,28 @@ namespace VJson.Schema.UnitTests
                 },
                 "Object.Property.String.(root)[\"Z\"]: MinLength assertion !(0 >= 3).",
                 null,
+            },
+        };
+
+        public class HasNullable
+        {
+            public int? X;
+        }
+
+        // Types are Nullable<T> BUT null will not be allowed.
+        // The reason is that classes are nullable but null values are not allowed. As same as it.
+        public static object[] HasNullableArgs = new object[] {
+            new object[] {
+                new HasNullable(),
+                "Object.Property.(root)[\"X\"]: Type is not matched(Actual: Null; Expected: integer).",
+                null,
+            },
+            new object[] {
+                new HasNullable() {
+                    X = 10,
+                },
+                null,
+                "{\"X\":10}",
             },
         };
     }

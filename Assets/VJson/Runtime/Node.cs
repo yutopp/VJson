@@ -328,6 +328,14 @@ namespace VJson
 
         public static NodeKind KindOfType(Type ty)
         {
+            // Unwrap all Nullable<T>s
+            // Any class values are nullable, however this library does not treat them as nullables.
+            // Thus we adjust logic of Nullable<T> to as same as class values. Nullable<T> will be treated as T.
+            if (TypeHelper.TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                return KindOfType(TypeHelper.TypeWrap(ty).GetGenericArguments()[0]);
+            }
+
             NodeKind k;
             if (_primitiveTable.TryGetValue(ty, out k))
             {

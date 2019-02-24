@@ -427,6 +427,16 @@ namespace VJson.UnitTests
                 EnumAsString.NameC,
                 @"""OtherName""",
             },
+
+            // Nullable
+            new object[] {
+                (Nullable<int>)(null),
+                @"null",
+            },
+            new object[] {
+                new Nullable<int>(1),
+                @"1",
+            },
         };
 
         static object[] OnlySerializeArgs = {

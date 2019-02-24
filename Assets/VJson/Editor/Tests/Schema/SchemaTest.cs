@@ -196,6 +196,18 @@ namespace VJson.Schema.UnitTests
                 typeof(VJson.UnitTests.EnumAsString),
                 "{\"enum\":[\"NameA\",\"NameB\",\"OtherName\"],\"type\":\"string\"}",
             },
+            new object[] {
+                typeof(Nullable<int>),
+                "{\"type\":\"integer\"}",
+            },
+            new object[] {
+                typeof(int?),
+                "{\"type\":\"integer\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasNullable),
+                "{\"properties\":{\"X\":{\"type\":\"integer\"}},\"type\":\"object\"}",
+            },
         };
     }
 
