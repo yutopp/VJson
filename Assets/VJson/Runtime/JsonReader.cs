@@ -14,53 +14,6 @@ namespace VJson
 {
     public class JsonReader : IDisposable
     {
-        private class ReaderWrapper : IDisposable
-        {
-            private StreamReader _reader;
-
-            public ulong Position
-            {
-                get; private set;
-            }
-
-            private int _lastToken;
-            public char LastToken
-            {
-                get
-                {
-                    return (char)_lastToken;
-                }
-            }
-
-            public ReaderWrapper(Stream s)
-            {
-                _reader = new StreamReader(s, Encoding.UTF8);
-                Position = 0;
-            }
-
-            public void Dispose()
-            {
-                if (_reader != null)
-                {
-                    ((IDisposable)_reader).Dispose();
-                }
-            }
-
-            public int Peek()
-            {
-                _lastToken = _reader.Peek();
-                return _lastToken;
-            }
-
-            public int Read()
-            {
-                ++Position;
-
-                _lastToken = _reader.Read();
-                return _lastToken;
-            }
-        }
-
         private ReaderWrapper _reader;
 
         private StringBuilder _strCache = new StringBuilder();
@@ -129,7 +82,7 @@ namespace VJson
                 return node;
             }
 
-            return null;
+            throw NodeExpectedError("value");
         }
 
         INode ReadObject()
@@ -593,14 +546,64 @@ namespace VJson
 
         ParseFailedException NodeExpectedError(string expected)
         {
-            var msg = String.Format("A node \"{0}\" is expected but a charactor '{1}' is provided", expected, _reader.LastToken);
+            var msg = String.Format("A node \"{0}\" is expected but '{1}' is provided", expected, _reader.LastToken);
             return new ParseFailedException(msg, _reader.Position);
         }
 
         ParseFailedException TokenExpectedError(char expected)
         {
-            var msg = String.Format("A charactor '{0}' is expected but a charactor '{1}' is provided", expected, _reader.LastToken);
+            var msg = String.Format("A charactor '{0}' is expected but '{1}' is provided", expected, _reader.LastToken);
             return new ParseFailedException(msg, _reader.Position);
+        }
+
+        private class ReaderWrapper : IDisposable
+        {
+            private StreamReader _reader;
+
+            public ulong Position
+            {
+                get; private set;
+            }
+
+            private int _lastToken;
+            public string LastToken
+            {
+                get
+                {
+                    if (_lastToken == -1) {
+                        return "<EOS>";
+                    }
+                    return ((char)_lastToken).ToString();
+                }
+            }
+
+            public ReaderWrapper(Stream s)
+            {
+                _reader = new StreamReader(s, Encoding.UTF8);
+                Position = 0;
+            }
+
+            public void Dispose()
+            {
+                if (_reader != null)
+                {
+                    ((IDisposable)_reader).Dispose();
+                }
+            }
+
+            public int Peek()
+            {
+                _lastToken = _reader.Peek();
+                return _lastToken;
+            }
+
+            public int Read()
+            {
+                ++Position;
+
+                _lastToken = _reader.Read();
+                return _lastToken;
+            }
         }
     }
 

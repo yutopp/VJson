@@ -303,9 +303,13 @@ namespace VJson.UnitTests
 
         //
         static object[] FixtureArgs = {
-			// Numbers
+            new object[] {
+                "A node \"value\" is expected but '<EOS>' is provided (at position 0)",
+                "",
+            },
+
 			new object[] {
-                "A node \"EOS\" is expected but a charactor '1' is provided (at position 3)",
+                "A node \"EOS\" is expected but '1' is provided (at position 3)",
                 @"  012  ",
             },
         };
