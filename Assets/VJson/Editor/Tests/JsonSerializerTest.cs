@@ -259,14 +259,9 @@ namespace VJson.UnitTests
         public void SerializeTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
+            var actual = serializer.Serialize(obj);
 
-            using (var textWriter = new StringWriter())
-            {
-                serializer.Serialize(textWriter, obj);
-                var actual = textWriter.ToString();
-
-                Assert.AreEqual(expected, actual);
-            }
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -525,13 +520,8 @@ namespace VJson.UnitTests
         public void SerializeTest<E>(IEnumerable<E> obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            using (var textWriter = new StringWriter())
-            {
-                serializer.Serialize(textWriter, obj);
-                var actual = textWriter.ToString();
-
-                Assert.That(actual, Is.EquivalentTo(expected));
-            }
+            var actual = serializer.Serialize(obj);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -539,13 +529,9 @@ namespace VJson.UnitTests
         public void SerializeTest<K, V>(IDictionary<K, V> obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            using (var textWriter = new StringWriter())
-            {
-                serializer.Serialize(textWriter, obj);
-                var actual = textWriter.ToString();
+            var actual =  serializer.Serialize(obj);
 
-                Assert.That(actual, Is.EquivalentTo(expected));
-            }
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]

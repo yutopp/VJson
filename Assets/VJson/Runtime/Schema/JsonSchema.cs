@@ -267,11 +267,7 @@ namespace VJson.Schema
         public override string ToString()
         {
             var serializer = new JsonSerializer(typeof(JsonSchema));
-            using (var textWriter = new StringWriter())
-            {
-                serializer.Serialize(textWriter, this);
-                return textWriter.ToString();
-            }
+            return serializer.Serialize(this);
         }
 
         public static JsonSchema CreateFromClass<T>(JsonSchemaRegistory reg = null, bool asRef = false)

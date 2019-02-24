@@ -6,6 +6,7 @@
 //
 
 using System.IO;
+using System.Text;
 using NUnit.Framework;
 
 namespace VJson.UnitTests
@@ -15,13 +16,40 @@ namespace VJson.UnitTests
         [Test]
         public void ValueWriteTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteValue(1);
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteValue(1);
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual("1", actual);
+            }
+        }
+
+        [Test]
+        public void EmojiValueWriteTest()
+        {
+            using (var s = new MemoryStream())
+            {
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteValue("🍣");
+                }
+
+                // Check UTF-8 sequence
+                var actualArr = s.ToArray();
+                Assert.AreEqual(6, actualArr.Length);
+                Assert.AreEqual(0x22, actualArr[0]);
+                Assert.AreEqual(0xF0, actualArr[1]);
+                Assert.AreEqual(0x9F, actualArr[2]);
+                Assert.AreEqual(0x8D, actualArr[3]);
+                Assert.AreEqual(0xA3, actualArr[4]);
+                Assert.AreEqual(0x22, actualArr[5]);
+
+                var actual = Encoding.UTF8.GetString(s.ToArray());
+                Assert.AreEqual("\"🍣\"", actual);
             }
         }
     }
@@ -31,13 +59,15 @@ namespace VJson.UnitTests
         [Test]
         public void EmptyTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteObjectStart();
-                f.WriteObjectEnd();
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteObjectStart();
+                    f.WriteObjectEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"{}", actual);
             }
         }
@@ -45,15 +75,17 @@ namespace VJson.UnitTests
         [Test]
         public void SingleTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteObjectStart();
-                f.WriteObjectKey("foo");
-                f.WriteValue(42);
-                f.WriteObjectEnd();
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteObjectStart();
+                    f.WriteObjectKey("foo");
+                    f.WriteValue(42);
+                    f.WriteObjectEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"{""foo"":42}", actual);
             }
         }
@@ -61,18 +93,20 @@ namespace VJson.UnitTests
         [Test]
         public void MultiTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteObjectStart();
-                f.WriteObjectKey("foo");
-                f.WriteValue(42);
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteObjectStart();
+                    f.WriteObjectKey("foo");
+                    f.WriteValue(42);
 
-                f.WriteObjectKey("bar");
-                f.WriteValue(84);
-                f.WriteObjectEnd();
+                    f.WriteObjectKey("bar");
+                    f.WriteValue(84);
+                    f.WriteObjectEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"{""foo"":42,""bar"":84}", actual);
             }
         }
@@ -80,20 +114,22 @@ namespace VJson.UnitTests
         [Test]
         public void NestedTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteObjectStart();
-                f.WriteObjectKey("foo");
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteObjectStart();
+                    f.WriteObjectKey("foo");
 
-                f.WriteObjectStart();
-                f.WriteObjectKey("bar");
-                f.WriteValue(84);
-                f.WriteObjectEnd();
+                    f.WriteObjectStart();
+                    f.WriteObjectKey("bar");
+                    f.WriteValue(84);
+                    f.WriteObjectEnd();
 
-                f.WriteObjectEnd();
+                    f.WriteObjectEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"{""foo"":{""bar"":84}}", actual);
             }
         }
@@ -104,13 +140,15 @@ namespace VJson.UnitTests
         [Test]
         public void EmptyTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteArrayStart();
-                f.WriteArrayEnd();
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteArrayStart();
+                    f.WriteArrayEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"[]", actual);
             }
         }
@@ -118,14 +156,16 @@ namespace VJson.UnitTests
         [Test]
         public void SingleTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteArrayStart();
-                f.WriteValue(42);
-                f.WriteArrayEnd();
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteArrayStart();
+                    f.WriteValue(42);
+                    f.WriteArrayEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"[42]", actual);
             }
         }
@@ -133,15 +173,17 @@ namespace VJson.UnitTests
         [Test]
         public void MultiTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteArrayStart();
-                f.WriteValue(42);
-                f.WriteValue("aaa");
-                f.WriteArrayEnd();
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteArrayStart();
+                    f.WriteValue(42);
+                    f.WriteValue("aaa");
+                    f.WriteArrayEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"[42,""aaa""]", actual);
             }
         }
@@ -149,17 +191,19 @@ namespace VJson.UnitTests
         [Test]
         public void NestedTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteArrayStart();
-                f.WriteValue(42);
-                f.WriteArrayStart();
-                f.WriteValue("aaa");
-                f.WriteArrayEnd();
-                f.WriteArrayEnd();
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteArrayStart();
+                    f.WriteValue(42);
+                    f.WriteArrayStart();
+                    f.WriteValue("aaa");
+                    f.WriteArrayEnd();
+                    f.WriteArrayEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"[42,[""aaa""]]", actual);
             }
         }
@@ -170,26 +214,28 @@ namespace VJson.UnitTests
         [Test]
         public void CompoundTest()
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                var f = new JsonWriter(textWriter);
-                f.WriteArrayStart();
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteArrayStart();
 
-                f.WriteObjectStart();
-                f.WriteObjectKey("foo");
-                f.WriteValue(42);
-                f.WriteObjectEnd();
+                    f.WriteObjectStart();
+                    f.WriteObjectKey("foo");
+                    f.WriteValue(42);
+                    f.WriteObjectEnd();
 
-                f.WriteObjectStart();
-                f.WriteObjectKey("foo");
-                f.WriteArrayStart();
-                f.WriteValue(84);
-                f.WriteArrayEnd();
-                f.WriteObjectEnd();
+                    f.WriteObjectStart();
+                    f.WriteObjectKey("foo");
+                    f.WriteArrayStart();
+                    f.WriteValue(84);
+                    f.WriteArrayEnd();
+                    f.WriteObjectEnd();
 
-                f.WriteArrayEnd();
+                    f.WriteArrayEnd();
+                }
 
-                var actual = textWriter.ToString();
+                var actual = Encoding.UTF8.GetString(s.ToArray());
                 Assert.AreEqual(@"[{""foo"":42},{""foo"":[84]}]", actual);
             }
         }

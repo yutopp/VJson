@@ -579,7 +579,7 @@ namespace VJson
 
             public ReaderWrapper(Stream s)
             {
-                _reader = new StreamReader(s, Encoding.UTF8);
+                _reader = new StreamReader(s); // Encodings will be auto detected
                 Position = 0;
             }
 

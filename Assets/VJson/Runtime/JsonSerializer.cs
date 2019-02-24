@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 namespace VJson
 {
@@ -20,18 +21,21 @@ namespace VJson
         }
 
         #region Serializer
-        public void Serialize<T>(TextWriter textWriter, T o)
+
+        public void Serialize<T>(Stream s, T o)
         {
-            var writer = new JsonWriter(textWriter);
-            SerializeValue(writer, o);
+            using (var w = new JsonWriter(s))
+            {
+                SerializeValue(w, o);
+            }
         }
 
         public string Serialize<T>(T o)
         {
-            using (var textWriter = new StringWriter())
+            using (var s = new MemoryStream())
             {
-                Serialize(textWriter, o);
-                return textWriter.ToString();
+                Serialize(s, o);
+                return Encoding.UTF8.GetString(s.ToArray());
             }
         }
 

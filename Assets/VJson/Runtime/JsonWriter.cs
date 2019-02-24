@@ -6,13 +6,17 @@
 //
 
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.IO;
 
 namespace VJson
 {
+    /// <summary>
+    /// Write JSON data to streams as UTF-8.
+    /// </summary>
     // TODO: Add [Preserve] in Unity
-    public class JsonWriter
+    public class JsonWriter : IDisposable
     {
         enum State
         {
@@ -24,13 +28,21 @@ namespace VJson
             None,
         }
 
-        private TextWriter _writer;
+        private StreamWriter _writer;
         private Stack<State> _states = new Stack<State>();
 
-        public JsonWriter(TextWriter writer)
+        public JsonWriter(Stream s)
         {
-            this._writer = writer;
+            this._writer = new StreamWriter(s); // UTF-8 by default
             this._states.Push(State.None);
+        }
+
+        public void Dispose()
+        {
+            if (_writer != null)
+            {
+                ((IDisposable)_writer).Dispose();
+            }
         }
 
         public void WriteObjectStart()
