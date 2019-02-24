@@ -554,6 +554,21 @@ namespace VJson.Schema
         {
             var matched = false;
 
+            if (_schema._dynamicResolverTag != null)
+            {
+                Type dynElemType;
+                if (DynamicResolver.Find(_schema._dynamicResolverTag, key, out dynElemType))
+                {
+                    var dynElemSchema = JsonSchema.CreateFromType(dynElemType, reg, true);
+                    var ex = dynElemSchema.Validate(value, state, reg);
+
+                    if (ex != null)
+                    {
+                        return new ConstraintsViolationException("DynamicResolver", ex);
+                    }
+                }
+            }
+
             if (_schema.Properties != null)
             {
                 JsonSchema itemSchema = null;

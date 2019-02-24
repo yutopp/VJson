@@ -223,6 +223,8 @@ namespace VJson.Schema
         }
         #endregion
 
+        internal Type _dynamicResolverTag;
+
         public JsonSchema()
         {
         }
@@ -399,10 +401,13 @@ namespace VJson.Schema
             var fields = TypeHelper.TypeWrap(ty).GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (var field in fields)
             {
+                var fieldType = field.FieldType;
+
                 JsonSchema fieldSchema = null;
                 var attr = TypeHelper.GetCustomAttribute<JsonField>(field);
                 var elemName = JsonField.FieldName(attr, field); // TODO: duplication check
 
+                // If elements are also included in Base classes, skip collecting a schema for the elements.
                 if (baseFieldNames != null && baseFieldNames.Contains(field.Name))
                 {
                     fieldSchema = new JsonSchema();
@@ -421,6 +426,26 @@ namespace VJson.Schema
                     fieldSchema.Items = fieldItemsSchema;
                 }
 
+                if (attr != null && attr.DynamicResolverTag != null)
+                {
+                    if (!TypeHelper.TypeWrap(fieldType).IsGenericType || fieldType.GetGenericTypeDefinition() != typeof(Dictionary<,>))
+                    {
+                        var baseMsg = "A type of the field which has DynamicResolver must be a Dictionary<,>";
+                        var msg = string.Format("{0}: Type = {1} at \"{2}\" of {3}", baseMsg, fieldType, elemName, ty);
+                        throw new InvalidOperationException(msg);
+                    }
+
+                    var keyType = TypeHelper.TypeWrap(fieldType).GetGenericArguments()[0];
+                    if (keyType != typeof(string))
+                    {
+                        var baseMsg = "A key of the dictionary which has DynamicResolver must be a string type";
+                        var msg = string.Format("{0}: KeyType = {1} at \"{2}\" of {3}", baseMsg, keyType, elemName, ty);
+                        throw new InvalidOperationException(msg);
+                    }
+
+                    fieldSchema._dynamicResolverTag = attr.DynamicResolverTag;
+                }
+
                 var fieldItemRequired = TypeHelper.GetCustomAttribute<JsonSchemaRequired>(field);
                 if (fieldItemRequired != null)
                 {
@@ -433,11 +458,10 @@ namespace VJson.Schema
                     dependencies.Add(elemName, fieldItemDependencies.Dependencies);
                 }
 
-                var fieldTypeSchema = CreateFromType(field.FieldType, reg, true);
+                var fieldTypeSchema = CreateFromType(fieldType, reg, true);
                 if (fieldTypeSchema.Ref != null)
                 {
                     fieldSchema = fieldTypeSchema;
-
                 }
                 else
                 {

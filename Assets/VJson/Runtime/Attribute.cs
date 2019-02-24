@@ -27,8 +27,9 @@ namespace VJson
     [AttributeUsage(AttributeTargets.Field)]
     public class JsonField : System.Attribute
     {
-        public Type[] TypeHints;
         public string Name;
+        public Type[] TypeHints;
+        public Type DynamicResolverTag;
 
         public static string FieldName(JsonField f, FieldInfo fi)
         {

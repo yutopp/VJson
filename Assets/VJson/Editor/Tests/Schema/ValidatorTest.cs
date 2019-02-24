@@ -25,6 +25,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasNestedArgs")]
         [TestCaseSource("DerivingArgs")]
         [TestCaseSource("HasNullableArgs")]
+        [TestCaseSource("HasDynamicResolverArgs")]
         public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
         {
             var schema = JsonSchema.CreateFromClass<T>();
@@ -49,6 +50,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasNestedArgs")]
         [TestCaseSource("DerivingArgs")]
         [TestCaseSource("HasNullableArgs")]
+        [TestCaseSource("HasDynamicResolverArgs")]
         public void SerializationTest<T>(T o, string _expectedMsg, string expectedContent)
         {
             if (_expectedMsg != null)
@@ -384,6 +386,59 @@ namespace VJson.Schema.UnitTests
                 },
                 null,
                 "{\"X\":10}",
+            },
+        };
+
+        public class HasDynamicResolver
+        {
+            [JsonField(DynamicResolverTag = typeof(Resolver)), JsonFieldIgnorable]
+            public Dictionary<string, object> Dict;
+
+            public class Resolver
+            {
+                static Resolver()
+                {
+                    // A example for registration of resolvers
+                    DynamicResolver.Register<Resolver>("b", typeof(int));
+                }
+            }
+            private Resolver _toInitialize = new Resolver();
+        }
+
+        public static object[] HasDynamicResolverArgs = new object[] {
+            new object[] {
+                new HasDynamicResolver(),
+                null,
+                "{}",
+            },
+            new object[] {
+                new HasDynamicResolver() {
+                    Dict = new Dictionary<string, object> {
+                        {"a", 10},
+                    }
+                },
+                null,
+                "{\"Dict\":{\"a\":10}}",
+            },
+            new object[] {
+                new HasDynamicResolver() {
+                    Dict = new Dictionary<string, object> {
+                        {"a", 10},
+                        {"b", 20},
+                    }
+                },
+                null,
+                "{\"Dict\":{\"a\":10,\"b\":20}}",
+            },
+            new object[] {
+                new HasDynamicResolver() {
+                    Dict = new Dictionary<string, object> {
+                        {"a", 10},
+                        {"b", "out"},
+                    }
+                },
+                "Object.Property.Object.DynamicResolver.(root)[\"Dict\"][\"b\"]: Type is not matched(Actual: String; Expected: integer).",
+                null,
             },
         };
     }

@@ -9,17 +9,15 @@ using System;
 
 namespace VJson.Schema
 {
-    [AttributeUsage(AttributeTargets.Field,
-                    Inherited = false)]
+    [AttributeUsage(AttributeTargets.Field, Inherited = false)]
     public class JsonSchemaRequired : Attribute
     {
     }
 
-    [AttributeUsage(AttributeTargets.Field,
-                    Inherited = false)]
+    [AttributeUsage(AttributeTargets.Field, Inherited = false)]
     public class JsonSchemaDependencies : Attribute
     {
-        public string[] Dependencies;
+        public string[] Dependencies { get; private set; }
 
         public JsonSchemaDependencies(params string[] deps)
         {
