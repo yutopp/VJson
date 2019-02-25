@@ -27,6 +27,16 @@ namespace VJson
         }
 #endif
 
+        public static bool IsBoxed(Type ty)
+        {
+            var ti = TypeWrap(ty);
+            if (ti.IsClass) {
+                return true;
+            }
+
+            return ti.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+
         public static T GetCustomAttribute<T>(FieldInfo fi) where T : Attribute
         {
             return (T)fi.GetCustomAttributes(typeof(T), false)

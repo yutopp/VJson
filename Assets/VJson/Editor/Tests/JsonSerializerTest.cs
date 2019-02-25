@@ -201,6 +201,30 @@ namespace VJson.UnitTests
         NameC = 100,
     }
 
+    public class HasNullable
+    {
+        public Nullable<int> X;
+
+        [JsonFieldIgnorable]
+        public Nullable<int> Y;
+
+        public override bool Equals(object rhsObj)
+        {
+            var rhs = rhsObj as HasNullable;
+            if (rhs == null)
+            {
+                return false;
+            }
+
+            return Object.Equals(X, rhs.X) && Object.Equals(Y, rhs.Y);
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class HasDynamicResolver
     {
         [JsonField(DynamicResolverTag = typeof(Resolver)), JsonFieldIgnorable]
@@ -256,17 +280,6 @@ namespace VJson.UnitTests
         [Test]
         [TestCaseSource("CommonArgs")]
         [TestCaseSource("OnlySerializeArgs")]
-        public void SerializeTest(object obj, string expected)
-        {
-            var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            var actual = serializer.Serialize(obj);
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        [TestCaseSource("CommonArgs")]
-        [TestCaseSource("OnlySerializeArgs")]
         public void SerializeFromStringTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
@@ -274,17 +287,6 @@ namespace VJson.UnitTests
             var actual = serializer.Serialize(obj);
 
             Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        [TestCaseSource("CommonArgs")]
-        [TestCaseSource("OnlyDeserializeArgs")]
-        public void DeserializeTest(object obj, string expected)
-        {
-            var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            var actual = serializer.Deserialize(expected);
-
-            Assert.AreEqual(obj, actual);
         }
 
         [Test]
@@ -378,6 +380,8 @@ namespace VJson.UnitTests
                 (decimal)3.14,
                 @"3.14",
             },
+
+
 
             // Strings
             new object[] {
@@ -486,6 +490,16 @@ namespace VJson.UnitTests
             new object[] {
                 new Nullable<int>(1),
                 @"1",
+            },
+            new object[] {
+                new HasNullable(),
+                "{\"X\":null}"
+            },
+            new object[] {
+                new HasNullable {
+                    X = 10,
+                },
+                "{\"X\":10}"
             },
 
             // Dynamic resolver
@@ -689,7 +703,7 @@ namespace VJson.UnitTests
             new object[] {
                 typeof(bool),
                 "null",
-                "(root): Null cannot convert to non-nullable value(System.Boolean).",
+                "(root): Null cannot convert to non-boxed value(System.Boolean).",
             },
             new object[] {
                 typeof(int),
@@ -704,7 +718,7 @@ namespace VJson.UnitTests
             new object[] {
                 typeof(int),
                 "null",
-                "(root): Null cannot convert to non-nullable value(System.Int32).",
+                "(root): Null cannot convert to non-boxed value(System.Int32).",
             },
             new object[] {
                 typeof(string),

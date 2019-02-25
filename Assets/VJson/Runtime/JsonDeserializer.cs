@@ -86,9 +86,9 @@ namespace VJson
         {
             if (node is NullNode)
             {
-                if (!TypeHelper.TypeWrap(targetType).IsClass)
+                if (!TypeHelper.IsBoxed(targetType))
                 {
-                    var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
+                    var msg = state.CreateMessage("Null cannot convert to non-boxed value({0})", targetType);
                     throw new DeserializeFailureException(msg);
                 }
 
@@ -110,9 +110,9 @@ namespace VJson
         {
             if (node is NullNode)
             {
-                if (!TypeHelper.TypeWrap(targetType).IsClass)
+                if (!TypeHelper.IsBoxed(targetType))
                 {
-                    var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
+                    var msg = state.CreateMessage("Null cannot convert to non-boxed value({0})", targetType);
                     throw new DeserializeFailureException(msg);
                 }
 
@@ -140,9 +140,9 @@ namespace VJson
         {
             if (node is NullNode)
             {
-                if (!TypeHelper.TypeWrap(targetType).IsClass)
+                if (!TypeHelper.IsBoxed(targetType))
                 {
-                    var msg = state.CreateMessage("Null cannot convert to non-nullable value({0})", targetType);
+                    var msg = state.CreateMessage("Null cannot convert to non-boxed value({0})", targetType);
                     throw new DeserializeFailureException(msg);
                 }
 
@@ -395,6 +395,14 @@ namespace VJson
             if (targetType == typeof(object))
             {
                 return value;
+            }
+
+            // Is Nullable
+            var nullableInnerTy = Nullable.GetUnderlyingType(targetType);
+            if (nullableInnerTy != null)
+            {
+                // Treat as primitive types
+                targetType = nullableInnerTy;
             }
 
             var convFunc = TypeHelper.GetConverter(typeof(T), targetType);
