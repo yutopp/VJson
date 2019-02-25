@@ -5,6 +5,7 @@
 // file LICENSE_1_0.txt or copy at  https://www.boost.org/LICENSE_1_0.txt)
 //
 
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -40,32 +41,87 @@ namespace VJson.UnitTests
         };
     }
 
-    [TestFixtureSource("FixtureArgs")]
     public class NodeComparisonTests
     {
-        IntegerNode _lhs;
-        IntegerNode _rhs;
-        bool _expected;
-
-        public NodeComparisonTests(IntegerNode lhs, IntegerNode rhs, bool expected)
+        [Test]
+        [TestCaseSource("FixtureArgs")]
+        public void EqualityTest(INode lhs, INode rhs, bool expected)
         {
-            _lhs = lhs;
-            _rhs = rhs;
-            _expected = expected;
-        }
-
-        public void EqualityTest()
-        {
-            var actual = _lhs.Equals(_rhs);
-            Assert.AreEqual(_expected, actual);
+            var actual = Object.Equals(lhs, rhs);
+            Assert.AreEqual(expected, actual);
         }
 
         //
         static object[] FixtureArgs = {
+            // Boolean
+            new object[] {
+                new BooleanNode(true),
+                new BooleanNode(true),
+                true
+            },
+            new object[] {
+                new BooleanNode(true),
+                new NullNode(),
+                false
+            },
+            new object[] {
+                new BooleanNode(true),
+                new BooleanNode(false),
+                false
+            },
+            new object[] {
+                new BooleanNode(true),
+                null,
+                false
+            },
+            new object[] {
+                new BooleanNode(true)[0],
+                null,
+                true
+            },
+            new object[] {
+                new BooleanNode(true)["a"],
+                null,
+                true
+            },
+
+            // Null
+            new object[] {
+                new NullNode(),
+                new NullNode(),
+                true
+            },
+            new object[] {
+                new NullNode(),
+                new BooleanNode(true),
+                false
+            },
+            new object[] {
+                new NullNode(),
+                null,
+                false
+            },
+            new object[] {
+                new NullNode()[0],
+                null,
+                true
+            },
+            new object[] {
+                new NullNode()["a"],
+                null,
+                true
+            },
+
+            // Integer
             new object[] {
                 new IntegerNode(42),
-                 new IntegerNode(42),
-                 true
+                new IntegerNode(42),
+                true
+            },
+            new object[] {
+                new IntegerNode(42),
+                new NullNode(),
+                false
             },
             new object[] {
                 new IntegerNode(42),
@@ -76,7 +132,285 @@ namespace VJson.UnitTests
                 new IntegerNode(42),
                 null,
                 false
-            }
+            },
+            new object[] {
+                new IntegerNode(42)[0],
+                null,
+                true
+            },
+            new object[] {
+                new IntegerNode(42)["a"],
+                null,
+                true
+            },
+
+            // Float
+            new object[] {
+                new FloatNode(42),
+                new FloatNode(42),
+                true
+            },
+            new object[] {
+                new FloatNode(42),
+                new NullNode(),
+                false
+            },
+            new object[] {
+                new FloatNode(42),
+                new FloatNode(72),
+                false
+            },
+            new object[] {
+                new FloatNode(42),
+                null,
+                false
+            },
+            new object[] {
+                new FloatNode(42)[0],
+                null,
+                true
+            },
+            new object[] {
+                new FloatNode(42)["a"],
+                null,
+                true
+            },
+
+            // String
+            new object[] {
+                new StringNode("42"),
+                new StringNode("42"),
+                true
+            },
+            new object[] {
+                new StringNode("42"),
+                new NullNode(),
+                false
+            },
+            new object[] {
+                new StringNode("42"),
+                new StringNode("72"),
+                false
+            },
+            new object[] {
+                new StringNode("42"),
+                null,
+                false
+            },
+            new object[] {
+                new StringNode("42")[0],
+                null,
+                true
+            },
+            new object[] {
+                new StringNode("42")["a"],
+                null,
+                true
+            },
+
+            // Object
+            new object[] {
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                },
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                },
+                true
+            },
+            new object[] {
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                },
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"b", new StringNode("42")},
+                        {"a", new IntegerNode(42)},
+                    },
+                },
+                true
+            },
+            new object[] {
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                },
+                new NullNode(),
+                false
+            },
+            new object[] {
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                },
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(72)},
+                        {"b", new StringNode("72")},
+                    },
+                },
+                false
+            },
+            new object[] {
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                },
+                null,
+                false
+            },
+            new object[] {
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                }[0],
+                null,
+                true
+            },
+            new object[] {
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                }["a"],
+                new IntegerNode(42),
+                true
+            },
+            new object[] {
+                new ObjectNode {
+                    Elems = new Dictionary<string, INode> {
+                        {"a", new IntegerNode(42)},
+                        {"b", new StringNode("42")},
+                    },
+                }["c"],
+                null,
+                true
+            },
+            new object[] {
+                new ObjectNode()["c"],
+                null,
+                true
+            },
+
+            // Array
+            new object[] {
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                },
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                },
+                true
+            },
+            new object[] {
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                },
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new StringNode("42"),
+                        new IntegerNode(42),
+                    },
+                },
+                false
+            },
+            new object[] {
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                },
+                new NullNode(),
+                false
+            },
+            new object[] {
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                },
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(72),
+                        new StringNode("72"),
+                    },
+                },
+                false
+            },
+            new object[] {
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                },
+                null,
+                false
+            },
+            new object[] {
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                }["a"],
+                null,
+                true
+            },
+            new object[] {
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                }[0],
+                new IntegerNode(42),
+                true
+            },
+            new object[] {
+                new ArrayNode {
+                    Elems = new List<INode> {
+                        new IntegerNode(42),
+                        new StringNode("42"),
+                    },
+                }[2],
+                null,
+                true
+            },
+            new object[] {
+                new ArrayNode()[0],
+                null,
+                true
+            },
         };
     }
 }

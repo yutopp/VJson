@@ -25,6 +25,10 @@ namespace VJson
     public interface INode
     {
         NodeKind Kind { get; }
+
+        object GenericValue { get; }
+        INode this[int index] { get; }
+        INode this[string key] { get; }
     }
 
     public class BooleanNode : INode
@@ -33,6 +37,10 @@ namespace VJson
         {
             get { return NodeKind.Boolean; }
         }
+
+        public object GenericValue { get { return Value; } }
+        public INode this[int index] { get { return null; } }
+        public INode this[string key] { get { return null; } }
 
         public bool Value { get; private set; }
 
@@ -70,6 +78,10 @@ namespace VJson
             get { return NodeKind.Null; }
         }
 
+        public object GenericValue { get { return null; } }
+        public INode this[int index] { get { return null; } }
+        public INode this[string key] { get { return null; } }
+
         public override bool Equals(object rhsObj)
         {
             var rhs = rhsObj as NullNode;
@@ -98,6 +110,10 @@ namespace VJson
         {
             get { return NodeKind.Integer; }
         }
+
+        public object GenericValue { get { return Value; } }
+        public INode this[int index] { get { return null; } }
+        public INode this[string key] { get { return null; } }
 
         public long Value { get; private set; }
 
@@ -135,6 +151,10 @@ namespace VJson
             get { return NodeKind.Float; }
         }
 
+        public object GenericValue { get { return Value; } }
+        public INode this[int index] { get { return null; } }
+        public INode this[string key] { get { return null; } }
+
         public double Value { get; private set; }
 
         public FloatNode(double v)
@@ -170,6 +190,10 @@ namespace VJson
         {
             get { return NodeKind.String; }
         }
+
+        public object GenericValue { get { return Value; } }
+        public INode this[int index] { get { return null; } }
+        public INode this[string key] { get { return null; } }
 
         public string Value { get; private set; }
 
@@ -207,6 +231,22 @@ namespace VJson
         public NodeKind Kind
         {
             get { return NodeKind.Object; }
+        }
+
+        public object GenericValue { get { return Elems != null ? Elems : new Dictionary<string, INode>(); } }
+        public INode this[int index] { get { return null; } }
+        public INode this[string key]
+        {
+            get
+            {
+                if (Elems == null)
+                {
+                    return null;
+                }
+
+                INode n;
+                return Elems.TryGetValue(key, out n) ? n : null;
+            }
         }
 
         public void AddElement(string key, INode elem)
@@ -264,6 +304,10 @@ namespace VJson
         {
             get { return NodeKind.Array; }
         }
+
+        public object GenericValue { get { return Elems != null ? Elems : new List<INode>(); } }
+        public INode this[int index] { get { return Elems != null ? Elems.ElementAtOrDefault(index) : null; } }
+        public INode this[string key] { get { return null; } }
 
         public void AddElement(INode elem)
         {
