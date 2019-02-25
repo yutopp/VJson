@@ -76,12 +76,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new BooleanNode(true)[0],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
                 new BooleanNode(true)["a"],
-                null,
+                NullNode.Null,
                 true
             },
 
@@ -103,12 +103,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new NullNode()[0],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
                 new NullNode()["a"],
-                null,
+                NullNode.Null,
                 true
             },
 
@@ -135,12 +135,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new IntegerNode(42)[0],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
                 new IntegerNode(42)["a"],
-                null,
+                NullNode.Null,
                 true
             },
 
@@ -167,12 +167,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new FloatNode(42)[0],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
                 new FloatNode(42)["a"],
-                null,
+                NullNode.Null,
                 true
             },
 
@@ -199,12 +199,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new StringNode("42")[0],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
                 new StringNode("42")["a"],
-                null,
+                NullNode.Null,
                 true
             },
 
@@ -281,7 +281,7 @@ namespace VJson.UnitTests
                         {"b", new StringNode("42")},
                     },
                 }[0],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
@@ -301,12 +301,12 @@ namespace VJson.UnitTests
                         {"b", new StringNode("42")},
                     },
                 }["c"],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
                 new ObjectNode()["c"],
-                null,
+                NullNode.Null,
                 true
             },
 
@@ -383,7 +383,7 @@ namespace VJson.UnitTests
                         new StringNode("42"),
                     },
                 }["a"],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
@@ -403,12 +403,19 @@ namespace VJson.UnitTests
                         new StringNode("42"),
                     },
                 }[2],
-                null,
+                NullNode.Null,
                 true
             },
             new object[] {
                 new ArrayNode()[0],
-                null,
+                NullNode.Null,
+                true
+            },
+
+            // Nested
+            new object[] {
+                new ArrayNode()[0]["a"][1][20000],
+                NullNode.Null,
                 true
             },
         };

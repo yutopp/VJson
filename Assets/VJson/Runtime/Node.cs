@@ -37,8 +37,8 @@ namespace VJson
             get { return NodeKind.Boolean; }
         }
 
-        public INode this[int index] { get { return null; } }
-        public INode this[string key] { get { return null; } }
+        public INode this[int index] { get { return NullNode.Null; } }
+        public INode this[string key] { get { return NullNode.Null; } }
 
         public bool Value { get; private set; }
 
@@ -76,8 +76,10 @@ namespace VJson
             get { return NodeKind.Null; }
         }
 
-        public INode this[int index] { get { return null; } }
-        public INode this[string key] { get { return null; } }
+        public INode this[int index] { get { return Null; } }
+        public INode this[string key] { get { return Null; } }
+
+        public static readonly INode Null = new NullNode();
 
         public override bool Equals(object rhsObj)
         {
@@ -108,8 +110,8 @@ namespace VJson
             get { return NodeKind.Integer; }
         }
 
-        public INode this[int index] { get { return null; } }
-        public INode this[string key] { get { return null; } }
+        public INode this[int index] { get { return NullNode.Null; } }
+        public INode this[string key] { get { return NullNode.Null; } }
 
         public long Value { get; private set; }
 
@@ -147,8 +149,8 @@ namespace VJson
             get { return NodeKind.Float; }
         }
 
-        public INode this[int index] { get { return null; } }
-        public INode this[string key] { get { return null; } }
+        public INode this[int index] { get { return NullNode.Null; } }
+        public INode this[string key] { get { return NullNode.Null; } }
 
         public double Value { get; private set; }
 
@@ -186,8 +188,8 @@ namespace VJson
             get { return NodeKind.String; }
         }
 
-        public INode this[int index] { get { return null; } }
-        public INode this[string key] { get { return null; } }
+        public INode this[int index] { get { return NullNode.Null; } }
+        public INode this[string key] { get { return NullNode.Null; } }
 
         public string Value { get; private set; }
 
@@ -227,18 +229,18 @@ namespace VJson
             get { return NodeKind.Object; }
         }
 
-        public INode this[int index] { get { return null; } }
+        public INode this[int index] { get { return NullNode.Null; } }
         public INode this[string key]
         {
             get
             {
-                if (Elems == null)
+                INode n = null;
+                if (Elems != null)
                 {
-                    return null;
+                    Elems.TryGetValue(key, out n);
                 }
 
-                INode n;
-                return Elems.TryGetValue(key, out n) ? n : null;
+                return n != null ? n : NullNode.Null;
             }
         }
 
@@ -298,8 +300,15 @@ namespace VJson
             get { return NodeKind.Array; }
         }
 
-        public INode this[int index] { get { return Elems != null ? Elems.ElementAtOrDefault(index) : null; } }
-        public INode this[string key] { get { return null; } }
+        public INode this[int index]
+        {
+            get
+            {
+                var elem = Elems != null ? Elems.ElementAtOrDefault(index) : null;
+                return elem != null ? elem : NullNode.Null;
+            }
+        }
+        public INode this[string key] { get { return NullNode.Null; } }
 
         public void AddElement(INode elem)
         {
