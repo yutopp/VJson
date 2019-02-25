@@ -26,7 +26,6 @@ namespace VJson
     {
         NodeKind Kind { get; }
 
-        object GenericValue { get; }
         INode this[int index] { get; }
         INode this[string key] { get; }
     }
@@ -38,7 +37,6 @@ namespace VJson
             get { return NodeKind.Boolean; }
         }
 
-        public object GenericValue { get { return Value; } }
         public INode this[int index] { get { return null; } }
         public INode this[string key] { get { return null; } }
 
@@ -78,7 +76,6 @@ namespace VJson
             get { return NodeKind.Null; }
         }
 
-        public object GenericValue { get { return null; } }
         public INode this[int index] { get { return null; } }
         public INode this[string key] { get { return null; } }
 
@@ -111,7 +108,6 @@ namespace VJson
             get { return NodeKind.Integer; }
         }
 
-        public object GenericValue { get { return Value; } }
         public INode this[int index] { get { return null; } }
         public INode this[string key] { get { return null; } }
 
@@ -151,7 +147,6 @@ namespace VJson
             get { return NodeKind.Float; }
         }
 
-        public object GenericValue { get { return Value; } }
         public INode this[int index] { get { return null; } }
         public INode this[string key] { get { return null; } }
 
@@ -191,7 +186,6 @@ namespace VJson
             get { return NodeKind.String; }
         }
 
-        public object GenericValue { get { return Value; } }
         public INode this[int index] { get { return null; } }
         public INode this[string key] { get { return null; } }
 
@@ -233,7 +227,6 @@ namespace VJson
             get { return NodeKind.Object; }
         }
 
-        public object GenericValue { get { return Elems != null ? Elems : new Dictionary<string, INode>(); } }
         public INode this[int index] { get { return null; } }
         public INode this[string key]
         {
@@ -305,7 +298,6 @@ namespace VJson
             get { return NodeKind.Array; }
         }
 
-        public object GenericValue { get { return Elems != null ? Elems : new List<INode>(); } }
         public INode this[int index] { get { return Elems != null ? Elems.ElementAtOrDefault(index) : null; } }
         public INode this[string key] { get { return null; } }
 
