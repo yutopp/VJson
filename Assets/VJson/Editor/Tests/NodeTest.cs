@@ -76,12 +76,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new BooleanNode(true)[0],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
                 new BooleanNode(true)["a"],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
 
@@ -103,12 +103,39 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new NullNode()[0],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
                 new NullNode()["a"],
-                NullNode.Null,
+                UndefinedNode.Undef,
+                true
+            },
+
+            // Undefined
+            new object[] {
+                new UndefinedNode(),
+                new UndefinedNode(),
+                true
+            },
+            new object[] {
+                new UndefinedNode(),
+                new BooleanNode(true),
+                false
+            },
+            new object[] {
+                new UndefinedNode(),
+                null,
+                false
+            },
+            new object[] {
+                new UndefinedNode()[0],
+                UndefinedNode.Undef,
+                true
+            },
+            new object[] {
+                new UndefinedNode()["a"],
+                UndefinedNode.Undef,
                 true
             },
 
@@ -135,12 +162,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new IntegerNode(42)[0],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
                 new IntegerNode(42)["a"],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
 
@@ -167,12 +194,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new FloatNode(42)[0],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
                 new FloatNode(42)["a"],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
 
@@ -199,12 +226,12 @@ namespace VJson.UnitTests
             },
             new object[] {
                 new StringNode("42")[0],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
                 new StringNode("42")["a"],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
 
@@ -281,7 +308,7 @@ namespace VJson.UnitTests
                         {"b", new StringNode("42")},
                     },
                 }[0],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
@@ -301,12 +328,12 @@ namespace VJson.UnitTests
                         {"b", new StringNode("42")},
                     },
                 }["c"],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
                 new ObjectNode()["c"],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
 
@@ -383,7 +410,7 @@ namespace VJson.UnitTests
                         new StringNode("42"),
                     },
                 }["a"],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
@@ -403,19 +430,19 @@ namespace VJson.UnitTests
                         new StringNode("42"),
                     },
                 }[2],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
             new object[] {
                 new ArrayNode()[0],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
 
             // Nested
             new object[] {
                 new ArrayNode()[0]["a"][1][20000],
-                NullNode.Null,
+                UndefinedNode.Undef,
                 true
             },
         };

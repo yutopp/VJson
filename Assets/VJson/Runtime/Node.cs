@@ -20,6 +20,8 @@ namespace VJson
         Float,   // Number
         Boolean,
         Null,
+
+        Undefined,
     }
 
     public interface INode
@@ -37,8 +39,8 @@ namespace VJson
             get { return NodeKind.Boolean; }
         }
 
-        public INode this[int index] { get { return NullNode.Null; } }
-        public INode this[string key] { get { return NullNode.Null; } }
+        public INode this[int index] { get { return UndefinedNode.Undef; } }
+        public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public bool Value { get; private set; }
 
@@ -76,8 +78,8 @@ namespace VJson
             get { return NodeKind.Null; }
         }
 
-        public INode this[int index] { get { return Null; } }
-        public INode this[string key] { get { return Null; } }
+        public INode this[int index] { get { return UndefinedNode.Undef; } }
+        public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public static readonly INode Null = new NullNode();
 
@@ -103,6 +105,40 @@ namespace VJson
         }
     }
 
+    public class UndefinedNode : INode
+    {
+        public NodeKind Kind
+        {
+            get { return NodeKind.Undefined; }
+        }
+
+        public INode this[int index] { get { return Undef; } }
+        public INode this[string key] { get { return Undef; } }
+
+        public static readonly INode Undef = new UndefinedNode();
+
+        public override bool Equals(object rhsObj)
+        {
+            var rhs = rhsObj as UndefinedNode;
+            if (rhs == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return 0;
+        }
+
+        public override string ToString()
+        {
+            return "UNDEFINED";
+        }
+    }
+
     public class IntegerNode : INode
     {
         public NodeKind Kind
@@ -110,8 +146,8 @@ namespace VJson
             get { return NodeKind.Integer; }
         }
 
-        public INode this[int index] { get { return NullNode.Null; } }
-        public INode this[string key] { get { return NullNode.Null; } }
+        public INode this[int index] { get { return UndefinedNode.Undef; } }
+        public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public long Value { get; private set; }
 
@@ -149,8 +185,8 @@ namespace VJson
             get { return NodeKind.Float; }
         }
 
-        public INode this[int index] { get { return NullNode.Null; } }
-        public INode this[string key] { get { return NullNode.Null; } }
+        public INode this[int index] { get { return UndefinedNode.Undef; } }
+        public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public double Value { get; private set; }
 
@@ -188,8 +224,8 @@ namespace VJson
             get { return NodeKind.String; }
         }
 
-        public INode this[int index] { get { return NullNode.Null; } }
-        public INode this[string key] { get { return NullNode.Null; } }
+        public INode this[int index] { get { return UndefinedNode.Undef; } }
+        public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public string Value { get; private set; }
 
@@ -229,7 +265,7 @@ namespace VJson
             get { return NodeKind.Object; }
         }
 
-        public INode this[int index] { get { return NullNode.Null; } }
+        public INode this[int index] { get { return UndefinedNode.Undef; } }
         public INode this[string key]
         {
             get
@@ -240,7 +276,7 @@ namespace VJson
                     Elems.TryGetValue(key, out n);
                 }
 
-                return n != null ? n : NullNode.Null;
+                return n != null ? n : UndefinedNode.Undef;
             }
         }
 
@@ -305,10 +341,10 @@ namespace VJson
             get
             {
                 var elem = Elems != null ? Elems.ElementAtOrDefault(index) : null;
-                return elem != null ? elem : NullNode.Null;
+                return elem != null ? elem : UndefinedNode.Undef;
             }
         }
-        public INode this[string key] { get { return NullNode.Null; } }
+        public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public void AddElement(INode elem)
         {
