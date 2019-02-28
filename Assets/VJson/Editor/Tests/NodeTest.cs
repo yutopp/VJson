@@ -447,4 +447,120 @@ namespace VJson.UnitTests
             },
         };
     }
+
+    public class ArrayNodeTests
+    {
+        [Test]
+        public void ElementsModificationTest()
+        {
+            var n = new ArrayNode();
+            Assert.AreEqual(null, n.Elems);
+
+            // Addition
+            n.AddElement(new IntegerNode(42));
+            n.AddElement(new StringNode("test"));
+
+            Assert.AreEqual(2, n.Elems.Count);
+
+            Assert.AreEqual(new IntegerNode(42), n.Elems[0]);
+            Assert.AreEqual(new StringNode("test"), n.Elems[1]);
+
+            // Deletion
+            n.RemoveElementAt(0);
+            n.RemoveElementAt(0);
+            n.RemoveElementAt(0); // Do not fail if removes non-existing keys
+
+            Assert.AreEqual(0, n.Elems.Count);
+        }
+
+        [Test]
+        public void DeletionForEmptyElemsTest()
+        {
+            var n = new ArrayNode();
+
+            n.RemoveElementAt(0);
+
+            Assert.AreEqual(null, n.Elems);
+        }
+
+        [Test]
+        public void ForeachForEmptyElemsTest()
+        {
+            var n = new ArrayNode();
+
+            foreach (var e in n) { }
+        }
+
+        [Test]
+        public void ForeachElemsTest()
+        {
+            var n = new ArrayNode();
+
+            n.AddElement(new IntegerNode(42));
+            n.AddElement(new StringNode("test"));
+
+            Assert.That(n, Is.EquivalentTo(new INode[] {
+                        new IntegerNode(42),
+                        new StringNode("test"),
+                    }));
+        }
+    }
+
+    public class ObjectNodeTests
+    {
+        [Test]
+        public void ElementsModificationTest()
+        {
+            var n = new ObjectNode();
+            Assert.AreEqual(null, n.Elems);
+
+            // Addition
+            n.AddElement("a", new IntegerNode(42));
+            n.AddElement("b", new StringNode("test"));
+
+            Assert.AreEqual(2, n.Elems.Count);
+
+            Assert.AreEqual(new IntegerNode(42), n.Elems["a"]);
+            Assert.AreEqual(new StringNode("test"), n.Elems["b"]);
+
+            // Deletion
+            n.RemoveElement("a");
+            n.RemoveElement("b");
+            n.RemoveElement("c"); // Do not fail if removes non-existing keys
+
+            Assert.AreEqual(0, n.Elems.Count);
+        }
+
+        [Test]
+        public void DeletionForEmptyElemsTest()
+        {
+            var n = new ObjectNode();
+
+            n.RemoveElement("a");
+
+            Assert.AreEqual(null, n.Elems);
+        }
+
+        [Test]
+        public void ForeachForEmptyElemsTest()
+        {
+            var n = new ObjectNode();
+
+            foreach (var e in n) { }
+        }
+
+        [Test]
+        public void ForeachElemsTest()
+        {
+            var n = new ObjectNode();
+
+            n.AddElement("a", new IntegerNode(42));
+            n.AddElement("b", new StringNode("test"));
+
+            Assert.That(n, Is.EquivalentTo(new KeyValuePair<string, INode>[] {
+                        new KeyValuePair<string, INode>("a", new IntegerNode(42)),
+                        new KeyValuePair<string, INode>("b", new StringNode("test")),
+                    }));
+        }
+    }
 }

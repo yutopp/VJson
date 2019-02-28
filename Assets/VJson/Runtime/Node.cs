@@ -6,6 +6,7 @@
 //
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -256,7 +257,7 @@ namespace VJson
         }
     }
 
-    public class ObjectNode : INode
+    public class ObjectNode : INode, IEnumerable<KeyValuePair<string, INode>>
     {
         public Dictionary<string, INode> Elems;
 
@@ -288,6 +289,31 @@ namespace VJson
             }
 
             Elems.Add(key, elem); // TODO: check duplication
+        }
+
+        public void RemoveElement(string key)
+        {
+            if (Elems == null)
+            {
+                return;
+            }
+
+            Elems.Remove(key);
+        }
+
+        public IEnumerator<KeyValuePair<string, INode>> GetEnumerator()
+        {
+            if (Elems != null)
+            {
+                return Elems.GetEnumerator();
+            }
+
+            return Enumerable.Empty<KeyValuePair<string, INode>>().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public override bool Equals(object rhsObj)
@@ -327,7 +353,7 @@ namespace VJson
         }
     }
 
-    public class ArrayNode : INode
+    public class ArrayNode : INode, IEnumerable<INode>
     {
         public List<INode> Elems;
 
@@ -354,6 +380,34 @@ namespace VJson
             }
 
             Elems.Add(elem); // TODO: check duplication
+        }
+
+        public void RemoveElementAt(int index)
+        {
+            if (Elems == null)
+            {
+                return;
+            }
+
+            if (index >= 0 && index < Elems.Count)
+            {
+                Elems.RemoveAt(index);
+            }
+        }
+
+        public IEnumerator<INode> GetEnumerator()
+        {
+            if (Elems != null)
+            {
+                return Elems.GetEnumerator();
+            }
+
+            return Enumerable.Empty<INode>().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public override bool Equals(object rhsObj)
