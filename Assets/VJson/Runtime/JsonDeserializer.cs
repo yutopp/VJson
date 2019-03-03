@@ -88,7 +88,7 @@ namespace VJson
             {
                 if (!TypeHelper.IsBoxed(targetType))
                 {
-                    var msg = state.CreateMessage("Null cannot convert to non-boxed value({0})", targetType);
+                    var msg = state.CreateNodeConversionFailureMessage(node, targetType);
                     throw new DeserializeFailureException(msg);
                 }
 
@@ -101,8 +101,7 @@ namespace VJson
                 return CreateInstanceIfConstrucutable<bool>(targetType, bNode.Value, state);
             }
 
-            // TODO: Should raise error?
-            var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+            var msg0 = state.CreateNodeConversionFailureMessage(node, targetType);
             throw new DeserializeFailureException(msg0);
         }
 
@@ -112,7 +111,7 @@ namespace VJson
             {
                 if (!TypeHelper.IsBoxed(targetType))
                 {
-                    var msg = state.CreateMessage("Null cannot convert to non-boxed value({0})", targetType);
+                    var msg = state.CreateNodeConversionFailureMessage(node, targetType);
                     throw new DeserializeFailureException(msg);
                 }
 
@@ -131,8 +130,7 @@ namespace VJson
                 return CreateInstanceIfConstrucutable<double>(targetType, fNode.Value, state);
             }
 
-            // TODO: Should raise error?
-            var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+            var msg0 = state.CreateNodeConversionFailureMessage(node, targetType);
             throw new DeserializeFailureException(msg0);
         }
 
@@ -142,7 +140,7 @@ namespace VJson
             {
                 if (!TypeHelper.IsBoxed(targetType))
                 {
-                    var msg = state.CreateMessage("Null cannot convert to non-boxed value({0})", targetType);
+                    var msg = state.CreateNodeConversionFailureMessage(node, targetType);
                     throw new DeserializeFailureException(msg);
                 }
 
@@ -155,8 +153,7 @@ namespace VJson
                 return CreateInstanceIfConstrucutable<string>(targetType, sNode.Value, state);
             }
 
-            // TODO: Should raise error?
-            var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+            var msg0 = state.CreateNodeConversionFailureMessage(node, targetType);
             throw new DeserializeFailureException(msg0);
         }
 
@@ -169,7 +166,7 @@ namespace VJson
                 ;
             if (!isConvertible)
             {
-                var msg = state.CreateMessage("Array cannot convert to non-iterable value({0})", targetType);
+                var msg = state.CreateNodeConversionFailureMessage(node, targetType);
                 throw new DeserializeFailureException(msg);
             }
 
@@ -221,8 +218,7 @@ namespace VJson
                 }
             }
 
-            // TODO: Should raise error?
-            var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
+            var msg0 = state.CreateNodeConversionFailureMessage(node, targetType);
             throw new DeserializeFailureException(msg0);
         }
 
@@ -230,8 +226,8 @@ namespace VJson
         {
             if (targetKind != NodeKind.Object)
             {
-                var msg0 = state.CreateMessage("{0} cannot convert to {1}", node.Kind, targetType);
-                throw new DeserializeFailureException(msg0);
+                var msg = state.CreateNodeConversionFailureMessage(node, targetType);
+                throw new DeserializeFailureException(msg);
             }
 
             if (node is NullNode)
@@ -332,9 +328,7 @@ namespace VJson
                             }
                             if (!resolved)
                             {
-                                var msg = elemState.CreateMessage("{0} cannot convert to one of [{1}]",
-                                                                  elem.Kind,
-                                                                  string.Join(", ", attr.TypeHints.Select(t => t.ToString()).ToArray()));
+                                var msg = elemState.CreateNodeConversionFailureMessage(elem, attr.TypeHints);
                                 throw new DeserializeFailureException(msg);
                             }
                         }
@@ -421,14 +415,18 @@ namespace VJson
                         var enumConvFunc = TypeHelper.GetConverter(typeof(T), enumUnderlyingType);
                         if (enumConvFunc == null)
                         {
-                            var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                            var msg = state.CreateTypeConversionFailureMessage<T>(value,
+                                                                                  targetType,
+                                                                                  "Failed to cast");
                             throw new DeserializeFailureException(msg);
                         }
                         var enumValue = enumConvFunc(value);
 
                         if (!Enum.IsDefined(targetType, enumValue))
                         {
-                            var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                            var msg = state.CreateTypeConversionFailureMessage<T>(value,
+                                                                                  targetType,
+                                                                                  "Enum value is not defined");
                             throw new DeserializeFailureException(msg);
                         }
 
@@ -439,7 +437,9 @@ namespace VJson
                         var enumIndex = Array.IndexOf(stringEnumNames, value);
                         if (enumIndex == -1)
                         {
-                            var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                            var msg = state.CreateTypeConversionFailureMessage<T>(value,
+                                                                                  targetType,
+                                                                                  "Enum name is not defined");
                             throw new DeserializeFailureException(msg);
                         }
 
@@ -451,7 +451,7 @@ namespace VJson
             var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(targetType);
             if (attr == null)
             {
-                var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);
+                var msg = state.CreateTypeConversionFailureMessage<T>(value, targetType);
                 throw new DeserializeFailureException(msg);
             }
 
@@ -463,7 +463,9 @@ namespace VJson
             var ctor = TypeHelper.TypeWrap(targetType).GetConstructor(new[] { typeof(T) });
             if (ctor == null)
             {
-                var msg = state.CreateMessage("{0} cannot convert implicitly to {1}", typeof(T), targetType);
+                var msg = state.CreateTypeConversionFailureMessage<T>(value,
+                                                                      targetType,
+                                                                      "Suitable constructers are not found");
                 throw new DeserializeFailureException(msg);
             }
 

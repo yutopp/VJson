@@ -6,7 +6,6 @@
 //
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -543,7 +542,7 @@ namespace VJson.UnitTests
         public void SerializeTest<K, V>(IDictionary<K, V> obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-            var actual =  serializer.Serialize(obj);
+            var actual = serializer.Serialize(obj);
 
             Assert.That(actual, Is.EquivalentTo(expected));
         }
@@ -698,112 +697,112 @@ namespace VJson.UnitTests
             new object[] {
                 typeof(bool),
                 "1",
-                "(root): Integer cannot convert to System.Boolean.",
+                "(root): Integer node (1) cannot convert to System.Boolean.",
             },
             new object[] {
                 typeof(bool),
                 "null",
-                "(root): Null cannot convert to non-boxed value(System.Boolean).",
+                "(root): Null node cannot convert to non-boxed value(System.Boolean).",
             },
             new object[] {
                 typeof(int),
                 "true",
-                "(root): Boolean cannot convert to System.Int32.",
+                "(root): Boolean node (True) cannot convert to System.Int32.",
             },
             new object[] {
                 typeof(int),
                 "3.14",
-                "(root): System.Double cannot convert to System.Int32.",
+                "(root): System.Double value (3.14) cannot convert to System.Int32.",
             },
             new object[] {
                 typeof(int),
                 "null",
-                "(root): Null cannot convert to non-boxed value(System.Int32).",
+                "(root): Null node cannot convert to non-boxed value(System.Int32).",
             },
             new object[] {
                 typeof(string),
                 "true",
-                "(root): Boolean cannot convert to System.String.",
+                "(root): Boolean node (True) cannot convert to System.String.",
             },
             new object[] {
                 typeof(string[]),
                 "true",
-                "(root): Boolean cannot convert to System.String[].",
+                "(root): Boolean node (True) cannot convert to System.String[].",
             },
             new object[] {
                 typeof(List<string>),
                 "true",
-                "(root): Boolean cannot convert to System.Collections.Generic.List`1[System.String].",
+                "(root): Boolean node (True) cannot convert to System.Collections.Generic.List`1[System.String].",
             },
             new object[] {
                 typeof(string[]),
                 "[\"\", 1]",
-                "(root)[1]: Integer cannot convert to System.String.",
+                "(root)[1]: Integer node (1) cannot convert to System.String.",
             },
             new object[] {
                 typeof(List<string>),
                 "[\"\", 1]",
-                "(root)[1]: Integer cannot convert to System.String.",
+                "(root)[1]: Integer node (1) cannot convert to System.String.",
             },
             new object[] {
                 typeof(Dictionary<string, int>),
                 "true",
-                "(root): System.Boolean cannot convert to System.Collections.Generic.Dictionary`2[System.String,System.Int32].",
+                "(root): System.Boolean value (True) cannot convert to System.Collections.Generic.Dictionary`2[System.String,System.Int32].",
             },
             new object[] {
                 typeof(Dictionary<string, int>),
                 "{\"a\": 1, \"b\": \"bo\"}",
-                "(root)[\"b\"]: String cannot convert to System.Int32.",
+                "(root)[\"b\"]: String node cannot convert to System.Int32.",
             },
             new object[] {
                 typeof(SomeObject),
                 "true",
-                "(root): System.Boolean cannot convert to VJson.UnitTests.SomeObject.",
+                "(root): System.Boolean value (True) cannot convert to VJson.UnitTests.SomeObject.",
             },
             new object[] {
                 typeof(SomeObject),
                 "{\"X\": \"bo\"}",
-                "(root)[\"X\"]: String cannot convert to System.Int32.",
+                "(root)[\"X\"]: String node cannot convert to System.Int32.",
             },
             new object[] {
                 typeof(CustomObject),
                 "{\"Obj\": \"bo\"}",
-                "(root)[\"Obj\"]: String cannot convert to one of [System.Boolean, VJson.UnitTests.SomeObject].",
+                "(root)[\"Obj\"]: String node cannot convert to one of [System.Boolean, VJson.UnitTests.SomeObject].",
             },
             new object[] {
                 typeof(Hoge),
                 "42",
-                "(root): System.Int64 cannot convert implicitly to VJson.UnitTests.Hoge.",
+                "(root): System.Int64 value (42) cannot convert to VJson.UnitTests.Hoge (Reason: Suitable constructers are not found).",
             },
             new object[] {
                 typeof(EnumAsInt),
                 "42",
-                "(root): System.Int64 cannot convert to VJson.UnitTests.EnumAsInt.",
+                "(root): System.Int64 value (42) cannot convert to VJson.UnitTests.EnumAsInt (Reason: Enum value is not defined).",
             },
             new object[] {
                 typeof(EnumAsInt),
                 "\"A\"",
-                "(root): String cannot convert to VJson.UnitTests.EnumAsInt.",
+                "(root): String node cannot convert to VJson.UnitTests.EnumAsInt.",
             },
             new object[] {
                 typeof(EnumAsString),
                 "1",
-                "(root): Integer cannot convert to VJson.UnitTests.EnumAsString.",
+                "(root): Integer node (1) cannot convert to VJson.UnitTests.EnumAsString.",
             },
             new object[] {
                 typeof(EnumAsString),
                 "\"HogeHoge\"",
-                "(root): System.String cannot convert to VJson.UnitTests.EnumAsString.",
+                "(root): System.String value cannot convert to VJson.UnitTests.EnumAsString (Reason: Enum name is not defined).",
             },
             new object[] {
                 typeof(EnumAsString),
                 "\"NameC\"",
-                "(root): System.String cannot convert to VJson.UnitTests.EnumAsString.",
+                "(root): System.String value cannot convert to VJson.UnitTests.EnumAsString (Reason: Enum name is not defined).",
             },
             new object[] {
                 typeof(HasDynamicResolver),
                 "{\"Dict\":{\"a\":10,\"b\":42}}",
-                "(root)[\"Dict\"][\"a\"]: System.Int64 cannot convert to VJson.UnitTests.SomeObject.",
+                "(root)[\"Dict\"][\"a\"]: System.Int64 value (10) cannot convert to VJson.UnitTests.SomeObject.",
             },
             new object[] {
                 typeof(HasDynamicResolverFailWithTypeChecks),
