@@ -12,7 +12,7 @@ This library is developed as a purely C# project, however it also supports that 
 
 You can use [Nuget/VJson](https://www.nuget.org/packages/VJson/).
 
-```
+```bash
 dotnet add package VJson
 ```
 
@@ -24,7 +24,7 @@ dotnet add package VJson
 
 ### Serialize/Deserialize
 
-```
+```csharp
 //
 // For serialization
 //
@@ -40,7 +40,7 @@ using (var s = new MemoryStream())
 }
 ```
 
-```
+```csharp
 //
 // For deserialization
 //
@@ -65,7 +65,8 @@ using (var s = new MemoryStream(Encoding.UTF8.GetBytes(json)))
 and User defined classes. For user defined classes, only all public fields are supported.
 
 e.g.
-```
+
+```csharp
 class SomeObject
 {
     private float _p = 3.14f; // A private field will not be exported.
