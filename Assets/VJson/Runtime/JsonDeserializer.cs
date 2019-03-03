@@ -298,10 +298,10 @@ namespace VJson
                     var fields = TypeHelper.TypeWrap(targetType).GetFields();
                     foreach (var field in fields)
                     {
-                        var attr = TypeHelper.GetCustomAttribute<JsonField>(field);
+                        var attr = TypeHelper.GetCustomAttribute<JsonFieldAttribute>(field);
 
                         // TODO: duplication check
-                        var elemName = JsonField.FieldName(attr, field);
+                        var elemName = JsonFieldAttribute.FieldName(attr, field);
 
                         INode elem = null;
                         if (oNode.Elems == null || !oNode.Elems.TryGetValue(elemName, out elem))
@@ -413,7 +413,7 @@ namespace VJson
 
             if (TypeHelper.TypeWrap(targetType).IsEnum)
             {
-                var enumAttr = TypeHelper.GetCustomAttribute<Json>(targetType);
+                var enumAttr = TypeHelper.GetCustomAttribute<JsonAttribute>(targetType);
                 switch (enumAttr != null ? enumAttr.EnumConversion : EnumConversionType.AsInt)
                 {
                     case EnumConversionType.AsInt:
@@ -448,7 +448,7 @@ namespace VJson
             }
 
             // Try to convert value implicitly
-            var attr = TypeHelper.GetCustomAttribute<Json>(targetType);
+            var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(targetType);
             if (attr == null)
             {
                 var msg = state.CreateMessage("{0} cannot convert to {1}", typeof(T), targetType);

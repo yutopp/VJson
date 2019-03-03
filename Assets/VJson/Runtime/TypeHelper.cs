@@ -56,7 +56,7 @@ namespace VJson
         {
             var enumFields = TypeWrap(ty).GetFields(BindingFlags.Static|BindingFlags.Public);
             return enumFields.Select(fi => {
-                    var attr = GetCustomAttribute<JsonField>(fi);
+                    var attr = GetCustomAttribute<JsonFieldAttribute>(fi);
                     if (attr != null && attr.Name != null) {
                         return attr.Name;
                     }
@@ -140,14 +140,14 @@ namespace VJson
                 var fields = TypeWrap(ty).GetFields();
                 foreach (var field in fields)
                 {
-                    var fieldAttr = GetCustomAttribute<JsonField>(field);
+                    var fieldAttr = GetCustomAttribute<JsonFieldAttribute>(field);
 
                     // TODO: duplication check
-                    var elemName = JsonField.FieldName(fieldAttr, field);
+                    var elemName = JsonFieldAttribute.FieldName(fieldAttr, field);
                     var elemValue = field.GetValue(o);
 
-                    var fieldIgnoreAttr = GetCustomAttribute<JsonFieldIgnorable>(field);
-                    if (JsonFieldIgnorable.IsIgnorable(fieldIgnoreAttr, elemValue))
+                    var fieldIgnoreAttr = GetCustomAttribute<JsonFieldIgnorableAttribute>(field);
+                    if (JsonFieldIgnorableAttribute.IsIgnorable(fieldIgnoreAttr, elemValue))
                     {
                         continue;
                     }

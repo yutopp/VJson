@@ -67,7 +67,7 @@ namespace VJson
         {
             if (TypeHelper.TypeWrap(o.GetType()).IsEnum)
             {
-                var attr = TypeHelper.GetCustomAttribute<Json>(o.GetType());
+                var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(o.GetType());
                 switch (attr != null ? attr.EnumConversion : EnumConversionType.AsInt)
                 {
                     case EnumConversionType.AsInt:

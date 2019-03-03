@@ -9,14 +9,12 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 
 namespace VJson.Schema
 {
     [Json(ImplicitConstructable = true)]
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field,
-                    Inherited = false)]
-    public class JsonSchema : Attribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field, Inherited = false)]
+    public class JsonSchemaAttribute : Attribute
     {
         #region Core
         [JsonField(Name = "$schema")]
@@ -53,7 +51,7 @@ namespace VJson.Schema
         [JsonFieldIgnorable]
         public object Const;
 
-        bool EqualsOnlyAny(JsonSchema rhs)
+        bool EqualsOnlyAny(JsonSchemaAttribute rhs)
         {
             return EqualsSingletonOrArray<string>(Type, rhs.Type)
                 && EqualsEnumerable(Enum, rhs.Enum)
@@ -83,7 +81,7 @@ namespace VJson.Schema
         [JsonFieldIgnorable(WhenValueIs = double.MaxValue)]
         public double ExclusiveMinimum = double.MaxValue;
 
-        bool EqualsOnlyNum(JsonSchema rhs)
+        bool EqualsOnlyNum(JsonSchemaAttribute rhs)
         {
             return MultipleOf == rhs.MultipleOf
                 && Maximum == rhs.Maximum
@@ -107,7 +105,7 @@ namespace VJson.Schema
         [JsonFieldIgnorable]
         public string Pattern;
 
-        bool EqualsOnlyString(JsonSchema rhs)
+        bool EqualsOnlyString(JsonSchemaAttribute rhs)
         {
             return MaxLength == rhs.MaxLength
                 && MinLength == rhs.MinLength
@@ -117,13 +115,14 @@ namespace VJson.Schema
         #endregion
 
         #region 6.4: Arrays
-        [JsonField(Name = "items", TypeHints = new Type[] { typeof(JsonSchema), typeof(JsonSchema[]) })]
+        [JsonField(Name = "items",
+                   TypeHints = new Type[] { typeof(JsonSchemaAttribute), typeof(JsonSchemaAttribute[]) })]
         [JsonFieldIgnorable]
         public object Items;
 
         [JsonField(Name = "additionalItems")]
         [JsonFieldIgnorable]
-        public JsonSchema AdditionalItems;
+        public JsonSchemaAttribute AdditionalItems;
 
         [JsonField(Name = "maxItems")]
         [JsonFieldIgnorable(WhenValueIs = int.MinValue)]
@@ -139,9 +138,9 @@ namespace VJson.Schema
 
         // contains
 
-        bool EqualsOnlyArray(JsonSchema rhs)
+        bool EqualsOnlyArray(JsonSchemaAttribute rhs)
         {
-            return EqualsSingletonOrArray<JsonSchema>(Items, rhs.Items)
+            return EqualsSingletonOrArray<JsonSchemaAttribute>(Items, rhs.Items)
                 && Object.Equals(AdditionalItems, rhs.AdditionalItems)
                 && MaxItems == rhs.MaxItems
                 && MinItems == rhs.MinItems
@@ -165,31 +164,31 @@ namespace VJson.Schema
 
         [JsonField(Name = "properties")]
         [JsonFieldIgnorable]
-        public Dictionary<string, JsonSchema> Properties;
+        public Dictionary<string, JsonSchemaAttribute> Properties;
 
         [JsonField(Name = "patternProperties")]
         [JsonFieldIgnorable]
-        public Dictionary<string, JsonSchema> PatternProperties;
+        public Dictionary<string, JsonSchemaAttribute> PatternProperties;
 
         [JsonField(Name = "additionalProperties")]
         [JsonFieldIgnorable]
-        public JsonSchema AdditionalProperties;
+        public JsonSchemaAttribute AdditionalProperties;
 
         [JsonField(Name = "dependencies",
                    /* TODO:
-                      A type of this field should be Map<string, string[] | JsonSchema>.
+                      A type of this field should be Map<string, string[] | JsonSchemaAttribute>.
                       But there are no ways to represent this type currently...
                     */
                    TypeHints = new Type[] {
                        typeof(Dictionary<string, string[]>),
-                       typeof(Dictionary<string, JsonSchema>)
+                       typeof(Dictionary<string, JsonSchemaAttribute>)
                    })]
         [JsonFieldIgnorable]
         public object Dependencies; // Use [JsonSchemaDependencies] instead when specify it by attributes.
 
         // propertyNames
 
-        bool EqualsOnlyObject(JsonSchema rhs)
+        bool EqualsOnlyObject(JsonSchemaAttribute rhs)
         {
             // TODO
             return true;
@@ -199,21 +198,21 @@ namespace VJson.Schema
         #region 6.7: Subschemas With Boolean Logic
         [JsonField(Name = "allOf")]
         [JsonFieldIgnorable]
-        public List<JsonSchema> AllOf;
+        public List<JsonSchemaAttribute> AllOf;
 
         [JsonField(Name = "anyOf")]
         [JsonFieldIgnorable]
-        public List<JsonSchema> AnyOf;
+        public List<JsonSchemaAttribute> AnyOf;
 
         [JsonField(Name = "oneOf")]
         [JsonFieldIgnorable]
-        public List<JsonSchema> OneOf;
+        public List<JsonSchemaAttribute> OneOf;
 
         [JsonField(Name = "not")]
         [JsonFieldIgnorable]
-        public JsonSchema Not;
+        public JsonSchemaAttribute Not;
 
-        bool EqualsOnlySubBool(JsonSchema rhs)
+        bool EqualsOnlySubBool(JsonSchemaAttribute rhs)
         {
             return EqualsEnumerable(AllOf, rhs.AllOf)
                 && EqualsEnumerable(AnyOf, rhs.AnyOf)
@@ -225,16 +224,16 @@ namespace VJson.Schema
 
         internal Type _dynamicResolverTag;
 
-        public JsonSchema()
+        public JsonSchemaAttribute()
         {
         }
 
-        public JsonSchema(bool b)
+        public JsonSchemaAttribute(bool b)
         {
             if (!b)
             {
                 // Equivalent to {"not": {}}
-                Not = new JsonSchema();
+                Not = new JsonSchemaAttribute();
             }
 
             // Equivalent to {}
@@ -242,7 +241,7 @@ namespace VJson.Schema
 
         public override bool Equals(object rhsObj)
         {
-            var rhs = rhsObj as JsonSchema;
+            var rhs = rhsObj as JsonSchemaAttribute;
             if (rhs == null)
             {
                 return false;
@@ -266,22 +265,22 @@ namespace VJson.Schema
 
         public override string ToString()
         {
-            var serializer = new JsonSerializer(typeof(JsonSchema));
+            var serializer = new JsonSerializer(typeof(JsonSchemaAttribute));
             return serializer.Serialize(this);
         }
 
-        public static JsonSchema CreateFromClass<T>(JsonSchemaRegistory reg = null, bool asRef = false)
+        public static JsonSchemaAttribute CreateFromClass<T>(JsonSchemaRegistory reg = null, bool asRef = false)
         {
             return CreateFromType(typeof(T), reg, asRef);
         }
 
-        public static JsonSchema CreateFromType(Type ty, JsonSchemaRegistory reg = null, bool asRef = false)
+        public static JsonSchemaAttribute CreateFromType(Type ty, JsonSchemaRegistory reg = null, bool asRef = false)
         {
             var kind = Node.KindOfType(ty);
             switch (kind)
             {
                 case NodeKind.Boolean:
-                    return new JsonSchema
+                    return new JsonSchemaAttribute
                     {
                         Type = "boolean",
                     };
@@ -292,14 +291,14 @@ namespace VJson.Schema
                     {
                         enumsForInteger = System.Enum.GetValues(ty).Cast<object>().ToArray();
                     }
-                    return new JsonSchema
+                    return new JsonSchemaAttribute
                     {
                         Type = "integer",
                         Enum = enumsForInteger,
                     };
 
                 case NodeKind.Float:
-                    return new JsonSchema
+                    return new JsonSchemaAttribute
                     {
                         Type = "number",
                     };
@@ -310,7 +309,7 @@ namespace VJson.Schema
                     {
                         enumsForString = TypeHelper.GetStringEnumNames(ty);
                     }
-                    return new JsonSchema
+                    return new JsonSchemaAttribute
                     {
                         Type = "string",
                         Enum = enumsForString,
@@ -318,7 +317,7 @@ namespace VJson.Schema
 
                 case NodeKind.Array:
                     var elemTy = TypeHelper.ElemTypeOfIEnumerable(ty);
-                    return new JsonSchema
+                    return new JsonSchemaAttribute
                     {
                         Type = "array",
                         Items = elemTy != null ? CreateFromType(elemTy, reg, true) : null,
@@ -327,12 +326,12 @@ namespace VJson.Schema
                 case NodeKind.Object:
                     if (ty == typeof(object))
                     {
-                        return new JsonSchema();
+                        return new JsonSchemaAttribute();
                     }
 
                     if (TypeHelper.TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     {
-                        return new JsonSchema
+                        return new JsonSchemaAttribute
                         {
                             Type = "object",
                         };
@@ -349,10 +348,10 @@ namespace VJson.Schema
                 reg = JsonSchemaRegistory.GetDefault();
             }
 
-            var schema = TypeHelper.GetCustomAttribute<JsonSchema>(ty);
+            var schema = TypeHelper.GetCustomAttribute<JsonSchemaAttribute>(ty);
             if (schema == null)
             {
-                schema = new JsonSchema();
+                schema = new JsonSchemaAttribute();
             }
             schema.Type = "object";
 
@@ -381,7 +380,7 @@ namespace VJson.Schema
                 {
                     if (schema.AllOf == null)
                     {
-                        schema.AllOf = new List<JsonSchema>();
+                        schema.AllOf = new List<JsonSchemaAttribute>();
                     }
                     schema.AllOf.Add(baseSchema);
 
@@ -390,7 +389,7 @@ namespace VJson.Schema
                 }
             }
 
-            var properties = new Dictionary<string, JsonSchema>();
+            var properties = new Dictionary<string, JsonSchemaAttribute>();
             var required = new List<string>();
             var dependencies = new Dictionary<string, string[]>();
 
@@ -399,24 +398,24 @@ namespace VJson.Schema
             {
                 var fieldType = field.FieldType;
 
-                JsonSchema fieldSchema = null;
-                var attr = TypeHelper.GetCustomAttribute<JsonField>(field);
-                var elemName = JsonField.FieldName(attr, field); // TODO: duplication check
+                JsonSchemaAttribute fieldSchema = null;
+                var attr = TypeHelper.GetCustomAttribute<JsonFieldAttribute>(field);
+                var elemName = JsonFieldAttribute.FieldName(attr, field); // TODO: duplication check
 
                 // If elements are also included in Base classes, skip collecting a schema for the elements.
                 if (baseFieldNames != null && baseFieldNames.Contains(field.Name))
                 {
-                    fieldSchema = new JsonSchema();
+                    fieldSchema = new JsonSchemaAttribute();
                     goto skipField;
                 }
 
-                fieldSchema = TypeHelper.GetCustomAttribute<JsonSchema>(field);
+                fieldSchema = TypeHelper.GetCustomAttribute<JsonSchemaAttribute>(field);
                 if (fieldSchema == null)
                 {
-                    fieldSchema = new JsonSchema();
+                    fieldSchema = new JsonSchemaAttribute();
                 }
 
-                var fieldItemsSchema = TypeHelper.GetCustomAttribute<ItemsJsonSchema>(field);
+                var fieldItemsSchema = TypeHelper.GetCustomAttribute<ItemsJsonSchemaAttribute>(field);
                 if (fieldItemsSchema != null)
                 {
                     fieldSchema.Items = fieldItemsSchema;
@@ -442,13 +441,13 @@ namespace VJson.Schema
                     fieldSchema._dynamicResolverTag = attr.DynamicResolverTag;
                 }
 
-                var fieldItemRequired = TypeHelper.GetCustomAttribute<JsonSchemaRequired>(field);
+                var fieldItemRequired = TypeHelper.GetCustomAttribute<JsonSchemaRequiredAttribute>(field);
                 if (fieldItemRequired != null)
                 {
                     required.Add(elemName);
                 }
 
-                var fieldItemDependencies = TypeHelper.GetCustomAttribute<JsonSchemaDependencies>(field);
+                var fieldItemDependencies = TypeHelper.GetCustomAttribute<JsonSchemaDependenciesAttribute>(field);
                 if (fieldItemDependencies != null)
                 {
                     dependencies.Add(elemName, fieldItemDependencies.Dependencies);
@@ -469,7 +468,7 @@ namespace VJson.Schema
 
                     if (fieldTypeSchema.Items != null)
                     {
-                        var fieldTypeSchemaItems = fieldTypeSchema.Items as JsonSchema;
+                        var fieldTypeSchemaItems = fieldTypeSchema.Items as JsonSchemaAttribute;
                         if (fieldTypeSchemaItems.Ref != null)
                         {
                             fieldSchema.Items = fieldTypeSchemaItems;
@@ -478,14 +477,14 @@ namespace VJson.Schema
                         {
                             if (fieldTypeSchemaItems.Type != null)
                             {
-                                var fieldSchemaItems = fieldSchema.Items as JsonSchema;
+                                var fieldSchemaItems = fieldSchema.Items as JsonSchemaAttribute;
                                 if (fieldSchemaItems != null)
                                 {
                                     fieldSchemaItems.Type = fieldTypeSchemaItems.Type;
                                 }
                                 else
                                 {
-                                    fieldSchema.Items = new JsonSchema
+                                    fieldSchema.Items = new JsonSchemaAttribute
                                     {
                                         Type = fieldTypeSchemaItems.Type,
                                     };
@@ -512,7 +511,7 @@ namespace VJson.Schema
         skip:
             if (asRef)
             {
-                return new JsonSchema
+                return new JsonSchemaAttribute
                 {
                     Ref = schemaId,
                 };
@@ -553,22 +552,21 @@ namespace VJson.Schema
         }
     }
 
-    [AttributeUsage(AttributeTargets.Field,
-                    Inherited = false)]
-    public class ItemsJsonSchema : JsonSchema
+    [AttributeUsage(AttributeTargets.Field, Inherited = false)]
+    public sealed class ItemsJsonSchemaAttribute : JsonSchemaAttribute
     {
     }
 
     public static class JsonSchemaExtensions
     {
-        public static ConstraintsViolationException Validate(this JsonSchema j,
+        public static ConstraintsViolationException Validate(this JsonSchemaAttribute j,
                                                              object o,
                                                              JsonSchemaRegistory reg = null)
         {
             return (new JsonSchemaValidator(j)).Validate(o, reg);
         }
 
-        internal static ConstraintsViolationException Validate(this JsonSchema j,
+        internal static ConstraintsViolationException Validate(this JsonSchemaAttribute j,
                                                                object o,
                                                                Internal.State state,
                                                                JsonSchemaRegistory reg)

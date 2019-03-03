@@ -18,20 +18,20 @@ namespace VJson
     }
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum)]
-    public class Json : System.Attribute
+    public sealed class JsonAttribute : System.Attribute
     {
         public bool ImplicitConstructable; // Only for classes
         public EnumConversionType EnumConversion; // Only for enums
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class JsonField : System.Attribute
+    public sealed class JsonFieldAttribute : System.Attribute
     {
         public string Name;
         public Type[] TypeHints;
         public Type DynamicResolverTag;
 
-        public static string FieldName(JsonField f, FieldInfo fi)
+        public static string FieldName(JsonFieldAttribute f, FieldInfo fi)
         {
             if (f != null && f.Name != null)
             {
@@ -43,12 +43,12 @@ namespace VJson
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class JsonFieldIgnorable : System.Attribute
+    public sealed class JsonFieldIgnorableAttribute : System.Attribute
     {
         public object WhenValueIs;
         public int WhenLengthIs;
 
-        public static bool IsIgnorable<T>(JsonFieldIgnorable f, T o)
+        public static bool IsIgnorable<T>(JsonFieldIgnorableAttribute f, T o)
         {
             if (f == null)
             {

@@ -10,16 +10,16 @@ using System;
 namespace VJson.Schema
 {
     [AttributeUsage(AttributeTargets.Field, Inherited = false)]
-    public class JsonSchemaRequired : Attribute
+    public sealed class JsonSchemaRequiredAttribute : Attribute
     {
     }
 
     [AttributeUsage(AttributeTargets.Field, Inherited = false)]
-    public class JsonSchemaDependencies : Attribute
+    public sealed class JsonSchemaDependenciesAttribute : Attribute
     {
         public string[] Dependencies { get; private set; }
 
-        public JsonSchemaDependencies(params string[] deps)
+        public JsonSchemaDependenciesAttribute(params string[] deps)
         {
             Dependencies = deps;
         }

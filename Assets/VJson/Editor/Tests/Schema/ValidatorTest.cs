@@ -28,7 +28,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasDynamicResolverArgs")]
         public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
         {
-            var schema = JsonSchema.CreateFromClass<T>();
+            var schema = JsonSchemaAttribute.CreateFromClass<T>();
 
             var ex = schema.Validate(o);
 

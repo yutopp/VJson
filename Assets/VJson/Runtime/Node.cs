@@ -480,7 +480,7 @@ namespace VJson
             // Enum(integer or string)
             if (TypeHelper.TypeWrap(ty).IsEnum)
             {
-                var attr = TypeHelper.GetCustomAttribute<Json>(ty);
+                var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(ty);
                 return attr != null && attr.EnumConversion == EnumConversionType.AsString
                     ? NodeKind.String
                     : NodeKind.Integer;

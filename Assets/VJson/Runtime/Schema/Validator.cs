@@ -17,9 +17,9 @@ namespace VJson.Schema
 
     public class JsonSchemaValidator
     {
-        JsonSchema _schema;
+        JsonSchemaAttribute _schema;
 
-        public JsonSchemaValidator(JsonSchema j)
+        public JsonSchemaValidator(JsonSchemaAttribute j)
         {
             _schema = j;
         }
@@ -385,7 +385,7 @@ namespace VJson.Schema
             {
                 if (_schema.Items.GetType().IsArray)
                 {
-                    var itemSchemas = (JsonSchema[])_schema.Items;
+                    var itemSchemas = (JsonSchemaAttribute[])_schema.Items;
 
                     var i = 0;
                     foreach (var elem in v)
@@ -413,7 +413,7 @@ namespace VJson.Schema
                 }
                 else
                 {
-                    var itemSchema = (JsonSchema)_schema.Items;
+                    var itemSchema = (JsonSchemaAttribute)_schema.Items;
                     var i = 0;
                     foreach (var elem in v)
                     {
@@ -520,12 +520,12 @@ namespace VJson.Schema
                     goto depChecked;
                 }
 
-                var schemaDep = _schema.Dependencies as Dictionary<string, JsonSchema>;
+                var schemaDep = _schema.Dependencies as Dictionary<string, JsonSchemaAttribute>;
                 if (schemaDep != null)
                 {
                     foreach (var va in validated)
                     {
-                        JsonSchema ext = null;
+                        JsonSchemaAttribute ext = null;
                         if (schemaDep.TryGetValue(va.Key, out ext))
                         {
                             var ex = ext.Validate(v, new State().NestAsElem(va.Key), reg);
@@ -559,7 +559,7 @@ namespace VJson.Schema
                 Type dynElemType;
                 if (DynamicResolver.Find(_schema._dynamicResolverTag, key, out dynElemType))
                 {
-                    var dynElemSchema = JsonSchema.CreateFromType(dynElemType, reg, true);
+                    var dynElemSchema = JsonSchemaAttribute.CreateFromType(dynElemType, reg, true);
                     var ex = dynElemSchema.Validate(value, state, reg);
 
                     if (ex != null)
@@ -571,7 +571,7 @@ namespace VJson.Schema
 
             if (_schema.Properties != null)
             {
-                JsonSchema itemSchema = null;
+                JsonSchemaAttribute itemSchema = null;
                 if (_schema.Properties.TryGetValue(key, out itemSchema))
                 {
                     matched = true;
