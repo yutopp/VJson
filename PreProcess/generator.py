@@ -57,8 +57,8 @@ def main(args):
     # FromType -> (ToType -> ConversionFunction)
     output_tables = ""
     output_tables += textwrap.indent("""
-private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> _convTable =
-    new Dictionary<Type, Dictionary<Type, Func<object, object>>>
+private static readonly Dictionary<Type, Dictionary<Type, Converter>> _convTable =
+    new Dictionary<Type, Dictionary<Type, Converter>>
     {
 """.lstrip(), mk_indent(2))
 
@@ -68,7 +68,7 @@ private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>>
 
         output_tables += textwrap.indent("""
 {{
-    typeof({0}), new Dictionary<Type, Func<object, object>>
+    typeof({0}), new Dictionary<Type, Converter>
     {{
 """.format(from_ty).lstrip(), mk_indent(4))
 
@@ -78,11 +78,11 @@ private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>>
 
             if from_ty != to_ty:
                 output_tables += textwrap.indent("""
-{{ typeof({1}), o => ConvertFrom{2}To{3}(({0})o) }},
+{{ typeof({1}), (object i, out object o) => ConvertFrom{2}To{3}(({0})i, out o) }},
 """.format(from_ty, to_ty, from_ty.capitalize(), to_ty.capitalize()).lstrip(), mk_indent(6))
             else:
                 output_tables += textwrap.indent("""
-{{ typeof({1}), o => o }},
+{{ typeof({1}), null }},
 """.format(from_ty, to_ty, from_ty.capitalize(), to_ty.capitalize()).lstrip(), mk_indent(6))
             # print(from_ty, to_ty, is_convertible(kinds[from_ty], kinds[to_ty]))
 
@@ -109,8 +109,17 @@ private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>>
                 continue
 
             output_funcs += textwrap.indent("""
-private static object ConvertFrom{2}To{3}({0} o) {{
-    return ({1})o;
+private static bool ConvertFrom{2}To{3}({0} i, out object o) {{
+    try
+    {{
+        o = checked(({1})i);
+        return true;
+    }}
+    catch(OverflowException)
+    {{
+        o = null;
+        return false;
+    }}
 }}
 """.format(from_ty, to_ty, from_ty.capitalize(), to_ty.capitalize()), mk_indent(2))
 

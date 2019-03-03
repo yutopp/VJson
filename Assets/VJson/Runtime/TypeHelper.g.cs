@@ -14,113 +14,229 @@ namespace VJson
 {
     static partial class TypeHelper
     {
-        private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> _convTable =
-            new Dictionary<Type, Dictionary<Type, Func<object, object>>>
+        private static readonly Dictionary<Type, Dictionary<Type, Converter>> _convTable =
+            new Dictionary<Type, Dictionary<Type, Converter>>
             {
                 {
-                    typeof(bool), new Dictionary<Type, Func<object, object>>
+                    typeof(bool), new Dictionary<Type, Converter>
                     {
-                        { typeof(bool), o => o },
+                        { typeof(bool), null },
                     }
                 },
                 {
-                    typeof(double), new Dictionary<Type, Func<object, object>>
+                    typeof(double), new Dictionary<Type, Converter>
                     {
-                        { typeof(decimal), o => ConvertFromDoubleToDecimal((double)o) },
-                        { typeof(double), o => o },
-                        { typeof(float), o => ConvertFromDoubleToFloat((double)o) },
+                        { typeof(decimal), (object i, out object o) => ConvertFromDoubleToDecimal((double)i, out o) },
+                        { typeof(double), null },
+                        { typeof(float), (object i, out object o) => ConvertFromDoubleToFloat((double)i, out o) },
                     }
                 },
                 {
-                    typeof(long), new Dictionary<Type, Func<object, object>>
+                    typeof(long), new Dictionary<Type, Converter>
                     {
-                        { typeof(byte), o => ConvertFromLongToByte((long)o) },
-                        { typeof(sbyte), o => ConvertFromLongToSbyte((long)o) },
-                        { typeof(char), o => ConvertFromLongToChar((long)o) },
-                        { typeof(decimal), o => ConvertFromLongToDecimal((long)o) },
-                        { typeof(double), o => ConvertFromLongToDouble((long)o) },
-                        { typeof(float), o => ConvertFromLongToFloat((long)o) },
-                        { typeof(int), o => ConvertFromLongToInt((long)o) },
-                        { typeof(uint), o => ConvertFromLongToUint((long)o) },
-                        { typeof(long), o => o },
-                        { typeof(ulong), o => ConvertFromLongToUlong((long)o) },
-                        { typeof(short), o => ConvertFromLongToShort((long)o) },
-                        { typeof(ushort), o => ConvertFromLongToUshort((long)o) },
+                        { typeof(byte), (object i, out object o) => ConvertFromLongToByte((long)i, out o) },
+                        { typeof(sbyte), (object i, out object o) => ConvertFromLongToSbyte((long)i, out o) },
+                        { typeof(char), (object i, out object o) => ConvertFromLongToChar((long)i, out o) },
+                        { typeof(decimal), (object i, out object o) => ConvertFromLongToDecimal((long)i, out o) },
+                        { typeof(double), (object i, out object o) => ConvertFromLongToDouble((long)i, out o) },
+                        { typeof(float), (object i, out object o) => ConvertFromLongToFloat((long)i, out o) },
+                        { typeof(int), (object i, out object o) => ConvertFromLongToInt((long)i, out o) },
+                        { typeof(uint), (object i, out object o) => ConvertFromLongToUint((long)i, out o) },
+                        { typeof(long), null },
+                        { typeof(ulong), (object i, out object o) => ConvertFromLongToUlong((long)i, out o) },
+                        { typeof(short), (object i, out object o) => ConvertFromLongToShort((long)i, out o) },
+                        { typeof(ushort), (object i, out object o) => ConvertFromLongToUshort((long)i, out o) },
                     }
                 },
                 {
-                    typeof(string), new Dictionary<Type, Func<object, object>>
+                    typeof(string), new Dictionary<Type, Converter>
                     {
-                        { typeof(string), o => o },
+                        { typeof(string), null },
                     }
                 },
             };
 
-        private static object ConvertFromDoubleToDecimal(double o) {
-            return (decimal)o;
-        }
-
-        private static object ConvertFromDoubleToFloat(double o) {
-            return (float)o;
-        }
-
-        private static object ConvertFromLongToByte(long o) {
-            return (byte)o;
-        }
-
-        private static object ConvertFromLongToSbyte(long o) {
-            return (sbyte)o;
-        }
-
-        private static object ConvertFromLongToChar(long o) {
-            return (char)o;
-        }
-
-        private static object ConvertFromLongToDecimal(long o) {
-            return (decimal)o;
-        }
-
-        private static object ConvertFromLongToDouble(long o) {
-            return (double)o;
-        }
-
-        private static object ConvertFromLongToFloat(long o) {
-            return (float)o;
-        }
-
-        private static object ConvertFromLongToInt(long o) {
-            return (int)o;
-        }
-
-        private static object ConvertFromLongToUint(long o) {
-            return (uint)o;
-        }
-
-        private static object ConvertFromLongToUlong(long o) {
-            return (ulong)o;
-        }
-
-        private static object ConvertFromLongToShort(long o) {
-            return (short)o;
-        }
-
-        private static object ConvertFromLongToUshort(long o) {
-            return (ushort)o;
-        }
-
-        public static Func<object, object> GetConverter(Type fromTy, Type toTy)
-        {
-            Dictionary<Type, Func<object, object>> conv;
-            if (_convTable.TryGetValue(fromTy, out conv))
+        private static bool ConvertFromDoubleToDecimal(double i, out object o) {
+            try
             {
-                Func<object, object> convFunc;
-                if (conv.TryGetValue(toTy, out convFunc))
-                {
-                    return convFunc;
-                }
+                o = checked((decimal)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromDoubleToFloat(double i, out object o) {
+            try
+            {
+                o = checked((float)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToByte(long i, out object o) {
+            try
+            {
+                o = checked((byte)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToSbyte(long i, out object o) {
+            try
+            {
+                o = checked((sbyte)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToChar(long i, out object o) {
+            try
+            {
+                o = checked((char)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToDecimal(long i, out object o) {
+            try
+            {
+                o = checked((decimal)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToDouble(long i, out object o) {
+            try
+            {
+                o = checked((double)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToFloat(long i, out object o) {
+            try
+            {
+                o = checked((float)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToInt(long i, out object o) {
+            try
+            {
+                o = checked((int)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToUint(long i, out object o) {
+            try
+            {
+                o = checked((uint)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToUlong(long i, out object o) {
+            try
+            {
+                o = checked((ulong)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToShort(long i, out object o) {
+            try
+            {
+                o = checked((short)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        private static bool ConvertFromLongToUshort(long i, out object o) {
+            try
+            {
+                o = checked((ushort)i);
+                return true;
+            }
+            catch(OverflowException)
+            {
+                o = null;
+                return false;
+            }
+        }
+
+        public delegate bool Converter(object input, out object output);
+
+        public static bool GetConverter(Type fromTy, Type toTy, out Converter converter)
+        {
+            Dictionary<Type, Converter> conv;
+            if (!_convTable.TryGetValue(fromTy, out conv))
+            {
+                converter = null;
+                return false;
             }
 
-            return null;
+            return conv.TryGetValue(toTy, out converter);
         }
     }
 }

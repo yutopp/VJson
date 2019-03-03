@@ -715,6 +715,16 @@ namespace VJson.UnitTests
                 "(root): System.Double value (3.14) cannot convert to System.Int32.",
             },
             new object[] {
+                typeof(uint),
+                "-1",
+                "(root): System.Int64 value (-1) cannot convert to System.UInt32.",
+            },
+            new object[] {
+                typeof(byte),
+                "256",
+                "(root): System.Int64 value (256) cannot convert to System.Byte.",
+            },
+            new object[] {
                 typeof(int),
                 "null",
                 "(root): Null node cannot convert to non-boxed value(System.Int32).",

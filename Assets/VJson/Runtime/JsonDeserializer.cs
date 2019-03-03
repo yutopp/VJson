@@ -399,10 +399,22 @@ namespace VJson
                 targetType = nullableInnerTy;
             }
 
-            var convFunc = TypeHelper.GetConverter(typeof(T), targetType);
-            if (convFunc != null)
+            TypeHelper.Converter convFunc;
+            if (TypeHelper.GetConverter(typeof(T), targetType, out convFunc))
             {
-                return convFunc(value);
+                if (convFunc == null) // Can return the value as is
+                {
+                    return value;
+                }
+
+                object ret;
+                if (convFunc(value, out ret))
+                {
+                    return ret;
+                }
+
+                var msg = state.CreateTypeConversionFailureMessage<T>(value, targetType);
+                throw new DeserializeFailureException(msg);
             }
 
             if (TypeHelper.TypeWrap(targetType).IsEnum)
@@ -412,15 +424,24 @@ namespace VJson
                 {
                     case EnumConversionType.AsInt:
                         var enumUnderlyingType = Enum.GetUnderlyingType(targetType);
-                        var enumConvFunc = TypeHelper.GetConverter(typeof(T), enumUnderlyingType);
-                        if (enumConvFunc == null)
+                        TypeHelper.Converter enumConvFunc;
+                        if (!TypeHelper.GetConverter(typeof(T), enumUnderlyingType, out enumConvFunc))
                         {
-                            var msg = state.CreateTypeConversionFailureMessage<T>(value,
-                                                                                  targetType,
-                                                                                  "Failed to cast");
+                            var msg = state.CreateTypeConversionFailureMessage<T>(value, targetType);
                             throw new DeserializeFailureException(msg);
                         }
-                        var enumValue = enumConvFunc(value);
+
+                        object enumValue;
+                        if (enumConvFunc != null)
+                        {
+                            if (!enumConvFunc(value, out enumValue))
+                            {
+                                var msg = state.CreateTypeConversionFailureMessage<T>(value, targetType);
+                                throw new DeserializeFailureException(msg);
+                            }
+                        } else {
+                            enumValue = value;
+                        }
 
                         if (!Enum.IsDefined(targetType, enumValue))
                         {

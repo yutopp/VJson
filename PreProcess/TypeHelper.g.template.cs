@@ -15,19 +15,18 @@ namespace VJson
     static partial class TypeHelper
     {
 $body
-        public static Func<object, object> GetConverter(Type fromTy, Type toTy)
+        public delegate bool Converter(object input, out object output);
+
+        public static bool GetConverter(Type fromTy, Type toTy, out Converter converter)
         {
-            Dictionary<Type, Func<object, object>> conv;
-            if (_convTable.TryGetValue(fromTy, out conv))
+            Dictionary<Type, Converter> conv;
+            if (!_convTable.TryGetValue(fromTy, out conv))
             {
-                Func<object, object> convFunc;
-                if (conv.TryGetValue(toTy, out convFunc))
-                {
-                    return convFunc;
-                }
+                converter = null;
+                return false;
             }
 
-            return null;
+            return conv.TryGetValue(toTy, out converter);
         }
     }
 }
