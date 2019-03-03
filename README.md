@@ -22,9 +22,83 @@ dotnet add package VJson
 
 ## Usage example
 
-Use cases are available at [here](https://github.com/yutopp/VJson/tree/master/Assets/VJson/Editor/Tests).
+### Serialize/Deserialize
+
+```
+//
+// For serialization
+//
+var serializer = new VJson.JsonSerializer(typeof(int));
+
+// You can get JSON strings,
+var json = serializer.Serialize(42);
+
+// OR write json data(UTF-8) to streams directly.
+using (var s = new MemoryStream())
+{
+    serializer.Serialize(s, 42);
+}
+```
+
+```
+//
+// For deserialization
+//
+var serializer = new VJson.JsonSerializer(typeof(int));
+
+// You can get Object from strings,
+var value = serializer.Deserialize(json);
+
+// OR read json data(UTF-8) from streams directly.
+using (var s = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+{
+    var value = serializer.Deserialize(s);
+}
+```
+
+`VJson` supports serializing/deserializing of some `System.Collections(.Generics)` below,
+
+- List<T>
+- Dictionary<string, T>
+- Array
+
+and User defined classes. For user defined classes, only all public fields are supported.
+
+e.g.
+```
+class SomeObject
+{
+    private float _p = 3.14f; // A private field will not be exported.
+    public int X;
+    public string Y;
+}
+
+var obj = new SomeObject {
+    X = 10,
+    Y = "abab",
+},
+
+var serializer = new VJson.JsonSerializer(typeof(SomeObject));
+var json = serializer.Serialize(obj);
+// > {"X":10,"Y":"abab"}
+
+var v = serializer.Deserialize("{\"X\":10,\"Y\":\"abab\"}");
+// > v becomes same as obj.
+```
+
+#### Attributes
+
+### JSON Schema and validation
+
+`VJson` supports JSON Schema draft7.
 
 (TODO: Write examples)
+
+#### Attributes
+
+(TODO: Write examples)
+
+Other use cases are available at [here](https://github.com/yutopp/VJson/tree/master/Assets/VJson/Editor/Tests).
 
 ## Tasks
 
