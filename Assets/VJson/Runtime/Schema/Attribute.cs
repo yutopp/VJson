@@ -24,4 +24,21 @@ namespace VJson.Schema
             Dependencies = deps;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Field, Inherited = false)]
+    public sealed class JsonSchemaRefAttribute : Attribute
+    {
+        public Type TagType { get; private set; }
+
+        public JsonSchemaRefAttribute(Type tagType)
+        {
+            Type schemaBaseType;
+            if (!RefChecker.IsRefTagDerived(tagType, out schemaBaseType))
+            {
+                throw new ArgumentException("IRefTag<T> must be derived by tagType");
+            }
+
+            TagType = tagType;
+        }
+    }
 }

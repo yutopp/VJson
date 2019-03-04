@@ -26,6 +26,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("DerivingArgs")]
         [TestCaseSource("HasNullableArgs")]
         [TestCaseSource("HasDynamicResolverArgs")]
+        [TestCaseSource("HasCustomTagArgs")]
         public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
         {
             var schema = JsonSchemaAttribute.CreateFromClass<T>();
@@ -51,6 +52,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("DerivingArgs")]
         [TestCaseSource("HasNullableArgs")]
         [TestCaseSource("HasDynamicResolverArgs")]
+        [TestCaseSource("HasCustomTagArgs")]
         public void SerializationTest<T>(T o, string _expectedMsg, string expectedContent)
         {
             if (_expectedMsg != null)
@@ -438,6 +440,32 @@ namespace VJson.Schema.UnitTests
                     }
                 },
                 "Object.Property.Object.DynamicResolver.(root)[\"Dict\"][\"b\"]: Type is not matched(Actual: String; Expected: integer).",
+                null,
+            },
+        };
+
+        [JsonSchema(Minimum = 0)]
+        public class CustomTag<T> : RefTag<T> where T : struct
+        {
+        }
+
+        public class HasCustomTag
+        {
+            [JsonSchemaRef(typeof(CustomTag<int>))]
+            public int X = 0;
+        }
+
+        public static object[] HasCustomTagArgs = new object[] {
+            new object[] {
+                new HasCustomTag(),
+                null,
+                "{\"X\":0}",
+            },
+            new object[] {
+                new HasCustomTag {
+                    X = -1,
+                },
+                "Object.Property.Number.(root)[\"X\"]: Minimum assertion !(-1 >= 0).",
                 null,
             },
         };

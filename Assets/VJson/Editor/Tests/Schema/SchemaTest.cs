@@ -208,6 +208,18 @@ namespace VJson.Schema.UnitTests
                 typeof(ValidatorWithSerializerTests.HasNullable),
                 "{\"properties\":{\"X\":{\"type\":\"integer\"}},\"type\":\"object\"}",
             },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.CustomTag<int>),
+                "{\"minimum\":0,\"type\":\"integer\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasCustomTag),
+                "{\"properties\":{\"X\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.CustomTag<float>),
+                "{\"minimum\":0,\"type\":\"number\"}",
+            },
         };
     }
 

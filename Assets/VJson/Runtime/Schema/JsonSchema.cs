@@ -375,6 +375,16 @@ namespace VJson.Schema
             HashSet<string> baseFieldNames = null;
             if (baseType != null)
             {
+                Type schemaBaseType;
+                if (RefChecker.IsRefTag(baseType, out schemaBaseType))
+                {
+                    var baseSchemaValue = CreateFromType(schemaBaseType, reg, false);
+                    schema.Type = baseSchemaValue.Type;
+
+                    goto skip;
+                }
+
+                // Nest fields included in the base class
                 var baseSchema = CreateFromType(baseType, reg, true);
                 if (baseSchema != null && baseSchema.Ref != null)
                 {
@@ -409,6 +419,20 @@ namespace VJson.Schema
                     goto skipField;
                 }
 
+                var customRef = TypeHelper.GetCustomAttribute<JsonSchemaRefAttribute>(field);
+                if (customRef != null)
+                {
+                    Type schemaBaseType;
+                    if (!RefChecker.IsRefTagDerived(customRef.TagType, out schemaBaseType))
+                    {
+                        throw new ArgumentException("IRefTag<T> must be derived by tagType");
+                    }
+
+                    var customSchema = CreateFromType(customRef.TagType, reg, true);
+                    fieldSchema = customSchema;
+                    goto skipField;
+                }
+
                 fieldSchema = TypeHelper.GetCustomAttribute<JsonSchemaAttribute>(field);
                 if (fieldSchema == null)
                 {
@@ -427,7 +451,7 @@ namespace VJson.Schema
                     {
                         var baseMsg = "A type of the field which has DynamicResolver must be a Dictionary<,>";
                         var msg = string.Format("{0}: Type = {1} at \"{2}\" of {3}", baseMsg, fieldType, elemName, ty);
-                        throw new InvalidOperationException(msg);
+                        throw new ArgumentException(msg);
                     }
 
                     var keyType = TypeHelper.TypeWrap(fieldType).GetGenericArguments()[0];
@@ -435,7 +459,7 @@ namespace VJson.Schema
                     {
                         var baseMsg = "A key of the dictionary which has DynamicResolver must be a string type";
                         var msg = string.Format("{0}: KeyType = {1} at \"{2}\" of {3}", baseMsg, keyType, elemName, ty);
-                        throw new InvalidOperationException(msg);
+                        throw new ArgumentException(msg);
                     }
 
                     fieldSchema._dynamicResolverTag = attr.DynamicResolverTag;
