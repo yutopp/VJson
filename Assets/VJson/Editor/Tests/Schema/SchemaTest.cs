@@ -213,8 +213,20 @@ namespace VJson.Schema.UnitTests
                 "{\"minimum\":0,\"type\":\"integer\"}",
             },
             new object[] {
-                typeof(ValidatorWithSerializerTests.HasCustomTag),
-                "{\"properties\":{\"X\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}},\"type\":\"object\"}",
+                typeof(ValidatorWithSerializerTests.HasCustomTagInt),
+                "{\"properties\":{\"X\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}],\"type\":\"integer\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasCustomTagArray),
+                "{\"properties\":{\"Xs\":{\"items\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}],\"type\":\"integer\"},\"type\":\"array\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasCustomTagDict),
+                "{\"properties\":{\"Xs\":{\"additionalProperties\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}]},\"type\":\"object\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasCustomTagArrayDict),
+                "{\"properties\":{\"Xs\":{\"items\":{\"additionalProperties\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}]},\"type\":\"object\"},\"type\":\"array\"}},\"type\":\"object\"}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.CustomTag<float>),

@@ -25,12 +25,19 @@ namespace VJson.Schema
         }
     }
 
+    public enum InfluenceRange
+    {
+        Entiry,
+        AdditionalProperties,
+    }
+
     [AttributeUsage(AttributeTargets.Field, Inherited = false)]
-    public sealed class JsonSchemaRefAttribute : Attribute
+    public class JsonSchemaRefAttribute : Attribute
     {
         public Type TagType { get; private set; }
+        public InfluenceRange Influence { get; private set; }
 
-        public JsonSchemaRefAttribute(Type tagType)
+        public JsonSchemaRefAttribute(Type tagType, InfluenceRange influence = InfluenceRange.Entiry)
         {
             Type schemaBaseType;
             if (!RefChecker.IsRefTagDerived(tagType, out schemaBaseType))
@@ -39,6 +46,16 @@ namespace VJson.Schema
             }
 
             TagType = tagType;
+            Influence = influence;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field, Inherited = false)]
+    public sealed class ItemsJsonSchemaRefAttribute : JsonSchemaRefAttribute
+    {
+        public ItemsJsonSchemaRefAttribute(Type tagType, InfluenceRange influence = InfluenceRange.Entiry)
+        : base(tagType, influence)
+        {
         }
     }
 }

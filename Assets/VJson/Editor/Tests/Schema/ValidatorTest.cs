@@ -317,14 +317,14 @@ namespace VJson.Schema.UnitTests
         public static object[] DerivingArgs = new object[] {
             new object[] {
                 new Deriving(),
-                "(root): AllOf: Failed at 0..Object.Property.(root)[\"X\"]: Type is not matched(Actual: Null; Expected: string).",
+                "(root): AllOf[0] is failed..Object.Property.(root)[\"X\"]: Type is not matched(Actual: Null; Expected: string).",
                 null,
             },
             new object[] {
                 new Deriving() {
                     Y = "abc",
                 },
-                "(root): AllOf: Failed at 0..Object.Property.(root)[\"X\"]: Type is not matched(Actual: Null; Expected: string).",
+                "(root): AllOf[0] is failed..Object.Property.(root)[\"X\"]: Type is not matched(Actual: Null; Expected: string).",
                 null,
             },
             new object[] {
@@ -339,7 +339,7 @@ namespace VJson.Schema.UnitTests
                     X = "",
                     Y = "",
                 },
-                "(root): AllOf: Failed at 0..Object.Property.String.(root)[\"X\"]: MinLength assertion !(0 >= 1).",
+                "(root): AllOf[0] is failed..Object.Property.String.(root)[\"X\"]: MinLength assertion !(0 >= 1).",
                 null,
             },
             new object[] {
@@ -355,7 +355,7 @@ namespace VJson.Schema.UnitTests
                     X = "a",
                     Y = "",
                 },
-                "(root): AllOf: Failed at 0..Object.Property.String.(root)[\"Y\"]: MinLength assertion !(0 >= 2).",
+                "(root): AllOf[0] is failed..Object.Property.String.(root)[\"Y\"]: MinLength assertion !(0 >= 2).",
                 null,
             },
             new object[] {
@@ -449,23 +449,92 @@ namespace VJson.Schema.UnitTests
         {
         }
 
-        public class HasCustomTag
+        public class HasCustomTagInt
         {
             [JsonSchemaRef(typeof(CustomTag<int>))]
             public int X = 0;
         }
 
+        public class HasCustomTagArray
+        {
+            [ItemsJsonSchemaRef(typeof(CustomTag<int>))]
+            public int[] Xs = new int[] { };
+        }
+
+        public class HasCustomTagDict
+        {
+            [JsonSchemaRef(typeof(CustomTag<int>), InfluenceRange.AdditionalProperties)]
+            public Dictionary<string, int> Xs = new Dictionary<string, int>();
+        }
+
+        public class HasCustomTagArrayDict
+        {
+            [ItemsJsonSchemaRef(typeof(CustomTag<int>), InfluenceRange.AdditionalProperties)]
+            public List<Dictionary<string, int>> Xs = new List<Dictionary<string, int>>();
+        }
+
+        // TODO
+        //public class HasCustomTagDictArray
+        //{
+        //    [JsonSchemaRef(typeof(CustomTag<int>), InfluenceRange.AdditionalProperties)]
+        //    public Dictionary<string, List<int>> Xs = new Dictionary<string, List<int>>();
+        //}
+
         public static object[] HasCustomTagArgs = new object[] {
             new object[] {
-                new HasCustomTag(),
+                new HasCustomTagInt(),
                 null,
                 "{\"X\":0}",
             },
             new object[] {
-                new HasCustomTag {
+                new HasCustomTagInt {
                     X = -1,
                 },
-                "Object.Property.Number.(root)[\"X\"]: Minimum assertion !(-1 >= 0).",
+                "Object.Property.(root)[\"X\"]: AllOf[0] is failed..Number.(root)[\"X\"]: Minimum assertion !(-1 >= 0).",
+                null,
+            },
+            new object[] {
+                new HasCustomTagArray(),
+                null,
+                "{\"Xs\":[]}",
+            },
+            new object[] {
+                new HasCustomTagArray {
+                    Xs = new int[] { -1 },
+                },
+                "Object.Property.Array.Items.(root)[\"Xs\"][0]: AllOf[0] is failed..Number.(root)[\"Xs\"][0]: Minimum assertion !(-1 >= 0).",
+                null,
+            },
+            new object[] {
+                new HasCustomTagDict(),
+                null,
+                "{\"Xs\":{}}",
+            },
+            new object[] {
+                new HasCustomTagDict {
+                    Xs = new Dictionary<string, int>
+                    {
+                        {"a", -1 },
+                    },
+                },
+                "Object.Property.Object.AdditionalProperties.(root)[\"Xs\"][\"a\"]: AllOf[0] is failed..Number.(root)[\"Xs\"][\"a\"]: Minimum assertion !(-1 >= 0).",
+                null,
+            },
+            new object[] {
+                new HasCustomTagArrayDict(),
+                null,
+                "{\"Xs\":[]}",
+            },
+            new object[] {
+                new HasCustomTagArrayDict {
+                    Xs = new List<Dictionary<string, int>>
+                    {
+                        new Dictionary<string, int>{
+                            {"a", -1 },
+                        },
+                    },
+                },
+                "Object.Property.Array.Items.Object.AdditionalProperties.(root)[\"Xs\"][0][\"a\"]: AllOf[0] is failed..Number.(root)[\"Xs\"][0][\"a\"]: Minimum assertion !(-1 >= 0).",
                 null,
             },
         };

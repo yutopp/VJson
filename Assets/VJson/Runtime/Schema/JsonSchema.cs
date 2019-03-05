@@ -200,13 +200,43 @@ namespace VJson.Schema
         [JsonFieldIgnorable]
         public List<JsonSchemaAttribute> AllOf;
 
+        private void AddToAllOf(JsonSchemaAttribute s)
+        {
+            if (AllOf == null)
+            {
+                AllOf = new List<JsonSchemaAttribute>();
+            }
+
+            AllOf.Add(s);
+        }
+
         [JsonField(Name = "anyOf")]
         [JsonFieldIgnorable]
         public List<JsonSchemaAttribute> AnyOf;
 
+        private void AddToAnyOf(JsonSchemaAttribute s)
+        {
+            if (AnyOf == null)
+            {
+                AnyOf = new List<JsonSchemaAttribute>();
+            }
+
+            AnyOf.Add(s);
+        }
+
         [JsonField(Name = "oneOf")]
         [JsonFieldIgnorable]
         public List<JsonSchemaAttribute> OneOf;
+
+        private void AddToOneOf(JsonSchemaAttribute s)
+        {
+            if (OneOf == null)
+            {
+                OneOf = new List<JsonSchemaAttribute>();
+            }
+
+            OneOf.Add(s);
+        }
 
         [JsonField(Name = "not")]
         [JsonFieldIgnorable]
@@ -388,11 +418,7 @@ namespace VJson.Schema
                 var baseSchema = CreateFromType(baseType, reg, true);
                 if (baseSchema != null && baseSchema.Ref != null)
                 {
-                    if (schema.AllOf == null)
-                    {
-                        schema.AllOf = new List<JsonSchemaAttribute>();
-                    }
-                    schema.AllOf.Add(baseSchema);
+                    schema.AddToAllOf(baseSchema);
 
                     var baseFields = TypeHelper.TypeWrap(baseType).GetFields(BindingFlags.Public | BindingFlags.Instance);
                     baseFieldNames = new HashSet<string>(baseFields.Select(f => f.Name));
@@ -416,20 +442,6 @@ namespace VJson.Schema
                 if (baseFieldNames != null && baseFieldNames.Contains(field.Name))
                 {
                     fieldSchema = new JsonSchemaAttribute();
-                    goto skipField;
-                }
-
-                var customRef = TypeHelper.GetCustomAttribute<JsonSchemaRefAttribute>(field);
-                if (customRef != null)
-                {
-                    Type schemaBaseType;
-                    if (!RefChecker.IsRefTagDerived(customRef.TagType, out schemaBaseType))
-                    {
-                        throw new ArgumentException("IRefTag<T> must be derived by tagType");
-                    }
-
-                    var customSchema = CreateFromType(customRef.TagType, reg, true);
-                    fieldSchema = customSchema;
                     goto skipField;
                 }
 
@@ -515,6 +527,69 @@ namespace VJson.Schema
                                 }
                             }
                         }
+                    }
+                }
+
+                // Add custom refs to AllOf not to override constrains which already existing.
+                var customRef = TypeHelper.GetCustomAttribute<JsonSchemaRefAttribute>(field);
+                if (customRef != null)
+                {
+                    Type schemaBaseType;
+                    if (!RefChecker.IsRefTagDerived(customRef.TagType, out schemaBaseType))
+                    {
+                        throw new ArgumentException("IRefTag<T> must be derived by tagType");
+                    }
+
+                    var customSchema = CreateFromType(customRef.TagType, reg, true);
+                    switch (customRef.Influence)
+                    {
+                        case InfluenceRange.Entiry:
+                            fieldSchema.AddToAllOf(customSchema);
+                            break;
+
+                        case InfluenceRange.AdditionalProperties:
+                            if (fieldSchema.AdditionalProperties == null)
+                            {
+                                fieldSchema.AdditionalProperties = new JsonSchemaAttribute();
+                            }
+                            fieldSchema.AdditionalProperties.AddToAllOf(customSchema);
+                            break;
+                    }
+                }
+
+                // Add custom refs to AllOf not to override constrains which already existing.
+                var customItemsRef = TypeHelper.GetCustomAttribute<ItemsJsonSchemaRefAttribute>(field);
+                if (customItemsRef != null)
+                {
+                    Type schemaBaseType;
+                    if (!RefChecker.IsRefTagDerived(customItemsRef.TagType, out schemaBaseType))
+                    {
+                        throw new ArgumentException("IRefTag<T> must be derived by tagType");
+                    }
+
+                    var customSchema = CreateFromType(customItemsRef.TagType, reg, true);
+                    switch (customItemsRef.Influence)
+                    {
+                        case InfluenceRange.Entiry:
+                            if (fieldSchema.Items == null)
+                            {
+                                fieldSchema.Items = new JsonSchemaAttribute();
+                            }
+                            ((JsonSchemaAttribute)fieldSchema.Items).AddToAllOf(customSchema);
+                            break;
+
+                        case InfluenceRange.AdditionalProperties:
+                            if (fieldSchema.Items == null)
+                            {
+                                fieldSchema.Items = new JsonSchemaAttribute();
+                            }
+                            if (((JsonSchemaAttribute)fieldSchema.Items).AdditionalProperties == null)
+                            {
+                                ((JsonSchemaAttribute)fieldSchema.Items).AdditionalProperties =
+                                    new JsonSchemaAttribute();
+                            }
+                            ((JsonSchemaAttribute)fieldSchema.Items).AdditionalProperties.AddToAllOf(customSchema);
+                            break;
                     }
                 }
 

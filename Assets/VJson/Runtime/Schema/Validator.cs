@@ -124,7 +124,7 @@ namespace VJson.Schema
                     ex = jsonSchema.Validate(o, state, reg);
                     if (ex != null)
                     {
-                        var msg = state.CreateMessage("AllOf: Failed at {0}", i);
+                        var msg = state.CreateMessage("AllOf[{0}] is failed", i);
                         return new ConstraintsViolationException(msg, ex);
                     }
 
@@ -146,7 +146,7 @@ namespace VJson.Schema
                 }
                 if (!schemaChecked)
                 {
-                    var msg = state.CreateMessage("AnyOf: No schemas are matched");
+                    var msg = state.CreateMessage("None of AnyOf is matched");
                     return new ConstraintsViolationException(msg);
                 }
             }
@@ -162,7 +162,7 @@ namespace VJson.Schema
                     {
                         if (checkedI != -1)
                         {
-                            var msg = state.CreateMessage("OneOf: Schemas at {0} and {1} are matched", checkedI, i);
+                            var msg = state.CreateMessage("Both of OneOf[{0}] and OneOf[{1}] are matched", checkedI, i);
                             return new ConstraintsViolationException(msg);
                         }
 
@@ -173,7 +173,7 @@ namespace VJson.Schema
                 }
                 if (checkedI == -1)
                 {
-                    var msg = state.CreateMessage("OneOf: No schemas are matched");
+                    var msg = state.CreateMessage("None of AnyOf is matched");
                     return new ConstraintsViolationException(msg);
                 }
             }
