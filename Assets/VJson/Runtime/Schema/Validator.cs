@@ -90,10 +90,16 @@ namespace VJson.Schema
 
             if (_schema.Enum != null)
             {
+                var oEnum = o;
+                if (o != null && TypeHelper.TypeWrap(o.GetType()).IsEnum && kind == NodeKind.String)
+                {
+                    oEnum = TypeHelper.GetStringEnumNameOf(o);
+                }
+
                 var found = false;
                 foreach (var e in _schema.Enum)
                 {
-                    if (TypeHelper.DeepEquals(o, e))
+                    if (TypeHelper.DeepEquals(oEnum, e))
                     {
                         found = true;
                         break;
@@ -194,7 +200,12 @@ namespace VJson.Schema
                     break;
 
                 case NodeKind.String:
-                    ex = ValidateString((string)o, state, reg);
+                    var oConverted =
+                        (o != null && TypeHelper.TypeWrap(o.GetType()).IsEnum)
+                        ? TypeHelper.GetStringEnumNameOf(o)
+                        : (string)o;
+
+                    ex = ValidateString(oConverted, state, reg);
                     if (ex != null)
                     {
                         return new ConstraintsViolationException("String", ex);

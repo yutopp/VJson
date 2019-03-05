@@ -25,6 +25,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasNestedArgs")]
         [TestCaseSource("DerivingArgs")]
         [TestCaseSource("HasNullableArgs")]
+        [TestCaseSource("HasEnumArgs")]
         [TestCaseSource("HasDynamicResolverArgs")]
         [TestCaseSource("HasCustomTagArgs")]
         public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
@@ -51,6 +52,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasNestedArgs")]
         [TestCaseSource("DerivingArgs")]
         [TestCaseSource("HasNullableArgs")]
+        [TestCaseSource("HasEnumArgs")]
         [TestCaseSource("HasDynamicResolverArgs")]
         [TestCaseSource("HasCustomTagArgs")]
         public void SerializationTest<T>(T o, string _expectedMsg, string expectedContent)
@@ -61,6 +63,30 @@ namespace VJson.Schema.UnitTests
             }
 
             var content = new JsonSerializer(typeof(T)).Serialize(o);
+            Assert.AreEqual(expectedContent, content);
+        }
+
+        [TestCaseSource("EnumArgs")]
+        public void FromTypeValidationTest<E>(Type ty, E e, string expectedMsg, string _expectedContent)
+        {
+            var schema = JsonSchemaAttribute.CreateFromType(ty);
+
+            var ex = schema.Validate(e);
+
+            var message =
+                String.Format("{0} : {1}", new JsonSerializer(ty).Serialize(e), schema.ToString());
+            Assert.AreEqual(expectedMsg, ex != null ? ex.Message : null, message);
+        }
+
+        [TestCaseSource("EnumArgs")]
+        public void FromTypeSerializationTest<E>(Type ty, E e, string _expectedMsg, string expectedContent)
+        {
+            if (_expectedMsg != null)
+            {
+                return;
+            }
+
+            var content = new JsonSerializer(ty).Serialize(e);
             Assert.AreEqual(expectedContent, content);
         }
 
@@ -391,6 +417,45 @@ namespace VJson.Schema.UnitTests
             },
         };
 
+        public class HasStrEnum
+        {
+            public VJson.UnitTests.EnumAsString E;
+        }
+
+        public class HasNumEnum
+        {
+            public VJson.UnitTests.EnumAsInt E;
+        }
+
+        // Types are Nullable<T> BUT null will not be allowed.
+        // The reason is that classes are nullable but null values are not allowed. As same as it.
+        public static object[] HasEnumArgs = new object[] {
+            new object[] {
+                new HasStrEnum(), // A default value is used.
+                null,
+                "{\"E\":\"NameA\"}",
+            },
+            new object[] {
+                new HasStrEnum() {
+                    E = VJson.UnitTests.EnumAsString.NameC,
+                },
+                null/*"Object.Property.(root)[\"E\"]: Enum is not matched."*/,
+                "{\"E\":\"OtherName\"}",
+            },
+            new object[] {
+                new HasNumEnum(), // A default value is used.
+                null,
+                "{\"E\":0}",
+            },
+            new object[] {
+                new HasNumEnum() {
+                    E = VJson.UnitTests.EnumAsInt.C,
+                },
+                null,
+                "{\"E\":100}",
+            },
+        };
+
         public class HasDynamicResolver
         {
             [JsonField(DynamicResolverTag = typeof(Resolver)), JsonFieldIgnorable]
@@ -535,6 +600,51 @@ namespace VJson.Schema.UnitTests
                     },
                 },
                 "Object.Property.Array.Items.Object.AdditionalProperties.(root)[\"Xs\"][0][\"a\"]: AllOf[0] is failed..Number.(root)[\"Xs\"][0][\"a\"]: Minimum assertion !(-1 >= 0).",
+                null,
+            },
+        };
+
+        public static object[] EnumArgs = new object[] {
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsInt),
+                VJson.UnitTests.EnumAsInt.A,
+                null,
+                "0",
+            },
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsInt),
+                8888,
+                "(root): Enum is not matched.",
+                null,
+            },
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsInt),
+                "???",
+                "(root): Type is not matched(Actual: String; Expected: integer).",
+                null,
+            },
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsString),
+                "NameA", /*VJson.UnitTests.EnumAsString.NameA,*/
+                null,
+                "\"NameA\"",
+            },
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsString),
+                VJson.UnitTests.EnumAsString.NameA,
+                null,
+                "\"NameA\"",
+            },
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsString),
+                "???",
+                "(root): Enum is not matched.",
+                null,
+            },
+            new object[] {
+                typeof(VJson.UnitTests.EnumAsString),
+                8888,
+                "(root): Type is not matched(Actual: Integer; Expected: string).",
                 null,
             },
         };

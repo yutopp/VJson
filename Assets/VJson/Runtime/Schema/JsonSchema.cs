@@ -502,6 +502,11 @@ namespace VJson.Schema
                         fieldSchema.Type = fieldTypeSchema.Type;
                     }
 
+                    if (fieldSchema.Enum == null)
+                    {
+                        fieldSchema.Enum = fieldTypeSchema.Enum;
+                    }
+
                     if (fieldTypeSchema.Items != null)
                     {
                         var fieldTypeSchemaItems = fieldTypeSchema.Items as JsonSchemaAttribute;
@@ -525,6 +530,12 @@ namespace VJson.Schema
                                         Type = fieldTypeSchemaItems.Type,
                                     };
                                 }
+                            }
+
+                            if (fieldTypeSchemaItems.Enum != null)
+                            {
+                                var fieldSchemaItems = fieldSchema.Items as JsonSchemaAttribute;
+                                fieldSchemaItems.Enum = fieldTypeSchemaItems.Enum;
                             }
                         }
                     }

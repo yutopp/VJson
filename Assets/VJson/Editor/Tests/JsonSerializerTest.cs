@@ -183,7 +183,7 @@ namespace VJson.UnitTests
         }
     }
 
-    enum EnumAsInt
+    public enum EnumAsInt
     {
         A,
         B,
@@ -191,7 +191,7 @@ namespace VJson.UnitTests
     }
 
     [Json(EnumConversion = EnumConversionType.AsString)]
-    enum EnumAsString
+    public enum EnumAsString
     {
         NameA,
         NameB,

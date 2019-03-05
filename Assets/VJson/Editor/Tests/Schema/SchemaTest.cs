@@ -209,6 +209,14 @@ namespace VJson.Schema.UnitTests
                 "{\"properties\":{\"X\":{\"type\":\"integer\"}},\"type\":\"object\"}",
             },
             new object[] {
+                typeof(ValidatorWithSerializerTests.HasStrEnum),
+                "{\"properties\":{\"E\":{\"enum\":[\"NameA\",\"NameB\",\"OtherName\"],\"type\":\"string\"}},\"type\":\"object\"}",
+            },
+            new object[] {
+                typeof(ValidatorWithSerializerTests.HasNumEnum),
+                "{\"properties\":{\"E\":{\"enum\":[0,1,100],\"type\":\"integer\"}},\"type\":\"object\"}",
+            },
+            new object[] {
                 typeof(ValidatorWithSerializerTests.CustomTag<int>),
                 "{\"minimum\":0,\"type\":\"integer\"}",
             },
