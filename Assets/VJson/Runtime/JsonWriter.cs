@@ -248,7 +248,7 @@ namespace VJson
 
         void WriteIndentBreakForHuman(int depth)
         {
-            if (_indent != 0)
+            if (_indent > 0)
             {
                 _writer.Write('\n');
 
@@ -261,7 +261,7 @@ namespace VJson
 
         void WriteSpaceForHuman()
         {
-            if (_indent != 0)
+            if (_indent > 0)
             {
                 _writer.Write(' ');
             }
