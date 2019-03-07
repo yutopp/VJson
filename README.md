@@ -56,7 +56,7 @@ using (var s = new MemoryStream(Encoding.UTF8.GetBytes(json)))
 }
 ```
 
-`VJson` supports serializing/deserializing of some `System.Collections(.Generics)` below,
+`VJson` supports serializing/deserializing of some `System.Collections(.Generics)` classes listed below,
 
 - List<T>
 - Dictionary<string, T>
