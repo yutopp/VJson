@@ -12,6 +12,7 @@ using System.Linq;
 
 namespace VJson.Schema
 {
+    // TODO: Divide attributes and models.
     [Json(ImplicitConstructable = true)]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field, Inherited = false)]
     public class JsonSchemaAttribute : Attribute
@@ -31,9 +32,11 @@ namespace VJson.Schema
         #endregion
 
         #region Metadata
+        [JsonField(Name = "title")]
         [JsonFieldIgnorable]
         public string Title;
 
+        [JsonField(Name = "description")]
         [JsonFieldIgnorable]
         public string Description;
         #endregion

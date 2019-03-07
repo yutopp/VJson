@@ -69,6 +69,7 @@ namespace VJson.Schema.UnitTests
         }
     }
 
+    [JsonSchema(Title = "a", Description = "b")]
     public class JsonSchemaFormatTests
     {
         [Test]
@@ -130,7 +131,7 @@ namespace VJson.Schema.UnitTests
             },
             new object[] {
                 typeof(JsonSchemaFormatTests),
-                "{\"properties\":{},\"type\":\"object\"}",
+                "{\"description\":\"b\",\"properties\":{},\"title\":\"a\",\"type\":\"object\"}",
             },
             new object[] {
                 typeof(JsonSchemaFormatTests[]),
