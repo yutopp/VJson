@@ -62,7 +62,7 @@ using (var s = new MemoryStream(Encoding.UTF8.GetBytes(json)))
 - Dictionary<string, T>
 - Array
 
-and User defined classes. For user defined classes, only all public fields are supported.
+and user defined classes. For user defined classes, converting only all public fields are supported.
 
 e.g.
 
