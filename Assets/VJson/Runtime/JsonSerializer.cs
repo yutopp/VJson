@@ -22,19 +22,19 @@ namespace VJson
 
         #region Serializer
 
-        public void Serialize<T>(Stream s, T o)
+        public void Serialize<T>(Stream s, T o, int indent = 0)
         {
-            using (var w = new JsonWriter(s))
+            using (var w = new JsonWriter(s, indent))
             {
                 SerializeValue(w, o);
             }
         }
 
-        public string Serialize<T>(T o)
+        public string Serialize<T>(T o, int indent = 0)
         {
             using (var s = new MemoryStream())
             {
-                Serialize(s, o);
+                Serialize(s, o, indent);
                 return Encoding.UTF8.GetString(s.ToArray());
             }
         }

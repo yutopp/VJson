@@ -289,7 +289,19 @@ namespace VJson.UnitTests
         }
 
         [Test]
+        [TestCaseSource("WithIndentArgs")]
+        public void SerializeWithIndentFromStringTest(object obj, string expected)
+        {
+            var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
+
+            var actual = serializer.Serialize(obj, 4/* indent */);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
         [TestCaseSource("CommonArgs")]
+        [TestCaseSource("WithIndentArgs")]
         [TestCaseSource("OnlyDeserializeArgs")]
         public void DeserializeFromStringTest(object obj, string expected)
         {
@@ -379,8 +391,6 @@ namespace VJson.UnitTests
                 (decimal)3.14,
                 @"3.14",
             },
-
-
 
             // Strings
             new object[] {
@@ -523,6 +533,95 @@ namespace VJson.UnitTests
         };
 
         static object[] OnlyDeserializeArgs = {
+        };
+
+        static object[] WithIndentArgs = {
+            new object[] {
+                false,
+                "false",
+            },
+            new object[] {
+                1,
+                "1",
+            },
+            new object[] {
+                3.14f,
+                "3.14",
+            },
+            new object[] {
+                "🍣",
+                "\"🍣\"",
+            },
+            new object[] {
+                new object[] {},
+                "[]",
+            },
+            new object[] {
+                new object[] {1},
+                @"[
+    1
+]",
+            },
+            new object[] {
+                new object[] {1, "a"},
+                @"[
+    1,
+    ""a""
+]",
+            },
+            new object[] {
+                new Dictionary<string, object> {},
+                "{}",
+            },
+            new object[] {
+                new Dictionary<string, object> {
+                    {"a", 1}
+                },
+                @"{
+    ""a"": 1
+}",
+            },
+            new object[] {
+                new Dictionary<string, object> {
+                    {"a", 1},
+                    {"b", 2}
+                },
+                @"{
+    ""a"": 1,
+    ""b"": 2
+}",
+            },
+            new object[] {
+                new Dictionary<string, object> {
+                    {"a", new int[] { 1, 2, 3 }},
+                    {"b",
+                     new Dictionary<string, object> {
+                            {"1a", 10},
+                            {"1b", new string[] { "こんにちは", "Hello" }},
+                            {"1c",
+                             new Dictionary<string, object> {
+                                    {"🍣", 1234},
+                             }},
+                     }}
+                },
+                @"{
+    ""a"": [
+        1,
+        2,
+        3
+    ],
+    ""b"": {
+        ""1a"": 10,
+        ""1b"": [
+            ""こんにちは"",
+            ""Hello""
+        ],
+        ""1c"": {
+            ""🍣"": 1234
+        }
+    }
+}",
+            },
         };
     }
 

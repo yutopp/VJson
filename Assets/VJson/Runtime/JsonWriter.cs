@@ -6,7 +6,6 @@
 //
 
 using System;
-using System.Text;
 using System.Collections.Generic;
 using System.IO;
 
@@ -18,7 +17,13 @@ namespace VJson
     // TODO: Add [Preserve] in Unity
     public class JsonWriter : IDisposable
     {
-        enum State
+        struct State
+        {
+            public StateKind Kind;
+            public int Depth;
+        }
+
+        enum StateKind
         {
             ObjectKeyHead,
             ObjectKeyOther,
@@ -29,12 +34,24 @@ namespace VJson
         }
 
         private StreamWriter _writer;
+        private int _indent;
+        private string _indentStr = null;
+
         private Stack<State> _states = new Stack<State>();
 
-        public JsonWriter(Stream s)
+        public JsonWriter(Stream s, int indent = 0)
         {
-            this._writer = new StreamWriter(s); // UTF-8 by default
-            this._states.Push(State.None);
+            _writer = new StreamWriter(s); // UTF-8 by default
+            _indent = indent;
+            if (_indent > 0) {
+                _indentStr = new String(' ', _indent);
+            }
+
+            _states.Push(new State
+            {
+                Kind = StateKind.None,
+                Depth = 0,
+            });
         }
 
         public void Dispose()
@@ -48,7 +65,7 @@ namespace VJson
         public void WriteObjectStart()
         {
             var state = _states.Peek();
-            if (state == State.ObjectKeyHead || state == State.ObjectKeyOther)
+            if (state.Kind == StateKind.ObjectKeyHead || state.Kind == StateKind.ObjectKeyOther)
             {
                 throw new Exception("");
             }
@@ -56,13 +73,17 @@ namespace VJson
             WriteDelimiter();
             _writer.Write("{");
 
-            _states.Push(State.ObjectKeyHead);
+            _states.Push(new State
+            {
+                Kind = StateKind.ObjectKeyHead,
+                Depth = state.Depth + 1,
+            });
         }
 
         public void WriteObjectKey(string key)
         {
             var state = _states.Peek();
-            if (state != State.ObjectKeyHead && state != State.ObjectKeyOther)
+            if (state.Kind != StateKind.ObjectKeyHead && state.Kind != StateKind.ObjectKeyOther)
             {
                 throw new Exception("");
             }
@@ -71,26 +92,34 @@ namespace VJson
             _writer.Write(":");
 
             _states.Pop();
-            _states.Push(State.ObjectValue);
+            _states.Push(new State
+            {
+                Kind = StateKind.ObjectValue,
+                Depth = state.Depth,
+            });
         }
 
         public void WriteObjectEnd()
         {
             var state = _states.Peek();
-            if (state != State.ObjectKeyHead && state != State.ObjectKeyOther)
+            if (state.Kind != StateKind.ObjectKeyHead && state.Kind != StateKind.ObjectKeyOther)
             {
                 throw new Exception("");
             }
 
-            _writer.Write("}");
-
             _states.Pop();
+
+            if (state.Kind == StateKind.ObjectKeyOther)
+            {
+                WriteIndentBreakForHuman(_states.Peek().Depth);
+            }
+            _writer.Write("}");
         }
 
         public void WriteArrayStart()
         {
             var state = _states.Peek();
-            if (state == State.ObjectKeyHead || state == State.ObjectKeyOther)
+            if (state.Kind == StateKind.ObjectKeyHead || state.Kind == StateKind.ObjectKeyOther)
             {
                 throw new Exception("");
             }
@@ -98,20 +127,28 @@ namespace VJson
             WriteDelimiter();
             _writer.Write("[");
 
-            _states.Push(State.ArrayHead);
+            _states.Push(new State
+            {
+                Kind = StateKind.ArrayHead,
+                Depth = state.Depth + 1,
+            });
         }
 
         public void WriteArrayEnd()
         {
             var state = _states.Peek();
-            if (state != State.ArrayHead && state != State.ArrayOther)
+            if (state.Kind != StateKind.ArrayHead && state.Kind != StateKind.ArrayOther)
             {
                 throw new Exception("");
             }
 
-            _writer.Write("]");
-
             _states.Pop();
+
+            if (state.Kind == StateKind.ArrayOther)
+            {
+                WriteIndentBreakForHuman(_states.Peek().Depth);
+            }
+            _writer.Write("]");
         }
 
         public void WriteValue(bool v)
@@ -185,9 +222,9 @@ namespace VJson
         {
             WriteDelimiter();
 
-            _writer.Write(@"""");
+            _writer.Write("\"");
             _writer.Write(v);
-            _writer.Write(@"""");
+            _writer.Write("\"");
         }
 
         public void WriteValueNull()
@@ -209,25 +246,65 @@ namespace VJson
             _writer.Write(v);
         }
 
+        void WriteIndentBreakForHuman(int depth)
+        {
+            if (_indent != 0)
+            {
+                _writer.Write('\n');
+
+                for (int i = 0; i < depth; ++i)
+                {
+                    _writer.Write(_indentStr);
+                }
+            }
+        }
+
+        void WriteSpaceForHuman()
+        {
+            if (_indent != 0)
+            {
+                _writer.Write(' ');
+            }
+        }
+
         void WriteDelimiter()
         {
             var state = _states.Peek();
-            if (state == State.ArrayHead)
+            if (state.Kind == StateKind.ArrayHead)
             {
+                WriteIndentBreakForHuman(state.Depth);
+
                 _states.Pop();
-                _states.Push(State.ArrayOther);
+                _states.Push(new State
+                {
+                    Kind = StateKind.ArrayOther,
+                    Depth = state.Depth
+                });
                 return;
             }
 
-            if (state == State.ArrayOther || state == State.ObjectKeyOther)
+            if (state.Kind == StateKind.ObjectKeyHead)
             {
-                _writer.Write(",");
+                WriteIndentBreakForHuman(state.Depth);
             }
 
-            if (state == State.ObjectValue)
+            if (state.Kind == StateKind.ArrayOther || state.Kind == StateKind.ObjectKeyOther)
             {
+                _writer.Write(",");
+
+                WriteIndentBreakForHuman(state.Depth);
+            }
+
+            if (state.Kind == StateKind.ObjectValue)
+            {
+                WriteSpaceForHuman();
+
                 _states.Pop();
-                _states.Push(State.ObjectKeyOther);
+                _states.Push(new State
+                {
+                    Kind = StateKind.ObjectKeyOther,
+                    Depth = state.Depth
+                });
             }
         }
     }
