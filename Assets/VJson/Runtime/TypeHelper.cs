@@ -115,10 +115,38 @@ namespace VJson
 
         public static IEnumerable<KeyValuePair<string, object>> ToKeyValues(object o)
         {
-            return ToKeyValuesUnordered(o).OrderBy(kv => kv.Key);
+            var pairs = ToRankedKeyValuesUnordered(o).ToList();
+            pairs.Sort(new RankedKeyValueComparer());
+
+            return pairs.Select(v => new KeyValuePair<string, object>(v.Key.Key, v.Value));
         }
 
-        public static IEnumerable<KeyValuePair<string, object>> ToKeyValuesUnordered(object o)
+        private struct RankedKey
+        {
+            public int Order;
+            public string Key;
+        }
+
+        class RankedKeyValueComparer : IComparer<KeyValuePair<RankedKey, object>>
+        {
+            public int Compare(KeyValuePair<RankedKey, object> a, KeyValuePair<RankedKey, object> b)
+            {
+                throw new NotImplementedException();
+            }
+
+            int IComparer<KeyValuePair<RankedKey, object>>.Compare(KeyValuePair<RankedKey, object> a,
+                                                                   KeyValuePair<RankedKey, object> b)
+            {
+                if (a.Key.Order != b.Key.Order)
+                {
+                    return a.Key.Order - b.Key.Order; // TODO: Concider when values are overflowed...
+                }
+
+                return string.Compare(a.Key.Key, b.Key.Key);
+            }
+        }
+
+        private static IEnumerable<KeyValuePair<RankedKey, object>> ToRankedKeyValuesUnordered(object o)
         {
             var ty = o.GetType();
             if (TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
@@ -132,7 +160,12 @@ namespace VJson
 
                 foreach (DictionaryEntry elem in (IDictionary)o)
                 {
-                    yield return new KeyValuePair<string, object>((string)elem.Key, elem.Value);
+                    yield return new KeyValuePair<RankedKey, object>(
+                        new RankedKey{
+                            Order = 0, // Dictionary has no order infomation
+                            Key = (string)elem.Key,
+                        },
+                        elem.Value);
                 }
             }
             else
@@ -152,7 +185,12 @@ namespace VJson
                         continue;
                     }
 
-                    yield return new KeyValuePair<string, object>(elemName, elemValue);
+                    yield return new KeyValuePair<RankedKey, object>(
+                        new RankedKey{
+                            Order = JsonFieldAttribute.FieldOrder(fieldAttr),
+                            Key = elemName,
+                        },
+                        elemValue);
                 }
             }
         }

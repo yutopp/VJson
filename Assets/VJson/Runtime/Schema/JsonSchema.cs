@@ -18,39 +18,39 @@ namespace VJson.Schema
     public class JsonSchemaAttribute : Attribute
     {
         #region Core
-        [JsonField(Name = "$schema")]
+        [JsonField(Name = "$schema", Order = -10)]
         [JsonFieldIgnorable]
         public string Schema;
 
-        [JsonField(Name = "$id")]
+        [JsonField(Name = "$id", Order = -11)]
         [JsonFieldIgnorable]
         public string Id;
 
-        [JsonField(Name = "$ref")]
+        [JsonField(Name = "$ref", Order = -12)]
         [JsonFieldIgnorable]
         public string Ref;
         #endregion
 
         #region Metadata
-        [JsonField(Name = "title")]
+        [JsonField(Name = "title", Order = 0)]
         [JsonFieldIgnorable]
         public string Title;
 
-        [JsonField(Name = "description")]
+        [JsonField(Name = "description", Order = 1)]
         [JsonFieldIgnorable]
         public string Description;
         #endregion
 
         #region 6.1: Any instances
-        [JsonField(Name = "type", TypeHints = new Type[] { typeof(string), typeof(string[]) })]
+        [JsonField(Name = "type", TypeHints = new Type[] { typeof(string), typeof(string[]) }, Order = 10)]
         [JsonFieldIgnorable]
         public object Type;
 
-        [JsonField(Name = "enum")]
+        [JsonField(Name = "enum", Order = 11)]
         [JsonFieldIgnorable]
         public object[] Enum;
 
-        [JsonField(Name = "const")]
+        [JsonField(Name = "const", Order = 12)]
         [JsonFieldIgnorable]
         public object Const;
 
@@ -64,23 +64,23 @@ namespace VJson.Schema
         #endregion
 
         #region 6.2: Numeric instances
-        [JsonField(Name = "multipleOf")]
+        [JsonField(Name = "multipleOf", Order = 20)]
         [JsonFieldIgnorable(WhenValueIs = double.MinValue)]
         public double MultipleOf = double.MinValue;
 
-        [JsonField(Name = "maximum")]
+        [JsonField(Name = "maximum", Order = 21)]
         [JsonFieldIgnorable(WhenValueIs = double.MinValue)]
         public double Maximum = double.MinValue;
 
-        [JsonField(Name = "exclusiveMaximum")]
+        [JsonField(Name = "exclusiveMaximum", Order = 22)]
         [JsonFieldIgnorable(WhenValueIs = double.MinValue)]
         public double ExclusiveMaximum = double.MinValue;
 
-        [JsonField(Name = "minimum")]
+        [JsonField(Name = "minimum", Order = 23)]
         [JsonFieldIgnorable(WhenValueIs = double.MaxValue)]
         public double Minimum = double.MaxValue;
 
-        [JsonField(Name = "exclusiveMinimum")]
+        [JsonField(Name = "exclusiveMinimum", Order = 24)]
         [JsonFieldIgnorable(WhenValueIs = double.MaxValue)]
         public double ExclusiveMinimum = double.MaxValue;
 
@@ -96,15 +96,15 @@ namespace VJson.Schema
         #endregion
 
         #region 6.3. Strings
-        [JsonField(Name = "maxLength")]
+        [JsonField(Name = "maxLength", Order = 30)]
         [JsonFieldIgnorable(WhenValueIs = int.MinValue)]
         public int MaxLength = int.MinValue;
 
-        [JsonField(Name = "minLength")]
+        [JsonField(Name = "minLength", Order = 31)]
         [JsonFieldIgnorable(WhenValueIs = int.MaxValue)]
         public int MinLength = int.MaxValue;
 
-        [JsonField(Name = "pattern")]
+        [JsonField(Name = "pattern", Order = 32)]
         [JsonFieldIgnorable]
         public string Pattern;
 
@@ -119,23 +119,24 @@ namespace VJson.Schema
 
         #region 6.4: Arrays
         [JsonField(Name = "items",
-                   TypeHints = new Type[] { typeof(JsonSchemaAttribute), typeof(JsonSchemaAttribute[]) })]
+                   TypeHints = new Type[] { typeof(JsonSchemaAttribute), typeof(JsonSchemaAttribute[]) },
+                   Order = 40)]
         [JsonFieldIgnorable]
         public object Items;
 
-        [JsonField(Name = "additionalItems")]
+        [JsonField(Name = "additionalItems", Order = 41)]
         [JsonFieldIgnorable]
         public JsonSchemaAttribute AdditionalItems;
 
-        [JsonField(Name = "maxItems")]
+        [JsonField(Name = "maxItems", Order = 42)]
         [JsonFieldIgnorable(WhenValueIs = int.MinValue)]
         public int MaxItems = int.MinValue;
 
-        [JsonField(Name = "minItems")]
+        [JsonField(Name = "minItems", Order = 43)]
         [JsonFieldIgnorable(WhenValueIs = int.MaxValue)]
         public int MinItems = int.MaxValue;
 
-        [JsonField(Name = "uniqueItems")]
+        [JsonField(Name = "uniqueItems", Order = 44)]
         [JsonFieldIgnorable(WhenValueIs = false)]
         public bool UniqueItems = false;
 
@@ -153,27 +154,27 @@ namespace VJson.Schema
         #endregion
 
         #region 6.5: Objects
-        [JsonField(Name = "maxProperties")]
+        [JsonField(Name = "maxProperties", Order = 50)]
         [JsonFieldIgnorable(WhenValueIs = int.MinValue)]
         public int MaxProperties = int.MinValue;
 
-        [JsonField(Name = "minProperties")]
+        [JsonField(Name = "minProperties", Order = 51)]
         [JsonFieldIgnorable(WhenValueIs = int.MaxValue)]
         public int MinProperties = int.MaxValue;
 
-        [JsonField(Name = "required")]
+        [JsonField(Name = "required", Order = 52)]
         [JsonFieldIgnorable]
         public string[] Required; // Use [JsonSchemaRequired] instead when specify it by attributes.
 
-        [JsonField(Name = "properties")]
+        [JsonField(Name = "properties", Order = 53)]
         [JsonFieldIgnorable]
         public Dictionary<string, JsonSchemaAttribute> Properties;
 
-        [JsonField(Name = "patternProperties")]
+        [JsonField(Name = "patternProperties", Order = 54)]
         [JsonFieldIgnorable]
         public Dictionary<string, JsonSchemaAttribute> PatternProperties;
 
-        [JsonField(Name = "additionalProperties")]
+        [JsonField(Name = "additionalProperties", Order = 55)]
         [JsonFieldIgnorable]
         public JsonSchemaAttribute AdditionalProperties;
 
@@ -185,7 +186,8 @@ namespace VJson.Schema
                    TypeHints = new Type[] {
                        typeof(Dictionary<string, string[]>),
                        typeof(Dictionary<string, JsonSchemaAttribute>)
-                   })]
+                   },
+                   Order = 56)]
         [JsonFieldIgnorable]
         public object Dependencies; // Use [JsonSchemaDependencies] instead when specify it by attributes.
 
@@ -199,7 +201,7 @@ namespace VJson.Schema
         #endregion
 
         #region 6.7: Subschemas With Boolean Logic
-        [JsonField(Name = "allOf")]
+        [JsonField(Name = "allOf", Order = 70)]
         [JsonFieldIgnorable]
         public List<JsonSchemaAttribute> AllOf;
 
@@ -213,7 +215,7 @@ namespace VJson.Schema
             AllOf.Add(s);
         }
 
-        [JsonField(Name = "anyOf")]
+        [JsonField(Name = "anyOf", Order = 71)]
         [JsonFieldIgnorable]
         public List<JsonSchemaAttribute> AnyOf;
 
@@ -227,7 +229,7 @@ namespace VJson.Schema
             AnyOf.Add(s);
         }
 
-        [JsonField(Name = "oneOf")]
+        [JsonField(Name = "oneOf", Order = 72)]
         [JsonFieldIgnorable]
         public List<JsonSchemaAttribute> OneOf;
 
@@ -241,7 +243,7 @@ namespace VJson.Schema
             OneOf.Add(s);
         }
 
-        [JsonField(Name = "not")]
+        [JsonField(Name = "not", Order = 73)]
         [JsonFieldIgnorable]
         public JsonSchemaAttribute Not;
 

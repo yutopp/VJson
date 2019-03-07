@@ -28,6 +28,7 @@ namespace VJson
     public sealed class JsonFieldAttribute : System.Attribute
     {
         public string Name;
+        public int Order = 0;
         public Type[] TypeHints;
         public Type DynamicResolverTag;
 
@@ -39,6 +40,16 @@ namespace VJson
             }
 
             return fi.Name;
+        }
+
+        public static int FieldOrder(JsonFieldAttribute f)
+        {
+            if (f != null)
+            {
+                return f.Order;
+            }
+
+            return 0;
         }
     }
 

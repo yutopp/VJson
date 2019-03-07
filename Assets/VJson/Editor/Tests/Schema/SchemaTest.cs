@@ -99,27 +99,27 @@ namespace VJson.Schema.UnitTests
             },
             new object[] {
                 typeof(object[]),
-                "{\"items\":{},\"type\":\"array\"}",
+                "{\"type\":\"array\",\"items\":{}}",
             },
             new object[] {
                 typeof(int[]),
-                "{\"items\":{\"type\":\"integer\"},\"type\":\"array\"}",
+                "{\"type\":\"array\",\"items\":{\"type\":\"integer\"}}",
             },
             new object[] {
                 typeof(float[]),
-                "{\"items\":{\"type\":\"number\"},\"type\":\"array\"}",
+                "{\"type\":\"array\",\"items\":{\"type\":\"number\"}}",
             },
             new object[] {
                 typeof(List<object>),
-                "{\"items\":{},\"type\":\"array\"}",
+                "{\"type\":\"array\",\"items\":{}}",
             },
             new object[] {
                 typeof(List<int>),
-                "{\"items\":{\"type\":\"integer\"},\"type\":\"array\"}",
+                "{\"type\":\"array\",\"items\":{\"type\":\"integer\"}}",
             },
             new object[] {
                 typeof(List<float>),
-                "{\"items\":{\"type\":\"number\"},\"type\":\"array\"}",
+                "{\"type\":\"array\",\"items\":{\"type\":\"number\"}}",
             },
             new object[] {
                 typeof(Dictionary<string, string>),
@@ -131,71 +131,71 @@ namespace VJson.Schema.UnitTests
             },
             new object[] {
                 typeof(JsonSchemaFormatTests),
-                "{\"description\":\"b\",\"properties\":{},\"title\":\"a\",\"type\":\"object\"}",
+                "{\"title\":\"a\",\"description\":\"b\",\"type\":\"object\",\"properties\":{}}",
             },
             new object[] {
                 typeof(JsonSchemaFormatTests[]),
-                "{\"items\":{\"$ref\":\"VJson.Schema.UnitTests.JsonSchemaFormatTests\"},\"type\":\"array\"}",
+                "{\"type\":\"array\",\"items\":{\"$ref\":\"VJson.Schema.UnitTests.JsonSchemaFormatTests\"}}",
             },
             new object[] {
                 typeof(List<JsonSchemaFormatTests>),
-                "{\"items\":{\"$ref\":\"VJson.Schema.UnitTests.JsonSchemaFormatTests\"},\"type\":\"array\"}",
+                "{\"type\":\"array\",\"items\":{\"$ref\":\"VJson.Schema.UnitTests.JsonSchemaFormatTests\"}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.NotRequiredObject),
-                "{\"$id\":\"not_required_object.json\",\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
+                "{\"$id\":\"not_required_object.json\",\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\",\"minimum\":1}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.NotRequiredObjectWithIgnorable),
-                "{\"properties\":{\"X\":{\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\",\"minimum\":1}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasDictionary),
-                "{\"properties\":{\"FP\":{\"type\":\"object\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"FP\":{\"type\":\"object\"}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasEnumerable),
-                "{\"properties\":{\"Fs\":{\"items\":{\"maximum\":1,\"minimum\":0,\"type\":\"number\"},\"type\":\"array\"},\"FsList\":{\"items\":{\"type\":\"number\"},\"type\":\"array\"},\"Os\":{\"type\":\"array\"},\"OsList\":{\"type\":\"array\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"Fs\":{\"type\":\"array\",\"items\":{\"type\":\"number\",\"maximum\":1,\"minimum\":0}},\"FsList\":{\"type\":\"array\",\"items\":{\"type\":\"number\"}},\"Os\":{\"type\":\"array\"},\"OsList\":{\"type\":\"array\"}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasRequiredItems),
-                "{\"properties\":{\"Xs\":{\"items\":{\"minimum\":0,\"type\":\"integer\"},\"minItems\":1,\"type\":\"array\"}},\"required\":[\"Xs\"],\"type\":\"object\"}",
+                "{\"type\":\"object\",\"required\":[\"Xs\"],\"properties\":{\"Xs\":{\"type\":\"array\",\"items\":{\"type\":\"integer\",\"minimum\":0},\"minItems\":1}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasRequiredString),
-                "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
+                "{\"type\":\"object\",\"required\":[\"S\"],\"properties\":{\"S\":{\"type\":\"string\"}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasRequiredButIgnorableString),
-                "{\"properties\":{\"S\":{\"type\":\"string\"}},\"required\":[\"S\"],\"type\":\"object\"}",
+                "{\"type\":\"object\",\"required\":[\"S\"],\"properties\":{\"S\":{\"type\":\"string\"}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasDeps),
-                "{\"dependencies\":{\"Y\":[\"X\"]},\"properties\":{\"X\":{\"minimum\":0,\"type\":\"integer\"},\"Y\":{\"type\":\"integer\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\",\"minimum\":0},\"Y\":{\"type\":\"integer\"}},\"dependencies\":{\"Y\":[\"X\"]}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasNested),
-                "{\"properties\":{\"C\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+HasNestedChild\"}},\"required\":[\"C\"],\"type\":\"object\"}",
+                "{\"type\":\"object\",\"required\":[\"C\"],\"properties\":{\"C\":{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+HasNestedChild\"}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.DerivingBase),
-                "{\"properties\":{\"X\":{\"minLength\":1,\"type\":\"string\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"string\",\"minLength\":1}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.Deriving),
-                "{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+DerivingBase\"}],\"properties\":{\"X\":{},\"Y\":{\"minLength\":2,\"type\":\"string\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"X\":{},\"Y\":{\"type\":\"string\",\"minLength\":2}},\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+DerivingBase\"}]}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.MoreDeriving),
-                "{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+Deriving\"}],\"properties\":{\"X\":{},\"Y\":{},\"Z\":{\"minLength\":3,\"type\":\"string\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"X\":{},\"Y\":{},\"Z\":{\"type\":\"string\",\"minLength\":3}},\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+Deriving\"}]}",
             },
             new object[] {
                 typeof(VJson.UnitTests.EnumAsInt),
-                "{\"enum\":[0,1,100],\"type\":\"integer\"}",
+                "{\"type\":\"integer\",\"enum\":[0,1,100]}",
             },
             new object[] {
                 typeof(VJson.UnitTests.EnumAsString),
-                "{\"enum\":[\"NameA\",\"NameB\",\"OtherName\"],\"type\":\"string\"}",
+                "{\"type\":\"string\",\"enum\":[\"NameA\",\"NameB\",\"OtherName\"]}",
             },
             new object[] {
                 typeof(Nullable<int>),
@@ -207,39 +207,39 @@ namespace VJson.Schema.UnitTests
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasNullable),
-                "{\"properties\":{\"X\":{\"type\":\"integer\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\"}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasStrEnum),
-                "{\"properties\":{\"E\":{\"enum\":[\"NameA\",\"NameB\",\"OtherName\"],\"type\":\"string\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"E\":{\"type\":\"string\",\"enum\":[\"NameA\",\"NameB\",\"OtherName\"]}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasNumEnum),
-                "{\"properties\":{\"E\":{\"enum\":[0,1,100],\"type\":\"integer\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"E\":{\"type\":\"integer\",\"enum\":[0,1,100]}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.CustomTag<int>),
-                "{\"minimum\":0,\"type\":\"integer\"}",
+                "{\"type\":\"integer\",\"minimum\":0}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasCustomTagInt),
-                "{\"properties\":{\"X\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}],\"type\":\"integer\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"X\":{\"type\":\"integer\",\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}]}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasCustomTagArray),
-                "{\"properties\":{\"Xs\":{\"items\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}],\"type\":\"integer\"},\"type\":\"array\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"Xs\":{\"type\":\"array\",\"items\":{\"type\":\"integer\",\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}]}}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasCustomTagDict),
-                "{\"properties\":{\"Xs\":{\"additionalProperties\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}]},\"type\":\"object\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"Xs\":{\"type\":\"object\",\"additionalProperties\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}]}}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.HasCustomTagArrayDict),
-                "{\"properties\":{\"Xs\":{\"items\":{\"additionalProperties\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}]},\"type\":\"object\"},\"type\":\"array\"}},\"type\":\"object\"}",
+                "{\"type\":\"object\",\"properties\":{\"Xs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":{\"allOf\":[{\"$ref\":\"VJson.Schema.UnitTests.ValidatorWithSerializerTests+CustomTag`1[System.Int32]\"}]}}}}}",
             },
             new object[] {
                 typeof(ValidatorWithSerializerTests.CustomTag<float>),
-                "{\"minimum\":0,\"type\":\"number\"}",
+                "{\"type\":\"number\",\"minimum\":0}",
             },
         };
     }
