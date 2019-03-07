@@ -29,6 +29,11 @@ namespace VJson.Schema
             _registory.Add(id, j);
         }
 
+        public IEnumerable<string> GetRegisteredIDs()
+        {
+            return _registory.Keys;
+        }
+
         private static JsonSchemaRegistory _defaultInstance = new JsonSchemaRegistory();
         public static JsonSchemaRegistory GetDefault()
         {
