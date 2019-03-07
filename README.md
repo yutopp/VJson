@@ -113,3 +113,7 @@ Other use cases are available at [here](https://github.com/yutopp/VJson/tree/mas
 
 - [JSON](https://www.json.org/)
 - [JSON Schema Specification](https://json-schema.org/specification.html)
+
+## Author
+
+- [@yutopp](https://github.com/yutopp)
