@@ -52,6 +52,21 @@ namespace VJson.UnitTests
                 Assert.AreEqual("\"🍣\"", actual);
             }
         }
+
+        [Test]
+        public void EscapeSequenceValueWriteTest()
+        {
+            using (var s = new MemoryStream())
+            {
+                using (var f = new JsonWriter(s))
+                {
+                    f.WriteValue("\"\\/\b\n\r\t");
+                }
+
+                var actual = Encoding.UTF8.GetString(s.ToArray());
+                Assert.AreEqual("\"\\\"\\\\/\\b\\n\\r\\t\"", actual);
+            }
+        }
     }
 
     public class JsonWriterObjectTests

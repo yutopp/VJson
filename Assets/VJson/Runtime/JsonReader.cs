@@ -204,11 +204,12 @@ namespace VJson
                         _reader.Read(); // Discard
 
                         var span = CommitBuffer();
-                        var str = Regex.Unescape(span).Replace("\\/", "/");
+                        var str = Regex.Unescape(span);
                         return new StringNode(str);
 
                     case '\\':
-                        SaveToBuffer(_reader.Read());
+                        _reader.Read(); // Discard
+
                         if (!ReadEscape())
                         {
                             throw NodeExpectedError("escape");
@@ -251,34 +252,42 @@ namespace VJson
             switch (next)
             {
                 case '\"':
+                    SaveToBuffer('\\');
                     SaveToBuffer(_reader.Read());
                     return true;
 
                 case '\\':
+                    SaveToBuffer('\\');
                     SaveToBuffer(_reader.Read());
                     return true;
 
                 case '/':
+                    // Escape is not required in C#
                     SaveToBuffer(_reader.Read());
                     return true;
 
                 case 'b':
+                    SaveToBuffer('\\');
                     SaveToBuffer(_reader.Read());
                     return true;
 
                 case 'n':
+                    SaveToBuffer('\\');
                     SaveToBuffer(_reader.Read());
                     return true;
 
                 case 'r':
+                    SaveToBuffer('\\');
                     SaveToBuffer(_reader.Read());
                     return true;
 
                 case 't':
+                    SaveToBuffer('\\');
                     SaveToBuffer(_reader.Read());
                     return true;
 
                 case 'u':
+                    SaveToBuffer('\\');
                     SaveToBuffer(_reader.Read());
                     for (int i = 0; i < 4; ++i)
                     {

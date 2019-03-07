@@ -158,6 +158,10 @@ namespace VJson.UnitTests
                 "\"\\/\"",
             },
             new object[] {
+                new StringNode("/"),
+                "\"/\"",
+            },
+            new object[] {
                 new StringNode("\b"),
                 @"""\b""",
             },

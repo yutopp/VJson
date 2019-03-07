@@ -397,7 +397,22 @@ namespace VJson.UnitTests
                 "🍣",
                 @"""🍣"""
             },
-
+            new object[] {
+                @"a
+b
+c
+""
+",
+                "\"a\\nb\\nc\\n\\\"\\n\"",
+            },
+            new object[] {
+                "\" \\ / \b \n \r \t",
+                "\"\\\" \\\\ / \\b \\n \\r \\t\"",
+            },
+            new object[] {
+                "\"\\/\b\n\r\t",
+                "\"\\\"\\\\/\\b\\n\\r\\t\"",
+            },
             // Arrays
             new object[] {
                 new object[] {1, "hoge", null},
@@ -533,6 +548,14 @@ namespace VJson.UnitTests
         };
 
         static object[] OnlyDeserializeArgs = {
+            new object[] {
+                "/",
+                "\"\\/\"",
+            },
+            new object[] {
+                "/",
+                "\"/\"",
+            },
         };
 
         static object[] WithIndentArgs = {

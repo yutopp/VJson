@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 
 namespace VJson
@@ -222,9 +223,9 @@ namespace VJson
         {
             WriteDelimiter();
 
-            _writer.Write("\"");
-            _writer.Write(v);
-            _writer.Write("\"");
+            _writer.Write('\"');
+            _writer.Write(Escape(v).ToArray());
+            _writer.Write('\"');
         }
 
         public void WriteValueNull()
@@ -305,6 +306,53 @@ namespace VJson
                     Kind = StateKind.ObjectKeyOther,
                     Depth = state.Depth
                 });
+            }
+        }
+
+        IEnumerable<char> Escape(string s)
+        {
+            foreach(var c in s)
+            {
+                char modified = default(char);
+                if (c <= 0x20 || c == '\"' || c == '\\')
+                {
+                    switch(c)
+                    {
+                        case '\"':
+                            modified = '\"';
+                            break;
+
+                        case '\\':
+                            modified = '\\';
+                            break;
+
+                        case '\b':
+                            modified = 'b';
+                            break;
+
+                        case '\n':
+                            modified = 'n';
+                            break;
+
+                        case '\r':
+                            modified = 'r';
+                            break;
+
+                        case '\t':
+                            modified = 't';
+                            break;
+                    }
+                }
+
+                if (modified != default(char))
+                {
+                    yield return '\\';
+                    yield return modified;
+                }
+                else
+                {
+                    yield return c;
+                }
             }
         }
     }
