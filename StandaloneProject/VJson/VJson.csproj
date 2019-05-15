@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="../../Assets/VJson/Runtime/**/*.cs" />
+    <Compile Include="../../Assets/net.yutopp.vjson/Runtime/**/*.cs" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VJson", "VJson\VJson.csproj", "{63EFA01F-793A-486D-A65F-39029DF64C6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VJson.Editor.Tests", "VJson.Editor.Tests\VJson.Editor.Tests.csproj", "{A500B2F2-CF5C-4E8A-B52B-05ACCD6BCDB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{A500B2F2-CF5C-4E8A-B52B-05ACCD6BCDB6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{63222FEC-933E-4219-A3F4-246FD2AD024F}"
 EndProject

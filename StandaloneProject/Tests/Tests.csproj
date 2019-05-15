@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../../Assets/VJson/Editor/Tests/**/*.cs" />
+    <Compile Include="../../Assets/net.yutopp.vjson/Editor/Tests/**/*.cs" />
   </ItemGroup>
 
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
