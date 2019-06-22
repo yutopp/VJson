@@ -15,6 +15,10 @@
     <ProjectReference Include="../VJson/VJson.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <DefineConstants>VJSON_FULL_TESTS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="../../Assets/net.yutopp.vjson/Editor/Tests/**/*.cs" />
   </ItemGroup>
