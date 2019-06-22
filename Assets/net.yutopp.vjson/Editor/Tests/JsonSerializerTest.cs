@@ -402,7 +402,7 @@ namespace VJson.UnitTests
 b
 c
 ""
-",
+".AsLF(),
                 "\"a\\nb\\nc\\n\\\"\\n\"",
             },
             new object[] {
@@ -583,14 +583,14 @@ c
                 new object[] {1},
                 @"[
     1
-]",
+]".AsLF(),
             },
             new object[] {
                 new object[] {1, "a"},
                 @"[
     1,
     ""a""
-]",
+]".AsLF(),
             },
             new object[] {
                 new Dictionary<string, object> {},
@@ -602,7 +602,7 @@ c
                 },
                 @"{
     ""a"": 1
-}",
+}".AsLF(),
             },
             new object[] {
                 new Dictionary<string, object> {
@@ -612,7 +612,7 @@ c
                 @"{
     ""a"": 1,
     ""b"": 2
-}",
+}".AsLF(),
             },
             new object[] {
                 new Dictionary<string, object> {
@@ -643,7 +643,7 @@ c
             ""🍣"": 1234
         }
     }
-}",
+}".AsLF(),
             },
         };
     }
@@ -947,5 +947,13 @@ c
                 "(root)[\"Dict\"]: A key of the dictionary which has DynamicResolver must be a string type: KeyType = System.Int32.",
             },
         };
+    }
+
+    public static class StringExtensions
+    {
+        public static string AsLF(this string str)
+        {
+            return str.Replace("\r\n", "\n");
+        }
     }
 }
