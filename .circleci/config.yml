@@ -84,8 +84,14 @@ workflows:
       - test_net35
       - test_net45
       - test_netcoreapp2_0
-      - coverage
-      - test_unity2018_3
+      - coverage:
+          requires:
+            - test_netcoreapp2_0
+      - test_unity2018_3:
+          requires:
+            - test_net35
+            - test_net45
+            - test_netcoreapp2_0
 
   nightly:
     triggers:
