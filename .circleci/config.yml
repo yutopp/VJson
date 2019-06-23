@@ -31,7 +31,7 @@ jobs:
     working_directory: ~/workspace-net45
     steps:
       - checkout
-      - run: apt-get update -yy && apt-get install -yy make git python3
+      - run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
       - run: make setup-net
       - run: make test-net45
       - store_test_results:
@@ -68,7 +68,7 @@ jobs:
     <<: *unity2018_3_docker_image
     working_directory: ~/workspace-unity2018.3.12f1
     steps:
-      - run: apt-get update && apt-get install -y git zip && git --version
+      - run: apt-get update && apt-get install -y git zip xsltproc && git --version
       - checkout
       - *setup_unity_license_file
       - run: make setup
