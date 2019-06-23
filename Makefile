@@ -41,7 +41,8 @@ build-debug-net35: restore-net35
 .PHONY: test-net35
 test-net35: build-debug-net35
 	mkdir -p test-results/net35
-	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net35/Tests.dll --result=test-results/net35/results.xml;transform=nunit-transforms/nunit3-junit.xslt
+	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net35/Tests.dll --result=test-results/net35/results.xml
+	xsltproc --noout --output test-results/net35/results.junit.xml nunit-transforms/nunit3-junit/nunit3-junit.xslt test-results/net35/results.xml
 
 # .NET Framework 4.5
 .PHONY: restore-net45
@@ -69,7 +70,7 @@ build-debug-netcore20: restore-dotnet
 .PHONY: test-netcore20
 test-netcore20: build-debug-netcore20
 	mkdir -p test-results/netcore20
-	dotnet test ${PROJECT_TEST_DIR} -f netcoreapp2.0 -r test-results/netcore20
+	dotnet test ${PROJECT_TEST_DIR} -f netcoreapp2.0 -r test-results/netcore20/results.xml
 
 .PHONY: coverage-netcore20
 coverage-netcore20: build-debug-netcore20

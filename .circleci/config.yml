@@ -19,7 +19,7 @@ jobs:
     working_directory: ~/workspace-net35
     steps:
       - checkout
-      - run: apt-get update -yy && apt-get install -yy make git python3
+      - run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
       - run: make setup-net
       - run: make test-net35
       - store_test_results:
