@@ -56,7 +56,8 @@ build-debug-net45: restore-net45
 .PHONY: test-net45
 test-net45: build-debug-net45
 	mkdir -p test-results/net45
-	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net45/Tests.dll --result=test-results/net45/results.xml;transform=nunit-transforms/nunit3-junit.xslt
+	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net45/Tests.dll --result=test-results/net45/results.xml
+	xsltproc --noout --output test-results/net45/results.junit.xml nunit-transforms/nunit3-junit/nunit3-junit.xslt test-results/net45/results.xml
 
 # .NET Standard 1.6, Core 1.0, Core 2.0
 .PHONY: restore-dotnet
