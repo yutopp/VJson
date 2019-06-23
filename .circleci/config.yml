@@ -1,4 +1,17 @@
 version: 2
+
+references:
+  unity2018_3_docker_image: &unity2018_3_docker_image
+    docker:
+      - image: gableroux/unity3d:2018.3.12f1
+
+  setup_unity_license_file: &setup_unity_license_file
+    run:
+      command: |
+        mkdir -p /root/.cache/unity3d
+        mkdir -p /root/.local/share/unity3d/Unity/
+        echo $UNITY_ULF | base64 -d > /root/.local/share/unity3d/Unity/Unity_lic.ulf
+
 jobs:
   test_net35:
     docker:
@@ -51,14 +64,29 @@ jobs:
       - run: make coverage-netcore20
       - run: ./codecov -f coverage/lcov.info
 
+  test_unity2018_3:
+    <<: *unity2018_3_docker_image
+    working_directory: ~/workspace-unity2018.3.12f1
+    steps:
+      - checkout
+      - *setup_unity_license_file
+      - run: make setup
+      - run: ./ci/run-unity-editor-tests.sh
+      - store_artifacts:
+          path: '$(pwd)/UnityEditorTestsResults.xml'
+          destination: 'UnityEditorTestsResults.xml'
+
 workflows:
   version: 2
+
   commit:
     jobs:
       - test_net35
       - test_net45
       - test_netcoreapp2_0
       - coverage
+      - test_unity2018_3
+
   nightly:
     triggers:
       - schedule:

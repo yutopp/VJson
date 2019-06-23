@@ -62,3 +62,4 @@ test-results
 lcov.info
 codecov
 BenchmarkDotNet.Artifacts
+*TestsResults.xml
