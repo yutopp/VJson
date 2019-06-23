@@ -183,7 +183,7 @@ namespace VJson.UnitTests
                 false
             },
             new object[] {
-                new FloatNode(420),
+                new FloatNode(42),
                 new FloatNode(72),
                 false
             },
