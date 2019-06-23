@@ -68,6 +68,7 @@ jobs:
     <<: *unity2018_3_docker_image
     working_directory: ~/workspace-unity2018.3.12f1
     steps:
+      - run: apt-get update && apt-get install -y git zip && git --version
       - checkout
       - *setup_unity_license_file
       - run: make setup
