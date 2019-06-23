@@ -39,7 +39,7 @@ jobs:
 
   test_netcoreapp2_0:
     docker:
-      - image: microsoft/dotnet:2.2-sdk
+      - image: mcr.microsoft.com/dotnet/core/sdk:2.2
     working_directory: ~/workspace-netcoreapp2_0
     steps:
       - checkout
@@ -51,7 +51,7 @@ jobs:
 
   coverage:
     docker:
-      - image: microsoft/dotnet:2.2-sdk
+      - image: mcr.microsoft.com/dotnet/core/sdk:2.2
     working_directory: ~/workspace-netcoreapp2_0
     steps:
       - checkout
