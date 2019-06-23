@@ -73,9 +73,8 @@ jobs:
       - *setup_unity_license_file
       - run: make setup
       - run: ./ci/run-unity-editor-tests.sh
-      - store_artifacts:
-          path: '$(pwd)/UnityEditorTestsResults.xml'
-          destination: 'UnityEditorTestsResults.xml'
+      - store_test_results:
+          path: test-results
 
 workflows:
   version: 2
