@@ -174,11 +174,7 @@ namespace VJson.UnitTests
             // Float
             new object[] {
                 new FloatNode(42),
-#if UNITY_EDITOR
-                new FloatNode(43),
-#else
                 new FloatNode(42),
-#endif
                 true
             },
             new object[] {
