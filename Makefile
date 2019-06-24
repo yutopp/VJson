@@ -29,9 +29,6 @@ pre-generated-files: Assets/${PACKAGE_NAME}/Runtime/TypeHelper.g.cs
 Assets/${PACKAGE_NAME}/Runtime/TypeHelper.g.cs: PreProcess/generator.py PreProcess/TypeHelper.g.template.cs
 	python3 PreProcess/generator.py PreProcess/TypeHelper.g.template.cs > $@
 
-test-results:
-	mkdir test-results
-
 # .NET Framework 3.5
 .PHONY: restore-net35
 restore-net35:
@@ -42,8 +39,14 @@ build-debug-net35: restore-net35
 	msbuild ${PROJECT_TEST_DIR} /p:TargetFramework=net35
 
 .PHONY: test-net35
-test-net35: build-debug-net35 test-results
-	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net35/Tests.dll --result=test-results/results.xml;transform=nunit-transforms/nunit3-junit.xslt
+test-net35: build-debug-net35
+	mkdir -p test-results/net35
+	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net35/Tests.dll --result=test-results/net35/results.xml
+ifneq ($(HAS_XSLTPROC),)
+	xsltproc --noout --output test-results/net35/results.junit.xml \
+		nunit-transforms/nunit3-junit/nunit3-junit.xslt \
+		test-results/net35/results.xml
+endif
 
 # .NET Framework 4.5
 .PHONY: restore-net45
@@ -55,8 +58,14 @@ build-debug-net45: restore-net45
 	msbuild ${PROJECT_TEST_DIR} /p:TargetFramework=net45
 
 .PHONY: test-net45
-test-net45: build-debug-net45 test-results
-	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net45/Tests.dll --result=test-results/results.xml;transform=nunit-transforms/nunit3-junit.xslt
+test-net45: build-debug-net45
+	mkdir -p test-results/net45
+	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net45/Tests.dll --result=test-results/net45/results.xml
+ifneq ($(HAS_XSLTPROC),)
+	xsltproc --noout --output test-results/net45/results.junit.xml \
+		nunit-transforms/nunit3-junit/nunit3-junit.xslt \
+		test-results/net45/results.xml
+endif
 
 # .NET Standard 1.6, Core 1.0, Core 2.0
 .PHONY: restore-dotnet
@@ -68,8 +77,9 @@ build-debug-netcore20: restore-dotnet
 	dotnet build ${PROJECT_TEST_DIR} -f netcoreapp2.0
 
 .PHONY: test-netcore20
-test-netcore20: build-debug-netcore20 test-results
-	dotnet test ${PROJECT_TEST_DIR} -f netcoreapp2.0 -r test-results
+test-netcore20: build-debug-netcore20
+	mkdir -p test-results/netcore20
+	dotnet test ${PROJECT_TEST_DIR} -f netcoreapp2.0 -r test-results/netcore20/results.xml
 
 .PHONY: coverage-netcore20
 coverage-netcore20: build-debug-netcore20
