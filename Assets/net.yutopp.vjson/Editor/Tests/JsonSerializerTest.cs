@@ -380,16 +380,24 @@ namespace VJson.UnitTests
                 @"1",
             },
             new object[] {
-                (float)3.14,
-                @"3.14",
+                (float)3.1400001,
+                @"3.1400001",
             },
             new object[] {
-                (double)3.14,
-                @"3.14",
+                (double)3.1400000000000001,
+                @"3.1400000000000001",
             },
             new object[] {
-                (decimal)3.14,
-                @"3.14",
+                (decimal)3.1400001,
+                @"3.1400001",
+            },
+            new object[] {
+                (float)1.25,
+                @"1.25",
+            },
+            new object[] {
+                (float)-1.25,
+                @"-1.25",
             },
 
             // Strings
@@ -569,7 +577,7 @@ c
             },
             new object[] {
                 3.14f,
-                "3.14",
+                "3.1400001",
             },
             new object[] {
                 "🍣",
