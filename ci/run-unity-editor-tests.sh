@@ -5,10 +5,12 @@ set -eux
 mkdir -p test-results/unity-editor
 
 function on_exit {
-    if [ -e test-results/unity-editor/results.xml ]; then
-        xsltproc --noout --output test-results/unity-editor/results.junit.xml \
-                 nunit-transforms/nunit3-junit/nunit3-junit.xslt \
-                 test-results/unity-editor/results.xml
+    if [ -v HAS_XSLTPROC ]; then
+        if [ -e test-results/unity-editor/results.xml ]; then
+            xsltproc --noout --output test-results/unity-editor/results.junit.xml \
+                     nunit-transforms/nunit3-junit/nunit3-junit.xslt \
+                     test-results/unity-editor/results.xml
+        fi
     fi
 }
 trap on_exit EXIT

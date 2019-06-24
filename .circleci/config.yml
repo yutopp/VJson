@@ -16,6 +16,8 @@ jobs:
   test_net35:
     docker:
       - image: mono:latest
+    environment:
+      - HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     working_directory: ~/workspace-net35
     steps:
       - checkout
@@ -28,6 +30,8 @@ jobs:
   test_net45:
     docker:
       - image: mono:latest
+    environment:
+      - HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     working_directory: ~/workspace-net45
     steps:
       - checkout
@@ -40,6 +44,8 @@ jobs:
   test_netcoreapp2_0:
     docker:
       - image: mcr.microsoft.com/dotnet/core/sdk:2.2.204
+    environment:
+      - HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     working_directory: ~/workspace-netcoreapp2_0
     steps:
       - checkout
@@ -66,6 +72,8 @@ jobs:
 
   test_unity2018_3:
     <<: *unity2018_3_docker_image
+    environment:
+      - HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     working_directory: ~/workspace-unity2018.3.12f1
     steps:
       - run: apt-get update && apt-get install -y git zip xsltproc && git --version

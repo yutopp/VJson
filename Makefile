@@ -42,7 +42,11 @@ build-debug-net35: restore-net35
 test-net35: build-debug-net35
 	mkdir -p test-results/net35
 	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net35/Tests.dll --result=test-results/net35/results.xml
-	xsltproc --noout --output test-results/net35/results.junit.xml nunit-transforms/nunit3-junit/nunit3-junit.xslt test-results/net35/results.xml
+ifneq ($(HAS_XSLTPROC),)
+	xsltproc --noout --output test-results/net35/results.junit.xml \
+		nunit-transforms/nunit3-junit/nunit3-junit.xslt \
+		test-results/net35/results.xml
+endif
 
 # .NET Framework 4.5
 .PHONY: restore-net45
@@ -57,7 +61,11 @@ build-debug-net45: restore-net45
 test-net45: build-debug-net45
 	mkdir -p test-results/net45
 	mono ${NUNIT_CONSOLE} ${PROJECT_TEST_DIR}/bin/Debug/net45/Tests.dll --result=test-results/net45/results.xml
-	xsltproc --noout --output test-results/net45/results.junit.xml nunit-transforms/nunit3-junit/nunit3-junit.xslt test-results/net45/results.xml
+ifneq ($(HAS_XSLTPROC),)
+	xsltproc --noout --output test-results/net45/results.junit.xml \
+		nunit-transforms/nunit3-junit/nunit3-junit.xslt \
+		test-results/net45/results.xml
+endif
 
 # .NET Standard 1.6, Core 1.0, Core 2.0
 .PHONY: restore-dotnet
