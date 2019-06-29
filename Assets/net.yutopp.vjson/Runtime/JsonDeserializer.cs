@@ -49,14 +49,17 @@ namespace VJson
 
         object DeserializeValue(INode node, Type expectedType, State state, Type tag)
         {
-            var expectedKind = Node.KindOfType(expectedType);
+            var expectedKind = Node.KindOfTypeWrapped(expectedType);
+            if (expectedKind.Wrapped) {
+                expectedType = Node.ValueTypeOfKind(expectedKind.Kind);
+            }
 
             return DeserializeValueAs(node, expectedKind, expectedType, state, tag);
         }
 
-        object DeserializeValueAs(INode node, NodeKind targetKind, Type targetType, State state, Type tag)
+        object DeserializeValueAs(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
         {
-            switch (targetKind)
+            switch (targetKind.Kind)
             {
                 case NodeKind.Boolean:
                     return DeserializeToBoolean(node, targetKind, targetType, state, tag);
@@ -78,11 +81,11 @@ namespace VJson
                     return DeserializeToNull(node, targetKind, targetType, state, tag);
 
                 default:
-                    throw new NotImplementedException("default: " + targetKind);
+                    throw new NotImplementedException("Unmatched kind: " + targetKind.Kind);
             }
         }
 
-        object DeserializeToBoolean(INode node, NodeKind targetKind, Type targetType, State state, Type tag)
+        object DeserializeToBoolean(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
         {
             if (node is NullNode)
             {
@@ -92,20 +95,24 @@ namespace VJson
                     throw new DeserializeFailureException(msg);
                 }
 
-                return null;
+                return targetKind.Wrapped
+                    ? NullNode.Null
+                    : null;
             }
 
             var bNode = node as BooleanNode;
             if (bNode != null)
             {
-                return CreateInstanceIfConstrucutable<bool>(targetType, bNode.Value, state);
+                return targetKind.Wrapped
+                    ? node
+                    : CreateInstanceIfConstrucutable<bool>(targetType, bNode.Value, state);
             }
 
             var msg0 = state.CreateNodeConversionFailureMessage(node, targetType);
             throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToNumber(INode node, NodeKind targetKind, Type targetType, State state, Type tag)
+        object DeserializeToNumber(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
         {
             if (node is NullNode)
             {
@@ -115,26 +122,32 @@ namespace VJson
                     throw new DeserializeFailureException(msg);
                 }
 
-                return null;
+                return targetKind.Wrapped
+                    ? NullNode.Null
+                    : null;
             }
 
             var iNode = node as IntegerNode;
             if (iNode != null)
             {
-                return CreateInstanceIfConstrucutable<long>(targetType, iNode.Value, state);
+                return targetKind.Wrapped
+                    ? node
+                    : CreateInstanceIfConstrucutable<long>(targetType, iNode.Value, state);
             }
 
             var fNode = node as FloatNode;
             if (fNode != null)
             {
-                return CreateInstanceIfConstrucutable<double>(targetType, fNode.Value, state);
+                return targetKind.Wrapped
+                    ? node
+                    : CreateInstanceIfConstrucutable<double>(targetType, fNode.Value, state);
             }
 
             var msg0 = state.CreateNodeConversionFailureMessage(node, targetType);
             throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToString(INode node, NodeKind targetKind, Type targetType, State state, Type tag)
+        object DeserializeToString(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
         {
             if (node is NullNode)
             {
@@ -144,20 +157,24 @@ namespace VJson
                     throw new DeserializeFailureException(msg);
                 }
 
-                return null;
+                return targetKind.Wrapped
+                    ? NullNode.Null
+                    : null;
             }
 
             var sNode = node as StringNode;
             if (sNode != null)
             {
-                return CreateInstanceIfConstrucutable<string>(targetType, sNode.Value, state);
+                return targetKind.Wrapped
+                    ? node
+                    : CreateInstanceIfConstrucutable<string>(targetType, sNode.Value, state);
             }
 
             var msg0 = state.CreateNodeConversionFailureMessage(node, targetType);
             throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToArray(INode node, NodeKind targetKind, Type targetType, State state, Type tag)
+        object DeserializeToArray(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
         {
             bool isConvertible =
                 targetType == typeof(object)
@@ -172,7 +189,9 @@ namespace VJson
 
             if (node is NullNode)
             {
-                return null;
+                return targetKind.Wrapped
+                    ? NullNode.Null
+                    : null;
             }
 
             var aNode = node as ArrayNode;
@@ -214,7 +233,11 @@ namespace VJson
                         container.Add(v);
                     }
 
-                    return container;
+                    if (targetKind.Wrapped) {
+                        return new ArrayNode(container as List<INode>);
+                    } else {
+                        return container;
+                    }
                 }
             }
 
@@ -222,9 +245,9 @@ namespace VJson
             throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToObject(INode node, NodeKind targetKind, Type targetType, State state, Type tag)
+        object DeserializeToObject(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
         {
-            if (targetKind != NodeKind.Object)
+            if (targetKind.Kind != NodeKind.Object)
             {
                 var msg = state.CreateNodeConversionFailureMessage(node, targetType);
                 throw new DeserializeFailureException(msg);
@@ -232,7 +255,9 @@ namespace VJson
 
             if (node is NullNode)
             {
-                return null;
+                return targetKind.Wrapped
+                    ? NullNode.Null
+                    : null;
             }
 
             var oNode = node as ObjectNode;
@@ -248,7 +273,9 @@ namespace VJson
                     Type containerTy = targetType;
                     if (containerTy == typeof(object))
                     {
-                        containerTy = typeof(Dictionary<string, object>);
+                        containerTy = targetKind.Wrapped
+                            ? typeof(Dictionary<string, INode>)
+                            : typeof(Dictionary<string, object>);
                     }
 
                     var keyType = TypeHelper.TypeWrap(containerTy).GetGenericArguments()[0];
@@ -283,11 +310,15 @@ namespace VJson
                     }
 
                 dictionaryDecoded:
-                    return container;
+                    if (targetKind.Wrapped) {
+                        return new ObjectNode(container as Dictionary<string, INode>);
+                    } else {
+                        return container;
+                    }
                 }
                 else
                 {
-                    // Mapping to the structure
+                    // Mapping to the structure (class | struct)
 
                     // TODO: add type check
                     var container = Activator.CreateInstance(targetType);
@@ -368,15 +399,24 @@ namespace VJson
 
             // A json node type is NOT an object but the target type is an object.
             // Thus, change a target kind and retry.
-            return DeserializeValueAs(node, node.Kind, targetType, state, tag);
+            var nodeKindWrapped = new NodeKindWrapped {
+                Kind = node.Kind,
+                Wrapped = targetKind.Wrapped,
+            };
+            if (targetKind.Wrapped) {
+                targetType = Node.ValueTypeOfKind(node.Kind);
+            }
+            return DeserializeValueAs(node, nodeKindWrapped, targetType, state, tag);
         }
 
-        object DeserializeToNull(INode node, NodeKind targetKind, Type targetType, State state, Type tag)
+        object DeserializeToNull(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
         {
             if (node is NullNode)
             {
                 // TODO: type check of targetType
-                return null;
+                return targetKind.Wrapped
+                    ? NullNode.Null
+                    : null;
             }
 
             // TODO: Should raise error?

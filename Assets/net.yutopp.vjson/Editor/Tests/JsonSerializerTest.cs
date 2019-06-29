@@ -173,6 +173,29 @@ namespace VJson.UnitTests
         }
     }
 
+    class PartialTypedObject
+    {
+        public int A;
+        public Dictionary<string, INode> Ext;
+
+        public override bool Equals(object rhsObj)
+        {
+            var rhs = rhsObj as PartialTypedObject;
+            if (rhs == null)
+            {
+                return false;
+            }
+
+            return A == rhs.A &&
+                Ext.OrderBy(p => p.Key).SequenceEqual(rhs.Ext.OrderBy(p => p.Key));
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [Json(ImplicitConstructable = true)]
     class Hoge
     {
@@ -282,7 +305,6 @@ namespace VJson.UnitTests
         public void SerializeFromStringTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-
             var actual = serializer.Serialize(obj);
 
             Assert.AreEqual(expected, actual);
@@ -293,7 +315,6 @@ namespace VJson.UnitTests
         public void SerializeWithIndentFromStringTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
-
             var actual = serializer.Serialize(obj, 4/* indent */);
 
             Assert.AreEqual(expected, actual);
@@ -318,15 +339,22 @@ namespace VJson.UnitTests
                 true,
                 @"true",
             },
-
             new object[] {
                 false,
                 @"false",
+            },
+            new object[] {
+                new BooleanNode(true),
+                @"true",
             },
 
             // Null
             new object[] {
                 (object)null,
+                @"null",
+            },
+            new object[] {
+                new NullNode(),
                 @"null",
             },
 
@@ -380,6 +408,10 @@ namespace VJson.UnitTests
                 @"1",
             },
             new object[] {
+                new IntegerNode(1),
+                @"1",
+            },
+            new object[] {
                 (float)3.1400001,
                 @"3.1400001",
             },
@@ -397,6 +429,10 @@ namespace VJson.UnitTests
             },
             new object[] {
                 (float)-1.25,
+                @"-1.25",
+            },
+            new object[] {
+                new FloatNode(-1.25f),
                 @"-1.25",
             },
 
@@ -421,6 +457,11 @@ c
                 "\"\\/\b\n\r\t",
                 "\"\\\"\\\\/\\b\\n\\r\\t\"",
             },
+            new object[] {
+                new StringNode("\"\\/\b\n\r\t"),
+                "\"\\\"\\\\/\\b\\n\\r\\t\"",
+            },
+
             // Arrays
             new object[] {
                 new object[] {1, "hoge", null},
@@ -436,6 +477,14 @@ c
             },
             new object[] {
                 new List<int> {1, 2, 3},
+                @"[1,2,3]",
+            },
+            new object[] {
+                new ArrayNode(new List<INode> {
+                        new IntegerNode(1),
+                        new IntegerNode(2),
+                        new IntegerNode(3)
+                    }),
                 @"[1,2,3]",
             },
 
@@ -486,6 +535,27 @@ c
                     Ignore1 = new List<int> {1},
                 },
                 @"{""Ignore1"":[1]}",
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(10)},
+                        {"Y", new StringNode("abab")},
+                    }),
+                @"{""X"":10,""Y"":""abab""}",
+            },
+            new object[] {
+                new PartialTypedObject {
+                    A = 10,
+                    Ext = new Dictionary<string, INode> {
+                        {"X", new ArrayNode(new List<INode> {
+                                    new IntegerNode(10)
+                                })},
+                        {"Y", new ObjectNode(new Dictionary<string, INode> {
+                                    {"A", new IntegerNode(20)},
+                                })},
+                    }
+                },
+                @"{""A"":10,""Ext"":{""X"":[10],""Y"":{""A"":20}}}",
             },
 
             // Enums

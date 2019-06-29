@@ -41,6 +41,11 @@ namespace VJson
 
         void SerializeValue<T>(JsonWriter writer, T o)
         {
+            if (o is INode) {
+                // unwrap INode
+                SerializeValue(writer, (o as INode).GenericContent);
+                return;
+            }
             var kind = Node.KindOfValue(o);
 
             switch (kind)

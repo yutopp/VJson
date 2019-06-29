@@ -25,25 +25,34 @@ namespace VJson
         Undefined,
     }
 
+    public struct NodeKindWrapped
+    {
+        public NodeKind Kind;
+        public bool Wrapped;
+    }
+
     public interface INode
     {
         NodeKind Kind { get; }
 
         INode this[int index] { get; }
         INode this[string key] { get; }
+
+        object GenericContent { get; }
     }
 
     public class BooleanNode : INode
     {
-        public NodeKind Kind
-        {
-            get { return NodeKind.Boolean; }
-        }
+        public static NodeKind KIND = NodeKind.Boolean;
+        public static Type TYPE = typeof(bool);
+
+        public NodeKind Kind { get { return KIND; } }
 
         public INode this[int index] { get { return UndefinedNode.Undef; } }
         public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public bool Value { get; private set; }
+        public object GenericContent { get { return Value; } }
 
         public BooleanNode(bool v)
         {
@@ -74,13 +83,15 @@ namespace VJson
 
     public class NullNode : INode
     {
-        public NodeKind Kind
-        {
-            get { return NodeKind.Null; }
-        }
+        public static NodeKind KIND = NodeKind.Null;
+        public static Type TYPE = typeof(object);
+
+        public NodeKind Kind { get { return KIND; } }
 
         public INode this[int index] { get { return UndefinedNode.Undef; } }
         public INode this[string key] { get { return UndefinedNode.Undef; } }
+
+        public object GenericContent { get { return null; } }
 
         public static readonly INode Null = new NullNode();
 
@@ -108,13 +119,15 @@ namespace VJson
 
     public class UndefinedNode : INode
     {
-        public NodeKind Kind
-        {
-            get { return NodeKind.Undefined; }
-        }
+        public static NodeKind KIND = NodeKind.Undefined;
+        public static Type TYPE = typeof(object);
+
+        public NodeKind Kind { get { return KIND; } }
 
         public INode this[int index] { get { return Undef; } }
         public INode this[string key] { get { return Undef; } }
+
+        public object GenericContent { get { return null; } }
 
         public static readonly INode Undef = new UndefinedNode();
 
@@ -142,15 +155,16 @@ namespace VJson
 
     public class IntegerNode : INode
     {
-        public NodeKind Kind
-        {
-            get { return NodeKind.Integer; }
-        }
+        public static NodeKind KIND = NodeKind.Integer;
+        public static Type TYPE = typeof(long);
+
+        public NodeKind Kind { get { return KIND; } }
 
         public INode this[int index] { get { return UndefinedNode.Undef; } }
         public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public long Value { get; private set; }
+        public object GenericContent { get { return Value; } }
 
         public IntegerNode(long v)
         {
@@ -181,15 +195,16 @@ namespace VJson
 
     public class FloatNode : INode
     {
-        public NodeKind Kind
-        {
-            get { return NodeKind.Float; }
-        }
+        public static NodeKind KIND = NodeKind.Float;
+        public static Type TYPE = typeof(double);
+
+        public NodeKind Kind { get { return KIND; } }
 
         public INode this[int index] { get { return UndefinedNode.Undef; } }
         public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public double Value { get; private set; }
+        public object GenericContent { get { return Value; } }
 
         public FloatNode(double v)
         {
@@ -220,15 +235,16 @@ namespace VJson
 
     public class StringNode : INode
     {
-        public NodeKind Kind
-        {
-            get { return NodeKind.String; }
-        }
+        public static NodeKind KIND = NodeKind.String;
+        public static Type TYPE = typeof(string);
+
+        public NodeKind Kind { get { return KIND; } }
 
         public INode this[int index] { get { return UndefinedNode.Undef; } }
         public INode this[string key] { get { return UndefinedNode.Undef; } }
 
         public string Value { get; private set; }
+        public object GenericContent { get { return Value; } }
 
         public StringNode(string v)
         {
@@ -259,12 +275,12 @@ namespace VJson
 
     public class ObjectNode : INode, IEnumerable<KeyValuePair<string, INode>>
     {
-        public Dictionary<string, INode> Elems;
+        public static NodeKind KIND = NodeKind.Object;
+        public static Type TYPE = typeof(Dictionary<string, INode>);
 
-        public NodeKind Kind
-        {
-            get { return NodeKind.Object; }
-        }
+        public NodeKind Kind { get { return KIND; } }
+
+        public Dictionary<string, INode> Elems;
 
         public INode this[int index] { get { return UndefinedNode.Undef; } }
         public INode this[string key]
@@ -279,6 +295,17 @@ namespace VJson
 
                 return n != null ? n : UndefinedNode.Undef;
             }
+        }
+
+        public object GenericContent { get { return Elems != null ? Elems : new Dictionary<string, INode>(); } }
+
+        public ObjectNode()
+        {
+        }
+
+        public ObjectNode(Dictionary<string, INode> v)
+        {
+            Elems = v;
         }
 
         public void AddElement(string key, INode elem)
@@ -355,12 +382,12 @@ namespace VJson
 
     public class ArrayNode : INode, IEnumerable<INode>
     {
-        public List<INode> Elems;
+        public static NodeKind KIND = NodeKind.Array;
+        public static Type TYPE = typeof(List<INode>);
 
-        public NodeKind Kind
-        {
-            get { return NodeKind.Array; }
-        }
+        public NodeKind Kind { get { return KIND; } }
+
+        public List<INode> Elems;
 
         public INode this[int index]
         {
@@ -371,6 +398,17 @@ namespace VJson
             }
         }
         public INode this[string key] { get { return UndefinedNode.Undef; } }
+
+        public object GenericContent { get { return Elems != null ? Elems : new List<INode>(); } }
+
+        public ArrayNode()
+        {
+        }
+
+        public ArrayNode(List<INode> v)
+        {
+            Elems = v;
+        }
 
         public void AddElement(INode elem)
         {
@@ -461,6 +499,22 @@ namespace VJson
             return KindOfType(ty);
         }
 
+        public static NodeKindWrapped KindOfTypeWrapped(Type ty)
+        {
+            if (TypeHelper.TypeWrap(typeof(INode)).IsAssignableFrom(ty))
+            {
+                return new NodeKindWrapped {
+                    Kind = _nodeKindTable[ty],
+                    Wrapped = true,
+                };
+            }
+
+            return new NodeKindWrapped {
+                Kind = KindOfType(ty),
+                Wrapped = false,
+            };
+        }
+
         public static NodeKind KindOfType(Type ty)
         {
             // Unwrap all Nullable<T>s
@@ -498,6 +552,11 @@ namespace VJson
             return NodeKind.Object;
         }
 
+        public static Type ValueTypeOfKind(NodeKind kind)
+        {
+            return _nodeTypeTable[kind];
+        }
+
         static Dictionary<Type, NodeKind> _primitiveTable = new Dictionary<Type, NodeKind>
         {
             {typeof(bool), NodeKind.Boolean},
@@ -514,6 +573,32 @@ namespace VJson
             {typeof(short), NodeKind.Integer},
             {typeof(ushort), NodeKind.Integer},
             {typeof(string), NodeKind.String},
+        };
+
+        static Dictionary<Type, NodeKind> _nodeKindTable = new Dictionary<Type, NodeKind>
+        {
+            {typeof(INode), ObjectNode.KIND}, // Can become any object
+
+            {typeof(BooleanNode), BooleanNode.KIND},
+            {typeof(NullNode), NullNode.KIND},
+            {typeof(UndefinedNode), UndefinedNode.KIND},
+            {typeof(IntegerNode), IntegerNode.KIND},
+            {typeof(FloatNode), FloatNode.KIND},
+            {typeof(StringNode), StringNode.KIND},
+            {typeof(ObjectNode), ObjectNode.KIND},
+            {typeof(ArrayNode), ArrayNode.KIND},
+        };
+
+        static Dictionary<NodeKind, Type> _nodeTypeTable = new Dictionary<NodeKind, Type>
+        {
+            {BooleanNode.KIND, BooleanNode.TYPE},
+            {NullNode.KIND, NullNode.TYPE},
+            {UndefinedNode.KIND, UndefinedNode.TYPE},
+            {IntegerNode.KIND, IntegerNode.TYPE},
+            {FloatNode.KIND, FloatNode.TYPE},
+            {StringNode.KIND, StringNode.TYPE},
+            {ObjectNode.KIND, ObjectNode.TYPE},
+            {ArrayNode.KIND, ArrayNode.TYPE},
         };
     }
 }
