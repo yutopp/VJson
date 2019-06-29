@@ -39,6 +39,23 @@ namespace VJson
             }
         }
 
+        public INode SerializeToNode<T>(T o)
+        {
+            // TODO: fix performance...
+            byte[] buffer = null;
+            using (var s = new MemoryStream())
+            {
+                Serialize<T>(s, o, 0);
+                buffer = s.ToArray();
+            }
+
+            using (var s = new MemoryStream(buffer))
+            {
+                var d = new JsonDeserializer(typeof(INode));
+                return d.Deserialize(s) as INode;
+            }
+        }
+
         void SerializeValue<T>(JsonWriter writer, T o)
         {
             if (o is INode) {

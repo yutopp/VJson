@@ -332,7 +332,7 @@ namespace VJson
         {
             if (Elems != null)
             {
-                return Elems.GetEnumerator();
+                return Elems.OrderBy(p => p.Key).GetEnumerator();
             }
 
             return Enumerable.Empty<KeyValuePair<string, INode>>().GetEnumerator();
@@ -376,7 +376,7 @@ namespace VJson
                 return "OBJECT: {}";
             }
 
-            return "OBJECT: " + String.Join("; ", Elems.Select(p => p.Key + " = " + p.Value).ToArray());
+            return "OBJECT: " + String.Join("; ", Elems.OrderBy(p => p.Key).Select(p => p.Key + " = " + p.Value).ToArray());
         }
     }
 

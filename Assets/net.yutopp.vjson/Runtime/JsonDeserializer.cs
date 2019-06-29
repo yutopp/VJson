@@ -38,11 +38,11 @@ namespace VJson
             using (var r = new JsonReader(s))
             {
                 var node = r.Read();
-                return Deserialize(node);
+                return DeserializeFromNode(node);
             }
         }
 
-        public object Deserialize(INode node)
+        public object DeserializeFromNode(INode node)
         {
             return DeserializeValue(node, _expectedInitialType, new State(), null);
         }

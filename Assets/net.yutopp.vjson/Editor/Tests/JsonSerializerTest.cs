@@ -59,6 +59,11 @@ namespace VJson.UnitTests
         {
             throw new NotImplementedException();
         }
+
+        public override string ToString()
+        {
+            return string.Format("{{D = {0}, base = {1}}}", D, base.ToString());
+        }
     }
 
     class CustomObject
@@ -1023,6 +1028,214 @@ c
                 typeof(HasDynamicResolverFailWithKeyTypeChecks),
                 "{\"Dict\":{}}",
                 "(root)[\"Dict\"]: A key of the dictionary which has DynamicResolver must be a string type: KeyType = System.Int32.",
+            },
+        };
+    }
+
+    class JsonBetweenNodesTests
+    {
+        [Test]
+        [TestCaseSource("CommonArgs")]
+        public void SerializeToNodeTest(INode expected, object obj)
+        {
+            var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
+            var actual = serializer.SerializeToNode(obj);
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [Test]
+        [TestCaseSource("CommonArgs")]
+        public void DeserializeFromNodeTest(INode node, object expected)
+        {
+            var deserializer = new VJson.JsonDeserializer(expected != null ? expected.GetType() : typeof(object));
+            var actual = deserializer.DeserializeFromNode(node);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        //
+        static object[] CommonArgs = {
+            // Boolean
+            new object[] {
+                new BooleanNode(true),
+                true,
+            },
+
+            // Null
+            new object[] {
+                new NullNode(),
+                null,
+            },
+
+            // Numbers
+            new object[] {
+                new IntegerNode(1),
+                1,
+            },
+            new object[] {
+                new FloatNode(-1.25f),
+                -1.25,
+            },
+
+            // Strings
+            new object[] {
+                new StringNode("abc"),
+                "abc",
+            },
+
+            // Arrays
+            new object[] {
+                new ArrayNode(new List<INode> {
+                        new IntegerNode(1),
+                        new IntegerNode(2),
+                        new IntegerNode(3)
+                    }),
+                new List<int> { 1, 2, 3 },
+            },
+
+            // Objects
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(10)},
+                        {"Y", new StringNode("abab")},
+                    }),
+                new SomeObject {
+                    X = 10,
+                    Y = "abab",
+                },
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(10)},
+                        {"Y", new StringNode("abab")},
+                        {"D", new BooleanNode(true)},
+                    }),
+                new DerivedSomeObject {
+                    X = 10,
+                    Y = "abab",
+                    D = true,
+                },
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(20)},
+                        {"Y", new StringNode("cdcd")},
+                        {"D", new BooleanNode(false)},
+                    }),
+                (SomeObject)(new DerivedSomeObject {
+                        X = 20,
+                        Y = "cdcd",
+                        D = false,
+                    }),
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"renamed", new IntegerNode(42)},
+                    }),
+                new RenamedObject {
+                    Actual = 42,
+                },
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                    }),
+                new IgnorableObject {
+                    Ignore0 = 0,
+                },
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"Ignore0", new IntegerNode(1)},
+                    }),
+                new IgnorableObject {
+                    Ignore0 = 1,
+                },
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"Ignore1", new ArrayNode(new List<INode> {
+                                    new IntegerNode(1),
+                                })
+                        },
+                    }),
+                new IgnorableObject {
+                    Ignore1 = new List<int> {1},
+                },
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"A", new IntegerNode(10)},
+                        {"Ext", new ObjectNode(new Dictionary<string, INode> {
+                                    {"X", new ArrayNode(new List<INode> {
+                                                new IntegerNode(10)
+                                            })},
+                                    {"Y", new ObjectNode(new Dictionary<string, INode> {
+                                                {"A", new IntegerNode(20)},
+                                            })},
+                                })},
+                    }),
+                new PartialTypedObject {
+                    A = 10,
+                    Ext = new Dictionary<string, INode> {
+                        {"X", new ArrayNode(new List<INode> {
+                                    new IntegerNode(10)
+                                })},
+                        {"Y", new ObjectNode(new Dictionary<string, INode> {
+                                    {"A", new IntegerNode(20)},
+                                })},
+                    }
+                },
+            },
+
+            // Enums
+            new object[] {
+                new IntegerNode(0),
+                EnumAsInt.A,
+            },
+            new object[] {
+                new IntegerNode(1),
+                EnumAsInt.B,
+            },
+            new object[] {
+                new IntegerNode(100),
+                EnumAsInt.C,
+            },
+            new object[] {
+                new StringNode("NameA"),
+                EnumAsString.NameA,
+            },
+            new object[] {
+                new StringNode("NameB"),
+                EnumAsString.NameB,
+            },
+            new object[] {
+                new StringNode("OtherName"),
+                EnumAsString.NameC,
+            },
+
+            // Nullable
+            new object[] {
+                new NullNode(),
+                (Nullable<int>)(null),
+            },
+            new object[] {
+                new IntegerNode(1),
+                new Nullable<int>(1),
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new NullNode()},
+                    }),
+                new HasNullable(),
+            },
+            new object[] {
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(10)},
+                    }),
+                new HasNullable {
+                    X = 10,
+                },
             },
         };
     }
