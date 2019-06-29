@@ -39,6 +39,32 @@ namespace VJson.Schema.UnitTests
             Assert.AreEqual(expectedMsg, ex != null ? ex.Message : null, message);
         }
 
+        [Test]
+        [TestCaseSource("NotRequiredObjectINodeArgs")]
+        [TestCaseSource("NotRequiredObjectWithIgnorableINodeArgs")]
+//        [TestCaseSource("HasDictionaryINodeArgs")]
+//        [TestCaseSource("HasEnumerableArgs")]
+//        [TestCaseSource("HasRequiredItemsArgs")]
+//        [TestCaseSource("HasRequiredStringArgs")]
+//        [TestCaseSource("HasRequiredButIgnorableStringArgs")]
+//        [TestCaseSource("HasDepsArgs")]
+//        [TestCaseSource("HasNestedArgs")]
+//        [TestCaseSource("DerivingArgs")]
+//        [TestCaseSource("HasNullableArgs")]
+//        [TestCaseSource("HasEnumArgs")]
+//        [TestCaseSource("HasDynamicResolverArgs")]
+//        [TestCaseSource("HasCustomTagArgs")]
+        public void ValidationForINodeTest(Type ty, INode node, string expectedMsg, string _expectedContent)
+        {
+            var schema = JsonSchemaAttribute.CreateFromType(ty);
+
+            var ex = schema.Validate(node);
+
+            var message =
+                String.Format("{0} : {1}", new JsonSerializer(ty).Serialize(node), schema.ToString());
+            Assert.AreEqual(expectedMsg, ex != null ? ex.Message : null, message);
+        }
+
         // TODO: Move to elsewhere
         [Test]
         [TestCaseSource("NotRequiredObjectArgs")]
@@ -110,6 +136,25 @@ namespace VJson.Schema.UnitTests
             },
         };
 
+        public static object[] NotRequiredObjectINodeArgs = new object[] {
+            new object[] {
+                typeof(NotRequiredObject),
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(0)},
+                    }),
+                "Object.Property.Number.(root)[\"X\"]: Minimum assertion !(0 >= 1).",
+                null,
+            },
+            new object[] {
+                typeof(NotRequiredObject),
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(1)},
+                    }),
+                null,
+                "{\"X\":1}",
+            },
+        };
+
         public class NotRequiredObjectWithIgnorable
         {
             [JsonSchema(Minimum = 1)]
@@ -130,6 +175,34 @@ namespace VJson.Schema.UnitTests
             },
             new object[] {
                 new NotRequiredObjectWithIgnorable {X = 1},
+                null,
+                "{\"X\":1}",
+            },
+        };
+
+        public static object[] NotRequiredObjectWithIgnorableINodeArgs = new object[] {
+            new object[] {
+                typeof(NotRequiredObjectWithIgnorable),
+                new ObjectNode(new Dictionary<string, INode> {
+                        // Ignorable is not a schema attribute, thus constraints are not applied to the INode...
+                        // {"X", new IntegerNode(-1)},
+                    }),
+                null,
+                "{}",
+            },
+            new object[] {
+                typeof(NotRequiredObjectWithIgnorable),
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(0)},
+                    }),
+                "Object.Property.Number.(root)[\"X\"]: Minimum assertion !(0 >= 1).",
+                null,
+            },
+            new object[] {
+                typeof(NotRequiredObjectWithIgnorable),
+                new ObjectNode(new Dictionary<string, INode> {
+                        {"X", new IntegerNode(1)},
+                    }),
                 null,
                 "{\"X\":1}",
             },

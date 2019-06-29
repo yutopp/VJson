@@ -48,6 +48,10 @@ namespace VJson.Schema
 
             ConstraintsViolationException ex = null;
 
+            if (o is INode) {
+                // unwrap INode
+                return Validate((o as INode).GenericContent, state, reg);
+            }
             var kind = Node.KindOfValue(o);
 
             if (_schema.Type != null)
