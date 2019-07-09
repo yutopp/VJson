@@ -170,7 +170,7 @@ namespace VJson
             }
             else
             {
-                var fields = TypeWrap(ty).GetFields();
+                var fields = TypeWrap(ty).GetFields(BindingFlags.Public | BindingFlags.Instance);
                 foreach (var field in fields)
                 {
                     var fieldAttr = GetCustomAttribute<JsonFieldAttribute>(field);

@@ -252,6 +252,28 @@ namespace VJson.UnitTests
         }
     }
 
+    public class HasStatic
+    {
+        public int I;
+        public static int S = 301; // Will not be exported
+
+        public override bool Equals(object rhsObj)
+        {
+            var rhs = rhsObj as HasStatic;
+            if (rhs == null)
+            {
+                return false;
+            }
+
+            return Object.Equals(I, rhs.I);
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class HasDynamicResolver
     {
         [JsonField(DynamicResolverTag = typeof(Resolver)), JsonFieldIgnorable]
@@ -607,6 +629,12 @@ c
                     X = 10,
                 },
                 "{\"X\":10}"
+            },
+            new object[] {
+                new HasStatic {
+                    I = 10,
+                },
+                "{\"I\":10}"
             },
 
             // Dynamic resolver
