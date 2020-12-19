@@ -2,7 +2,8 @@ PROJECT_NAME:=VJson
 PROJECT_VERSION:=0.8.0
 
 PACKAGE_NAME:=net.yutopp.vjson
-PACKAGE_JSON_PATH:=Assets/${PACKAGE_NAME}/package.json
+PACKAGE_DIR:=Packages/${PACKAGE_NAME}
+PACKAGE_JSON_PATH:=${PACKAGE_DIR}/package.json
 
 PROJECT_DIR:=StandaloneProject
 PROJECT_TEST_DIR:=${PROJECT_DIR}/Tests
@@ -24,9 +25,9 @@ setup-net: setup
 	nuget install NUnit.Console -ExcludeVersion -OutputDirectory .nuget
 
 .PHONY: pre-generated-files
-pre-generated-files: Assets/${PACKAGE_NAME}/Runtime/TypeHelper.g.cs
+pre-generated-files: ${PACKAGE_DIR}/Runtime/TypeHelper.g.cs
 
-Assets/${PACKAGE_NAME}/Runtime/TypeHelper.g.cs: PreProcess/generator.py PreProcess/TypeHelper.g.template.cs
+${PACKAGE_DIR}/Runtime/TypeHelper.g.cs: PreProcess/generator.py PreProcess/TypeHelper.g.template.cs
 	python3 PreProcess/generator.py PreProcess/TypeHelper.g.template.cs > $@
 
 # .NET Framework 3.5

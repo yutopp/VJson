@@ -13,11 +13,11 @@
     <PackageTags>csharp;json;json-schema;serialization;unity</PackageTags>
 
     <Description>A JSON serializer/deserializer library written in pure C#.</Description>
-    <Copyright>Copyright 2019</Copyright>
+    <Copyright>Copyright 2019 -</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="../../Assets/net.yutopp.vjson/Runtime/**/*.cs" />
+    <Compile Include="../../Packages/net.yutopp.vjson/Runtime/**/*.cs" />
   </ItemGroup>
 
   <PropertyGroup>
