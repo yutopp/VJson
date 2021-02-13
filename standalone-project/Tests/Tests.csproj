@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0;net45;net35</TargetFrameworks>
+    <LangVersion>4</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.1" />
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../VJson/VJson.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DefineConstants>VJSON_FULL_TESTS</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../Packages/net.yutopp.vjson/Tests/Runtime/**/*.cs" />
+  </ItemGroup>
+
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <MyBinFolder Include="../../JSON-Schema-Test-Suite/**/*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(MyBinFolder)" DestinationFiles="$(OutDir)/JSON-Schema-Test-Suite/%(RecursiveDir)%(Filename)%(Extension)" />
+  </Target>
+</Project>

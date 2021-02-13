@@ -5,8 +5,10 @@ PACKAGE_NAME:=net.yutopp.vjson
 PACKAGE_DIR:=Packages/${PACKAGE_NAME}
 PACKAGE_JSON_PATH:=${PACKAGE_DIR}/package.json
 
-PROJECT_DIR:=StandaloneProject
+PROJECT_DIR:=standalone-project
 PROJECT_TEST_DIR:=${PROJECT_DIR}/Tests
+
+PRE_PROCESS_DIR:=pre-process
 
 NUNIT_CONSOLE:=.nuget/NUnit.ConsoleRunner/tools/nunit3-console.exe
 
@@ -27,8 +29,8 @@ setup-net: setup
 .PHONY: pre-generated-files
 pre-generated-files: ${PACKAGE_DIR}/Runtime/TypeHelper.g.cs
 
-${PACKAGE_DIR}/Runtime/TypeHelper.g.cs: PreProcess/generator.py PreProcess/TypeHelper.g.template.cs
-	python3 PreProcess/generator.py PreProcess/TypeHelper.g.template.cs > $@
+${PACKAGE_DIR}/Runtime/TypeHelper.g.cs: ${PRE_PROCESS_DIR}/generator.py ${PRE_PROCESS_DIR}/TypeHelper.g.template.cs
+	python3 ${PRE_PROCESS_DIR}/generator.py ${PRE_PROCESS_DIR}/TypeHelper.g.template.cs > $@
 
 # .NET Framework 3.5
 .PHONY: restore-net35
