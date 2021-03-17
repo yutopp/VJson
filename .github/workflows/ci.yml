@@ -39,7 +39,7 @@ jobs:
 
   test_netcoreapp2_0:
     runs-on: ubuntu-20.04
-    container: mcr.microsoft.com/dotnet/sdk:2.1
+    container: mcr.microsoft.com/dotnet/sdk:2.1-focal
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
@@ -55,7 +55,7 @@ jobs:
   coverage:
     needs: [test_netcoreapp2_0]
     runs-on: ubuntu-20.04
-    container: mcr.microsoft.com/dotnet/sdk:2.1
+    container: mcr.microsoft.com/dotnet/sdk:2.1-focal
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
