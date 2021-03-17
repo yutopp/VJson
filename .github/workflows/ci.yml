@@ -12,6 +12,9 @@ jobs:
     container: mono:latest
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
+    defaults:
+      run:
+        working-directory: ~/workspace-net35
     steps:
       - uses: actions/checkout@v2
 
