@@ -13,10 +13,10 @@ jobs:
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
-      - uses: actions/checkout@v2
-
       - name: setup env
         run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
+
+      - uses: actions/checkout@v2
 
       - run: git --version
 
