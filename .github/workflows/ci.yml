@@ -74,5 +74,5 @@ jobs:
 
       - run: mkdir coverage
       - run: make coverage-netcore20
-
+        
       - run: ./codecov -f coverage/lcov.info
