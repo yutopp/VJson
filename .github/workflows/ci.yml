@@ -39,7 +39,7 @@ jobs:
 
   test_netcoreapp2_0:
     runs-on: ubuntu-20.04
-    container: mcr.microsoft.com/dotnet/sdk:5.0
+    container: mcr.microsoft.com/dotnet/sdk:2.1
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
@@ -48,14 +48,14 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - run: make setup-net
+      - run: make setup
 
       - run: make test-netcore20
 
   coverage:
     needs: [test_netcoreapp2_0]
     runs-on: ubuntu-20.04
-    container: mcr.microsoft.com/dotnet/sdk:5.0
+    container: mcr.microsoft.com/dotnet/sdk:2.1
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
@@ -68,12 +68,11 @@ jobs:
           curl -s https://codecov.io/bash > codecov
           chmod +x codecov
 
-      - run: mkdir coverage
-
       - run: dotnet add standalone-project/Tests/Tests.csproj package coverlet.msbuild
 
       - run: make setup
 
+      - run: mkdir coverage
       - run: make coverage-netcore20
 
       - run: ./codecov -f coverage/lcov.info
