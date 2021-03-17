@@ -19,6 +19,11 @@ jobs:
         run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
 
       - run: git --version
-      - run: make setup-net
+
+      - run: pwd
+
+      - run: ls -la
+
+      # - run: make setup-net
 
       #- run: make test-net35
