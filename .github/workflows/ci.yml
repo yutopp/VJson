@@ -12,15 +12,13 @@ jobs:
     container: mono:latest
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
-    defaults:
-      run:
-        working-directory: ~/workspace-net35
     steps:
       - uses: actions/checkout@v2
 
       - name: setup env
         run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
 
-      - run: make setup-net
+      - run: git --version
+      #- run: make setup-net
 
-      - run: make test-net35
+      #- run: make test-net35
