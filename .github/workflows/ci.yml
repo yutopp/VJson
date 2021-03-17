@@ -21,3 +21,59 @@ jobs:
       - run: make setup-net
 
       - run: make test-net35
+
+  test_net45:
+    runs-on: ubuntu-20.04
+    container: mono:latest
+    env:
+      HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
+    steps:
+      - name: setup env
+        run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
+
+      - uses: actions/checkout@v2
+
+      - run: make setup-net
+
+      - run: make test-net45
+
+  test_netcoreapp2_0:
+    runs-on: ubuntu-20.04
+    container: mcr.microsoft.com/dotnet/core/sdk:2.2.204
+    env:
+      HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
+    steps:
+      - name: setup env
+        run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
+
+      - uses: actions/checkout@v2
+
+      - run: make setup-net
+
+      - run: make test-netcore20
+
+  coverage:
+    needs: [test_netcoreapp2_0]
+    runs-on: ubuntu-20.04
+    container: mcr.microsoft.com/dotnet/core/sdk:2.2.204
+    env:
+      HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
+    steps:
+      - name: setup env
+        run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
+
+      - uses: actions/checkout@v2
+
+      - run: |
+          curl -s https://codecov.io/bash > codecov
+          chmod +x codecov
+
+      - run: mkdir coverage
+
+      - run: dotnet add standalone-project/Tests/Tests.csproj package coverlet.msbuild
+
+      - run: make setup
+
+      - run: make coverage-netcore20
+
+      - run: ./codecov -f coverage/lcov.info
