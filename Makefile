@@ -86,8 +86,8 @@ test-netcore20: build-debug-netcore20
 
 .PHONY: coverage-netcore20
 coverage-netcore20: build-debug-netcore20
-	dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput='./lcov.info' ${PROJECT_TEST_DIR} -f netcoreapp2.0
-	cp ${PROJECT_TEST_DIR}/lcov.info coverage/.
+	dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov ${PROJECT_TEST_DIR} -f netcoreapp2.0
+	cp ${PROJECT_TEST_DIR}/coverage.netcoreapp2.0.info coverage/lcov.info
 
 .PHONY: benchmark-netcore20
 benchmark-netcore20:
