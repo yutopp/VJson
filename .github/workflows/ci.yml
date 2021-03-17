@@ -1,0 +1,23 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test_net35:
+    runs-on: ubuntu-20.04
+    container: mono:latest
+    env:
+      HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: setup env
+        run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
+
+      - run: make setup-net
+
+      - run: make test-net35
