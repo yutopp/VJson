@@ -72,5 +72,31 @@ jobs:
 
       - run: mkdir coverage
       - run: make coverage-netcore20
-        
+
       - run: ./codecov -f coverage/lcov.info
+
+  test_unity2018_3:
+    needs: [test_net35, test_net45, test_netcoreapp2_0]
+    runs-on: ubuntu-20.04
+    container: unityci/editor:ubuntu-2018.3.12f1-base-0.11.0
+    env:
+      HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
+    steps:
+      - name: setup env
+        run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
+
+      - name: setup unity license
+        run: |
+          mkdir -p ~/.cache/unity3d
+          mkdir -p ~/.local/share/unity3d/Unity/
+          echo "$UNITY_ULF" | base64 -d > ~/.local/share/unity3d/Unity/Unity_lic.ulf
+        env:
+          UNITY_ULF: ${{ secrets.UNITY_2018_3_ULF }}
+
+      - uses: actions/checkout@v2
+
+      - run: which unity-editor
+
+      - run: make setup
+
+      - run: ./ci/run-unity-editor-tests.sh
