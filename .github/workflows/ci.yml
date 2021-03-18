@@ -13,10 +13,12 @@ jobs:
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: setup env
         run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
-
-      - uses: actions/checkout@v2
 
       - run: make setup-net
 
@@ -28,10 +30,12 @@ jobs:
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: setup env
         run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
-
-      - uses: actions/checkout@v2
 
       - run: make setup-net
 
@@ -43,12 +47,12 @@ jobs:
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: setup env
         run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
-
-      - uses: actions/checkout@v2
-
-      - run: make setup
 
       - run: make test-netcore20
 
@@ -59,16 +63,16 @@ jobs:
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: setup env
         run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
-
-      - uses: actions/checkout@v2
 
       - run: |
           curl -s https://codecov.io/bash > codecov
           chmod +x codecov
-
-      - run: make setup
 
       - run: mkdir coverage
       - run: make coverage-netcore20
@@ -76,12 +80,16 @@ jobs:
       - run: ./codecov -f coverage/lcov.info
 
   test_unity2018_3:
-    needs: [test_net35, test_net45, test_netcoreapp2_0]
+    # needs: [test_net35, test_net45, test_netcoreapp2_0]
     runs-on: ubuntu-20.04
     container: unityci/editor:ubuntu-2018.3.12f1-base-0.11.0
     env:
       HAS_XSLTPROC: 1 # To export JUnit formatted Test Summary
     steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: setup env
         run: apt-get update -yy && apt-get install -yy make git python3 xsltproc
 
@@ -92,11 +100,5 @@ jobs:
           echo "$UNITY_ULF" | base64 -d > ~/.local/share/unity3d/Unity/Unity_lic.ulf
         env:
           UNITY_ULF: ${{ secrets.UNITY_2018_3_ULF }}
-
-      - uses: actions/checkout@v2
-
-      - run: which unity-editor
-
-      - run: make setup
 
       - run: ./ci/run-unity-editor-tests.sh
