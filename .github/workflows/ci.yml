@@ -79,9 +79,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - unity_version: 2018.3.12f1
-            docker_container: unityci/editor:ubuntu-2018.3.12f1-base-0.11.0
-            ulf_secrets_key: UNITY_2018_3_ULF
+          - unity_version: 2019.4.22f1
+            docker_container: unityci/editor:ubuntu-2019.4.22f1-base-0.11.0
+            ulf_secrets_key: UNITY_2019_4_ULF
 
     runs-on: ubuntu-20.04
     container: ${{ matrix.docker_container }}
@@ -90,10 +90,9 @@ jobs:
     steps:
       - name: setup env
         run: |
-          apt install -yy --no-install-recommends software-properties-common
+          apt update -yy && apt install -yy --no-install-recommends software-properties-common
           add-apt-repository -yy ppa:git-core/ppa
-          apt update -yy
-          apt install -yy --no-install-recommends make git python3 xsltproc
+          apt update -yy && apt install -yy --no-install-recommends make git python3 xsltproc
         env:
           DEBIAN_FRONTEND: noninteractive
 
