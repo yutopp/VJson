@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "com.cysharp.runtimeunittesttoolkit": {
-      "version": "https://github.com/Cysharp/RuntimeUnitTestToolkit.git?path=RuntimeUnitTestToolkit/Assets/RuntimeUnitTestToolkit",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "464aebb22eb4eb692e63a49b5453405451c9a94d"
-    },
     "com.unity.ext.nunit": {
       "version": "1.0.6",
       "depth": 1,
