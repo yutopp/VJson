@@ -1,0 +1,27 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish_to_npm:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+
+      - name: publish to npm
+        working-directory: ./Packages/net.yutopp.vjson
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          REF: ${{ github.ref }}
+        run: |
+          cp ../../README.md README.md
+          cp ../../LICENSE_1_0.txt LICENSE.txt
+          npm version "$REF"
+          npm publish --access public --dry-run
