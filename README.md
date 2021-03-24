@@ -23,6 +23,36 @@ dotnet add package VJson
 
 ### For Unity projects
 
+#### stable
+
+Add scoped registry information shown below to your `Packages/manifest.json` if not exists.
+
+```json
+{
+  "scopedRegistries": [
+    {
+      "name": "yutopp.net",
+      "url": "https://registry.npmjs.com",
+      "scopes": [
+        "net.yutopp"
+      ]
+    }
+  ]
+}
+```
+
+#### nightly
+
+Add a url for VJson git repository to your `Packages/manifest.json` like below.
+
+```json
+{
+  "dependencies": {
+    "net.yutopp.vjson": "https://github.com/yutopp/VJson.git?path=Packages/net.yutopp.vjson"
+  }
+}
+```
+
 (TODO: Provide unity packages)
 
 ## Usage example
@@ -93,6 +123,8 @@ var v = serializer.Deserialize("{\"X\":10,\"Y\":\"abab\"}");
 ```
 
 #### Attributes
+
+...
 
 ### JSON Schema and validation
 
