@@ -9,7 +9,7 @@
 [![license](https://img.shields.io/github/license/yutopp/VJson.svg)](https://github.com/yutopp/VJson/blob/master/LICENSE_1_0.txt)
 
 `VJson` is a JSON serializer/deserializer (with JsonSchema support) library written in pure C#. Supported versions are `.NET Framework 3.5` and `.NET Standard 1.6` or higher.  
-This library is developed as a purely C# project, however it also supports that be build with `Unity 2018.3.12f1` or higher.
+This library is developed as a purely C# project, however it also supports that be build with `Unity 2019.4.22f1` or higher.
 
 ## Installation
 
