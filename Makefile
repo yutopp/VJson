@@ -1,5 +1,4 @@
 PROJECT_NAME:=VJson
-PROJECT_VERSION:=0.8.0
 
 PACKAGE_NAME:=net.yutopp.vjson
 PACKAGE_DIR:=Packages/${PACKAGE_NAME}
@@ -86,19 +85,18 @@ test-netcore20: build-debug-netcore20
 
 .PHONY: coverage-netcore20
 coverage-netcore20: build-debug-netcore20
-	dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput='./lcov.info' ${PROJECT_TEST_DIR} -f netcoreapp2.0
-	cp ${PROJECT_TEST_DIR}/lcov.info coverage/.
+	dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov ${PROJECT_TEST_DIR} -f netcoreapp2.0
+	cp ${PROJECT_TEST_DIR}/coverage.netcoreapp2.0.info coverage/lcov.info
 
 .PHONY: benchmark-netcore20
 benchmark-netcore20:
 	dotnet run -p ${PROJECT_DIR}/Benchmarks -c Release -f netcoreapp2.0 -- --job short --runtimes core
 
 #
-.PHONY: publish
-publish:
-	dotnet pack ${PROJECT_DIR}/${PROJECT_NAME} -c Release -p:PackageVersion=${PROJECT_VERSION}
-	# export NuGetKey="~~"
-	cd ${PROJECT_DIR}/${PROJECT_NAME}/bin/Release/ && \
-		dotnet nuget push \
-			-k $(NuGetKey) ${PROJECT_NAME}.${PROJECT_VERSION}.nupkg \
-			-s https://api.nuget.org/v3/index.json
+.PHONY: publish-to-nuget
+publish-to-nuget:
+	dotnet pack ${PROJECT_DIR}/${PROJECT_NAME} -c Release -p:PackageVersion=$(PROJECT_VERSION)
+	cd $(PROJECT_DIR)/$(PROJECT_NAME)/bin/Release/ && \
+		dotnet nuget push $(PROJECT_NAME).$(PROJECT_VERSION).nupkg \
+			--api-key $(NUGET_KEY) \
+			--source https://api.nuget.org/v3/index.json

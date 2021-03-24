@@ -1,10 +1,9 @@
 {
     "name": "Unity.net.yutopp.vjson.Tests",
     "references": [
-        "Unity.net.yutopp.vjson"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "Unity.net.yutopp.vjson",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -16,5 +15,7 @@
     "autoReferenced": false,
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
-    ]
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

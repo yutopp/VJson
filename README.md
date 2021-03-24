@@ -3,13 +3,13 @@
 > A JSON serializer/deserializer (with JsonSchema support) library written in pure C#.
 
 [![CircleCI](https://circleci.com/gh/yutopp/VJson.svg?style=svg)](https://circleci.com/gh/yutopp/VJson)
-![npm](https://img.shields.io/npm/v/net.yutopp.vjson)
+[![npm](https://img.shields.io/npm/v/net.yutopp.vjson)](https://www.npmjs.com/package/net.yutopp.vjson)
 [![NuGet Badge](https://buildstats.info/nuget/vjson)](https://www.nuget.org/packages/VJson/)
 [![codecov](https://codecov.io/gh/yutopp/VJson/branch/master/graph/badge.svg)](https://codecov.io/gh/yutopp/VJson)
 [![license](https://img.shields.io/github/license/yutopp/VJson.svg)](https://github.com/yutopp/VJson/blob/master/LICENSE_1_0.txt)
 
 `VJson` is a JSON serializer/deserializer (with JsonSchema support) library written in pure C#. Supported versions are `.NET Framework 3.5` and `.NET Standard 1.6` or higher.  
-This library is developed as a purely C# project, however it also supports that be build with `Unity 2018.3.12f1` or higher.
+This library is developed as a purely C# project, however it also supports that be build with `Unity 2019.4.22f1` or higher.
 
 ## Installation
 
@@ -22,6 +22,36 @@ dotnet add package VJson
 ```
 
 ### For Unity projects
+
+#### stable
+
+Add scoped registry information shown below to your `Packages/manifest.json` if not exists.
+
+```json
+{
+  "scopedRegistries": [
+    {
+      "name": "yutopp.net",
+      "url": "https://registry.npmjs.com",
+      "scopes": [
+        "net.yutopp"
+      ]
+    }
+  ]
+}
+```
+
+#### nightly
+
+Add a url for VJson git repository to your `Packages/manifest.json` like below.
+
+```json
+{
+  "dependencies": {
+    "net.yutopp.vjson": "https://github.com/yutopp/VJson.git?path=Packages/net.yutopp.vjson"
+  }
+}
+```
 
 (TODO: Provide unity packages)
 
@@ -93,6 +123,8 @@ var v = serializer.Deserialize("{\"X\":10,\"Y\":\"abab\"}");
 ```
 
 #### Attributes
+
+...
 
 ### JSON Schema and validation
 

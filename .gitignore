@@ -56,6 +56,9 @@ crashlytics-build.properties
 #
 #
 #
+Assets/RuntimeUnitTestToolkit/
+Assets/RuntimeUnitTestToolkit.meta
+
 bin/
 .nuget/
 test-results
