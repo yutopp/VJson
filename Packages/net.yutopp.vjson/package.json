@@ -1,6 +1,6 @@
 {
   "name": "net.yutopp.vjson",
-  "version": "",
+  "version": "0.0.0",
   "displayName": "VJson",
   "description": "A JSON serializer/deserializer (with JsonSchema support) library written in pure C#.",
   "unity": "2019.4",
