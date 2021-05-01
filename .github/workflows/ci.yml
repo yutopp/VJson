@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0
+          dotnet-version: '5.0.x'
 
       - run: make setup
 
@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0
+          dotnet-version: '5.0.x'
 
       - run: |
           curl -s https://codecov.io/bash > codecov
