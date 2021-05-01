@@ -25,7 +25,7 @@ jobs:
           cp ../../README.md README.md
           cp ../../LICENSE_1_0.txt LICENSE.txt
           npm version "${REF#refs/tags/v}"
-          npm publish --access public --dry-run
+          npm publish --access public
 
   publish_to_nuget:
     runs-on: ubuntu-20.04
