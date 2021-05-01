@@ -26,7 +26,6 @@ jobs:
   coverage:
     needs: [test_dotnet]
     runs-on: ubuntu-20.04
-    container: mcr.microsoft.com/dotnet/sdk:2.1-focal
     steps:
       - name: setup env
         run: apt-get update -yy && apt-get install -yy make git python3
