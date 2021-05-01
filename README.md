@@ -8,7 +8,7 @@
 [![codecov](https://codecov.io/gh/yutopp/VJson/branch/master/graph/badge.svg)](https://codecov.io/gh/yutopp/VJson)
 [![license](https://img.shields.io/github/license/yutopp/VJson.svg)](https://github.com/yutopp/VJson/blob/master/LICENSE_1_0.txt)
 
-`VJson` is a JSON serializer/deserializer (with JsonSchema support) library written in pure C#. Supported versions are `.NET Framework 3.5` and `.NET Standard 1.6` or higher.  
+`VJson` is a JSON serializer/deserializer (with JsonSchema support) library written in pure C#. Supported versions are `.NET Standard 2.0` or higher.  
 This library is developed as a purely C# project, however it also supports that be build with `Unity 2019.4.22f1` or higher.
 
 ## Installation
@@ -38,6 +38,16 @@ Add scoped registry information shown below to your `Packages/manifest.json` if 
       ]
     }
   ]
+}
+```
+
+And add `net.yutopp.vjson` to your `Packages/manifest.json` like below.
+
+```json
+{
+  "dependencies": {
+    "net.yutopp.vjson": "*"
+  }
 }
 ```
 

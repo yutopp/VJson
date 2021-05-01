@@ -63,5 +63,6 @@ bin/
 .nuget/
 test-results
 lcov.info
+coverage.*.info
 codecov
 BenchmarkDotNet.Artifacts
