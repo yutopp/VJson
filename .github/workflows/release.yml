@@ -31,13 +31,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: setup env
-        run: apt-get update -yy && apt-get install -yy make git
+        run: sudo apt-get update -yy && sudo apt-get install -yy make git
 
       - uses: actions/checkout@v2
 
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 2.1
+          dotnet-version: '5.0.x'
 
       - name: publish to nuget
         if: startsWith( github.ref, 'refs/tags/v' )
