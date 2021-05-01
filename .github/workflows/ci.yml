@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: setup env
-        run: apt-get update -yy && apt-get install -yy make git python3
+        run: sudo apt-get update -yy && sudo apt-get install -yy make git python3
 
       - uses: actions/checkout@v2
 
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: setup env
-        run: apt-get update -yy && apt-get install -yy make git python3
+        run: sudo apt-get update -yy && sudo apt-get install -yy make git python3
 
       - uses: actions/checkout@v2
 
