@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace VJson
 {
-    public class JsonReader : IDisposable
+    public sealed class JsonReader : IDisposable
     {
         private ReaderWrapper _reader;
 

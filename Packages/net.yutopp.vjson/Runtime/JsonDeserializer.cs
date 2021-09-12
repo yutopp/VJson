@@ -16,7 +16,7 @@ namespace VJson
 {
     using Internal;
 
-    public class JsonDeserializer
+    public sealed class JsonDeserializer
     {
         private Type _expectedInitialType = null;
 

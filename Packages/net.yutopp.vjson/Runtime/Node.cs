@@ -41,7 +41,7 @@ namespace VJson
         object GenericContent { get; }
     }
 
-    public class BooleanNode : INode
+    public sealed class BooleanNode : INode
     {
         public static NodeKind KIND = NodeKind.Boolean;
         public static Type TYPE = typeof(bool);
@@ -81,7 +81,7 @@ namespace VJson
         }
     }
 
-    public class NullNode : INode
+    public sealed class NullNode : INode
     {
         public static NodeKind KIND = NodeKind.Null;
         public static Type TYPE = typeof(object);
@@ -117,7 +117,7 @@ namespace VJson
         }
     }
 
-    public class UndefinedNode : INode
+    public sealed class UndefinedNode : INode
     {
         public static NodeKind KIND = NodeKind.Undefined;
         public static Type TYPE = typeof(object);
@@ -153,7 +153,7 @@ namespace VJson
         }
     }
 
-    public class IntegerNode : INode
+    public sealed class IntegerNode : INode
     {
         public static NodeKind KIND = NodeKind.Integer;
         public static Type TYPE = typeof(long);
@@ -193,7 +193,7 @@ namespace VJson
         }
     }
 
-    public class FloatNode : INode
+    public sealed class FloatNode : INode
     {
         public static NodeKind KIND = NodeKind.Float;
         public static Type TYPE = typeof(double);
@@ -233,7 +233,7 @@ namespace VJson
         }
     }
 
-    public class StringNode : INode
+    public sealed class StringNode : INode
     {
         public static NodeKind KIND = NodeKind.String;
         public static Type TYPE = typeof(string);
@@ -273,7 +273,7 @@ namespace VJson
         }
     }
 
-    public class ObjectNode : INode, IEnumerable<KeyValuePair<string, INode>>
+    public sealed class ObjectNode : INode, IEnumerable<KeyValuePair<string, INode>>
     {
         public static NodeKind KIND = NodeKind.Object;
         public static Type TYPE = typeof(Dictionary<string, INode>);
@@ -380,7 +380,7 @@ namespace VJson
         }
     }
 
-    public class ArrayNode : INode, IEnumerable<INode>
+    public sealed class ArrayNode : INode, IEnumerable<INode>
     {
         public static NodeKind KIND = NodeKind.Array;
         public static Type TYPE = typeof(List<INode>);

@@ -16,7 +16,7 @@ namespace VJson
     /// Write JSON data to streams as UTF-8.
     /// </summary>
     // TODO: Add [Preserve] in Unity
-    public class JsonWriter : IDisposable
+    public sealed class JsonWriter : IDisposable
     {
         struct State
         {

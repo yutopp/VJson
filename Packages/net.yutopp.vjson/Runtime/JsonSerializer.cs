@@ -11,7 +11,7 @@ using System.Text;
 
 namespace VJson
 {
-    public class JsonSerializer
+    public sealed class JsonSerializer
     {
         private Type _type;
 
