@@ -5,13 +5,15 @@
 // file LICENSE_1_0.txt or copy at  https://www.boost.org/LICENSE_1_0.txt)
 //
 
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace VJson.Schema
 {
-    public class JsonSchemaRegistory
+    public sealed class JsonSchemaRegistory
     {
-        Dictionary<string, JsonSchemaAttribute> _registory = new Dictionary<string, JsonSchemaAttribute>();
+        readonly Dictionary<string, JsonSchemaAttribute> _registory = new Dictionary<string, JsonSchemaAttribute>();
 
         public JsonSchemaAttribute Resolve(string id)
         {
@@ -32,12 +34,6 @@ namespace VJson.Schema
         public IEnumerable<string> GetRegisteredIDs()
         {
             return _registory.Keys;
-        }
-
-        private static JsonSchemaRegistory _defaultInstance = new JsonSchemaRegistory();
-        public static JsonSchemaRegistory GetDefault()
-        {
-            return _defaultInstance;
         }
     }
 }

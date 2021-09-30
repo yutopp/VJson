@@ -378,7 +378,7 @@ namespace VJson.Schema
 
             if (reg == null)
             {
-                reg = JsonSchemaRegistory.GetDefault();
+                reg = new JsonSchemaRegistory();
             }
 
             var schema = TypeHelper.GetCustomAttribute<JsonSchemaAttribute>(ty);

@@ -15,7 +15,7 @@ namespace VJson.Schema
 {
     using Internal;
 
-    public class JsonSchemaValidator
+    public sealed class JsonSchemaValidator
     {
         JsonSchemaAttribute _schema;
 
@@ -33,15 +33,10 @@ namespace VJson.Schema
         {
             if (_schema.Ref != null)
             {
-                if (reg == null)
-                {
-                    reg = JsonSchemaRegistory.GetDefault();
-                }
-                var schema = reg.Resolve(_schema.Ref);
+                var schema = reg?.Resolve(_schema.Ref);
                 if (schema == null)
                 {
-                    // TODO:
-                    throw new NotSupportedException();
+                    throw new Exception($"Schema is not registered or registory is null: Ref={_schema.Ref}");
                 }
                 return schema.Validate(o, state, reg);
             }
