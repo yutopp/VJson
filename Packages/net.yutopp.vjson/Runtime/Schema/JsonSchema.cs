@@ -257,8 +257,6 @@ namespace VJson.Schema
         }
         #endregion
 
-        internal Type _dynamicResolverTag;
-
         public JsonSchemaAttribute()
         {
         }
@@ -460,26 +458,6 @@ namespace VJson.Schema
                 if (fieldItemsSchema != null)
                 {
                     fieldSchema.Items = fieldItemsSchema;
-                }
-
-                if (attr != null && attr.DynamicResolverTag != null)
-                {
-                    if (!TypeHelper.TypeWrap(fieldType).IsGenericType || fieldType.GetGenericTypeDefinition() != typeof(Dictionary<,>))
-                    {
-                        var baseMsg = "A type of the field which has DynamicResolver must be a Dictionary<,>";
-                        var msg = string.Format("{0}: Type = {1} at \"{2}\" of {3}", baseMsg, fieldType, elemName, ty);
-                        throw new ArgumentException(msg);
-                    }
-
-                    var keyType = TypeHelper.TypeWrap(fieldType).GetGenericArguments()[0];
-                    if (keyType != typeof(string))
-                    {
-                        var baseMsg = "A key of the dictionary which has DynamicResolver must be a string type";
-                        var msg = string.Format("{0}: KeyType = {1} at \"{2}\" of {3}", baseMsg, keyType, elemName, ty);
-                        throw new ArgumentException(msg);
-                    }
-
-                    fieldSchema._dynamicResolverTag = attr.DynamicResolverTag;
                 }
 
                 var fieldItemRequired = TypeHelper.GetCustomAttribute<JsonSchemaRequiredAttribute>(field);

@@ -44,48 +44,48 @@ namespace VJson
 
         public object DeserializeFromNode(INode node)
         {
-            return DeserializeValue(node, _expectedInitialType, new State(), null);
+            return DeserializeValue(node, _expectedInitialType, new State());
         }
 
-        object DeserializeValue(INode node, Type expectedType, State state, Type tag)
+        object DeserializeValue(INode node, Type expectedType, State state)
         {
             var expectedKind = Node.KindOfTypeWrapped(expectedType);
             if (expectedKind.Wrapped) {
                 expectedType = Node.ValueTypeOfKind(expectedKind.Kind);
             }
 
-            return DeserializeValueAs(node, expectedKind, expectedType, state, tag);
+            return DeserializeValueAs(node, expectedKind, expectedType, state);
         }
 
-        object DeserializeValueAs(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
+        object DeserializeValueAs(INode node, NodeKindWrapped targetKind, Type targetType, State state)
         {
             switch (targetKind.Kind)
             {
                 case NodeKind.Boolean:
-                    return DeserializeToBoolean(node, targetKind, targetType, state, tag);
+                    return DeserializeToBoolean(node, targetKind, targetType, state);
 
                 case NodeKind.Integer:
                 case NodeKind.Float:
-                    return DeserializeToNumber(node, targetKind, targetType, state, tag);
+                    return DeserializeToNumber(node, targetKind, targetType, state);
 
                 case NodeKind.String:
-                    return DeserializeToString(node, targetKind, targetType, state, tag);
+                    return DeserializeToString(node, targetKind, targetType, state);
 
                 case NodeKind.Array:
-                    return DeserializeToArray(node, targetKind, targetType, state, tag);
+                    return DeserializeToArray(node, targetKind, targetType, state);
 
                 case NodeKind.Object:
-                    return DeserializeToObject(node, targetKind, targetType, state, tag);
+                    return DeserializeToObject(node, targetKind, targetType, state);
 
                 case NodeKind.Null:
-                    return DeserializeToNull(node, targetKind, targetType, state, tag);
+                    return DeserializeToNull(node, targetKind, targetType, state);
 
                 default:
                     throw new NotImplementedException("Unmatched kind: " + targetKind.Kind);
             }
         }
 
-        object DeserializeToBoolean(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
+        object DeserializeToBoolean(INode node, NodeKindWrapped targetKind, Type targetType, State state)
         {
             if (node is NullNode)
             {
@@ -112,7 +112,7 @@ namespace VJson
             throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToNumber(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
+        object DeserializeToNumber(INode node, NodeKindWrapped targetKind, Type targetType, State state)
         {
             if (node is NullNode)
             {
@@ -147,7 +147,7 @@ namespace VJson
             throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToString(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
+        object DeserializeToString(INode node, NodeKindWrapped targetKind, Type targetType, State state)
         {
             if (node is NullNode)
             {
@@ -174,7 +174,7 @@ namespace VJson
             throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToArray(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
+        object DeserializeToArray(INode node, NodeKindWrapped targetKind, Type targetType, State state)
         {
             bool isConvertible =
                 targetType == typeof(object)
@@ -212,7 +212,7 @@ namespace VJson
                     var elemType = conteinerTy.GetElementType();
                     for (int i = 0; i < len; ++i)
                     {
-                        var v = DeserializeValue(aNode.Elems[i], elemType, state.NestAsElem(i), tag);
+                        var v = DeserializeValue(aNode.Elems[i], elemType, state.NestAsElem(i));
                         container.SetValue(v, i);
                     }
 
@@ -229,7 +229,7 @@ namespace VJson
                     var elemType = TypeHelper.TypeWrap(conteinerTy).GetGenericArguments()[0];
                     for (int i = 0; i < len; ++i)
                     {
-                        var v = DeserializeValue(aNode.Elems[i], elemType, state.NestAsElem(i), tag);
+                        var v = DeserializeValue(aNode.Elems[i], elemType, state.NestAsElem(i));
                         container.Add(v);
                     }
 
@@ -245,7 +245,7 @@ namespace VJson
             throw new DeserializeFailureException(msg0);
         }
 
-        object DeserializeToObject(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
+        object DeserializeToObject(INode node, NodeKindWrapped targetKind, Type targetType, State state)
         {
             if (targetKind.Kind != NodeKind.Object)
             {
@@ -295,17 +295,9 @@ namespace VJson
                     foreach (var elem in oNode.Elems)
                     {
                         var elemType = allElemType;
-                        if (tag != null)
-                        {
-                            Type typeForKey;
-                            if (DynamicResolver.Find(tag, elem.Key, out typeForKey))
-                            {
-                                elemType = typeForKey;
-                            }
-                        }
 
                         // TODO: duplication check
-                        var v = DeserializeValue(elem.Value, elemType, state.NestAsElem(elem.Key), tag);
+                        var v = DeserializeValue(elem.Value, elemType, state.NestAsElem(elem.Key));
                         container.Add(elem.Key, v);
                     }
 
@@ -347,7 +339,7 @@ namespace VJson
                                 var elemType = hint;
                                 try
                                 {
-                                    var v = DeserializeValue(elem, elemType, elemState, tag);
+                                    var v = DeserializeValue(elem, elemType, elemState);
                                     field.SetValue(container, v);
 
                                     resolved = true;
@@ -366,29 +358,8 @@ namespace VJson
                         else
                         {
                             var elemType = field.FieldType;
-                            var elemTag = tag;
 
-                            if (attr != null && attr.DynamicResolverTag != null)
-                            {
-                                if (!TypeHelper.TypeWrap(elemType).IsGenericType || elemType.GetGenericTypeDefinition() != typeof(Dictionary<,>))
-                                {
-                                    var baseMsg = "A type of the field which has DynamicResolver must be a Dictionary<,>";
-                                    var msg = elemState.CreateMessage("{0}: Type = {1}", baseMsg, elemType);
-                                    throw new DeserializeFailureException(msg);
-                                }
-
-                                var keyType = TypeHelper.TypeWrap(elemType).GetGenericArguments()[0];
-                                if (keyType != typeof(string))
-                                {
-                                    var baseMsg = "A key of the dictionary which has DynamicResolver must be a string type";
-                                    var msg = elemState.CreateMessage("{0}: KeyType = {1}", baseMsg, keyType);
-                                    throw new DeserializeFailureException(msg);
-                                }
-
-                                elemTag = attr.DynamicResolverTag;
-                            }
-
-                            var v = DeserializeValue(elem, elemType, elemState, elemTag);
+                            var v = DeserializeValue(elem, elemType, elemState);
                             field.SetValue(container, v);
                         }
                     }
@@ -406,10 +377,10 @@ namespace VJson
             if (targetKind.Wrapped) {
                 targetType = Node.ValueTypeOfKind(node.Kind);
             }
-            return DeserializeValueAs(node, nodeKindWrapped, targetType, state, tag);
+            return DeserializeValueAs(node, nodeKindWrapped, targetType, state);
         }
 
-        object DeserializeToNull(INode node, NodeKindWrapped targetKind, Type targetType, State state, Type tag)
+        object DeserializeToNull(INode node, NodeKindWrapped targetKind, Type targetType, State state)
         {
             if (node is NullNode)
             {

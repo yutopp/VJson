@@ -30,7 +30,6 @@ namespace VJson
         public string Name;
         public int Order = 0;
         public Type[] TypeHints;
-        public Type DynamicResolverTag;
 
         public static string FieldName(JsonFieldAttribute f, FieldInfo fi)
         {

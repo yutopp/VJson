@@ -529,59 +529,6 @@ namespace VJson.Schema.UnitTests
             },
         };
 
-        public class HasDynamicResolver
-        {
-            [JsonField(DynamicResolverTag = typeof(Resolver)), JsonFieldIgnorable]
-            public Dictionary<string, object> Dict;
-
-            public class Resolver
-            {
-                static Resolver()
-                {
-                    // A example for registration of resolvers
-                    DynamicResolver.Register<Resolver>("b", typeof(int));
-                }
-            }
-            private Resolver _toInitialize = new Resolver();
-        }
-
-        public static object[] HasDynamicResolverArgs = new object[] {
-            new object[] {
-                new HasDynamicResolver(),
-                null,
-                "{}",
-            },
-            new object[] {
-                new HasDynamicResolver() {
-                    Dict = new Dictionary<string, object> {
-                        {"a", 10},
-                    }
-                },
-                null,
-                "{\"Dict\":{\"a\":10}}",
-            },
-            new object[] {
-                new HasDynamicResolver() {
-                    Dict = new Dictionary<string, object> {
-                        {"a", 10},
-                        {"b", 20},
-                    }
-                },
-                null,
-                "{\"Dict\":{\"a\":10,\"b\":20}}",
-            },
-            new object[] {
-                new HasDynamicResolver() {
-                    Dict = new Dictionary<string, object> {
-                        {"a", 10},
-                        {"b", "out"},
-                    }
-                },
-                "Object.Property.Object.DynamicResolver.(root)[\"Dict\"][\"b\"]: Type is not matched(Actual: String; Expected: integer).",
-                null,
-            },
-        };
-
         [JsonSchema(Minimum = 0)]
         public class CustomTag<T> : RefTag<T> where T : struct
         {

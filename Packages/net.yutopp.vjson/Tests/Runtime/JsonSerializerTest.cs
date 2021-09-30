@@ -274,56 +274,6 @@ namespace VJson.UnitTests
         }
     }
 
-    public class HasDynamicResolver
-    {
-        [JsonField(DynamicResolverTag = typeof(Resolver)), JsonFieldIgnorable]
-        public Dictionary<string, object> Dict;
-
-        public override bool Equals(object rhsObj)
-        {
-            var rhs = rhsObj as HasDynamicResolver;
-            if (rhs == null)
-            {
-                return false;
-            }
-
-            return (Dict == null && rhs.Dict == null)
-                || (Dict != null && rhs.Dict != null && Dict.OrderBy(p => p.Key).SequenceEqual(rhs.Dict.OrderBy(p => p.Key)))
-                ;
-        }
-
-        public override int GetHashCode()
-        {
-            throw new NotImplementedException();
-        }
-
-        public class Resolver
-        {
-            static Resolver()
-            {
-                // A example for registration of resolvers!
-                DynamicResolver.Register<Resolver>("a", typeof(SomeObject));
-            }
-        }
-        private Resolver _toInitialize = new Resolver();
-    }
-
-    public class HasDynamicResolverFailWithTypeChecks
-    {
-        [JsonField(DynamicResolverTag = typeof(Resolver)), JsonFieldIgnorable]
-        public int Dict; // A key must be a dictionary
-
-        public class Resolver { }
-    }
-
-    public class HasDynamicResolverFailWithKeyTypeChecks
-    {
-        [JsonField(DynamicResolverTag = typeof(Resolver)), JsonFieldIgnorable]
-        public Dictionary<int, int> Dict; // A key must be a string
-
-        public class Resolver { }
-    }
-
     class JsonSerializerTests
     {
         [Test]
@@ -636,17 +586,6 @@ c
                 },
                 "{\"I\":10}"
             },
-
-            // Dynamic resolver
-            new object[] {
-                new HasDynamicResolver{
-                    Dict = new Dictionary<string, object> {
-                        {"a", new SomeObject{ X = 10, Y = "bo" }},
-                        {"b", (long)42}, // A number which stored in object type will be int64...
-                    }
-                },
-                "{\"Dict\":{\"a\":{\"X\":10,\"Y\":\"bo\"},\"b\":42}}"
-            }
         };
 
         static object[] OnlySerializeArgs = {
@@ -1041,21 +980,6 @@ c
                 typeof(EnumAsString),
                 "\"NameC\"",
                 "(root): System.String value cannot convert to VJson.UnitTests.EnumAsString (Reason: Enum name is not defined).",
-            },
-            new object[] {
-                typeof(HasDynamicResolver),
-                "{\"Dict\":{\"a\":10,\"b\":42}}",
-                "(root)[\"Dict\"][\"a\"]: System.Int64 value (10) cannot convert to VJson.UnitTests.SomeObject.",
-            },
-            new object[] {
-                typeof(HasDynamicResolverFailWithTypeChecks),
-                "{\"Dict\":{}}",
-                "(root)[\"Dict\"]: A type of the field which has DynamicResolver must be a Dictionary<,>: Type = System.Int32.",
-            },
-            new object[] {
-                typeof(HasDynamicResolverFailWithKeyTypeChecks),
-                "{\"Dict\":{}}",
-                "(root)[\"Dict\"]: A key of the dictionary which has DynamicResolver must be a string type: KeyType = System.Int32.",
             },
         };
     }
