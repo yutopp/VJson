@@ -30,7 +30,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource("HasCustomTagArgs")]
         public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
         {
-            var r = new JsonSchemaRegistory();
+            var r = new JsonSchemaRegistry();
             var schema = JsonSchemaAttribute.CreateFromClass<T>(r);
 
             var ex = schema.Validate(o, r);
@@ -57,7 +57,7 @@ namespace VJson.Schema.UnitTests
 //        [TestCaseSource("HasCustomTagArgs")]
         public void ValidationForINodeTest(Type ty, INode node, string expectedMsg, string _expectedContent)
         {
-            var r = new JsonSchemaRegistory();
+            var r = new JsonSchemaRegistry();
             var schema = JsonSchemaAttribute.CreateFromType(ty, r);
 
             var ex = schema.Validate(node, r);

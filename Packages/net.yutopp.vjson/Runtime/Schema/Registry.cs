@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace VJson.Schema
 {
-    public sealed class JsonSchemaRegistory
+    public sealed class JsonSchemaRegistry
     {
         readonly Dictionary<string, JsonSchemaAttribute> _registory = new Dictionary<string, JsonSchemaAttribute>();
 

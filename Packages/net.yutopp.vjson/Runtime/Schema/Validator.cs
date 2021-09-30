@@ -24,12 +24,12 @@ namespace VJson.Schema
             _schema = j;
         }
 
-        public ConstraintsViolationException Validate(object o, JsonSchemaRegistory reg = null)
+        public ConstraintsViolationException Validate(object o, JsonSchemaRegistry reg = null)
         {
             return Validate(o, new State(), reg);
         }
 
-        internal ConstraintsViolationException Validate(object o, State state, JsonSchemaRegistory reg)
+        internal ConstraintsViolationException Validate(object o, State state, JsonSchemaRegistry reg)
         {
             if (_schema.Ref != null)
             {
@@ -237,7 +237,7 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateNumber(double v, State state, JsonSchemaRegistory reg)
+        ConstraintsViolationException ValidateNumber(double v, State state, JsonSchemaRegistry reg)
         {
             if (_schema.MultipleOf != double.MinValue)
             {
@@ -298,7 +298,7 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateString(string v, State state, JsonSchemaRegistory reg)
+        ConstraintsViolationException ValidateString(string v, State state, JsonSchemaRegistry reg)
         {
             StringInfo si = null;
 
@@ -337,7 +337,7 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateArray(IEnumerable<object> v, State state, JsonSchemaRegistory reg)
+        ConstraintsViolationException ValidateArray(IEnumerable<object> v, State state, JsonSchemaRegistry reg)
         {
             var length = v.Count();
 
@@ -456,7 +456,7 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateObject(object v, State state, JsonSchemaRegistory reg)
+        ConstraintsViolationException ValidateObject(object v, State state, JsonSchemaRegistry reg)
         {
             var validated = new Dictionary<string, object>();
 
@@ -560,7 +560,7 @@ namespace VJson.Schema
         ConstraintsViolationException ValidateObjectField(string key,
                                                           object value,
                                                           State state,
-                                                          JsonSchemaRegistory reg)
+                                                          JsonSchemaRegistry reg)
         {
             var matched = false;
 

@@ -302,12 +302,12 @@ namespace VJson.Schema
             return serializer.Serialize(this);
         }
 
-        public static JsonSchemaAttribute CreateFromClass<T>(JsonSchemaRegistory reg = null, bool asRef = false)
+        public static JsonSchemaAttribute CreateFromClass<T>(JsonSchemaRegistry reg = null, bool asRef = false)
         {
             return CreateFromType(typeof(T), reg, asRef);
         }
 
-        public static JsonSchemaAttribute CreateFromType(Type ty, JsonSchemaRegistory reg = null, bool asRef = false)
+        public static JsonSchemaAttribute CreateFromType(Type ty, JsonSchemaRegistry reg = null, bool asRef = false)
         {
             var kind = Node.KindOfType(ty);
             switch (kind)
@@ -378,7 +378,7 @@ namespace VJson.Schema
 
             if (reg == null)
             {
-                reg = new JsonSchemaRegistory();
+                reg = new JsonSchemaRegistry();
             }
 
             var schema = TypeHelper.GetCustomAttribute<JsonSchemaAttribute>(ty);
@@ -654,7 +654,7 @@ namespace VJson.Schema
     {
         public static ConstraintsViolationException Validate(this JsonSchemaAttribute j,
                                                              object o,
-                                                             JsonSchemaRegistory reg = null)
+                                                             JsonSchemaRegistry reg = null)
         {
             return (new JsonSchemaValidator(j)).Validate(o, reg);
         }
@@ -662,7 +662,7 @@ namespace VJson.Schema
         internal static ConstraintsViolationException Validate(this JsonSchemaAttribute j,
                                                                object o,
                                                                Internal.State state,
-                                                               JsonSchemaRegistory reg)
+                                                               JsonSchemaRegistry reg)
         {
             return (new JsonSchemaValidator(j)).Validate(o, state, reg);
         }

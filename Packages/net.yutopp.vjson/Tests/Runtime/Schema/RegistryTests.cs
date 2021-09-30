@@ -9,12 +9,12 @@ using NUnit.Framework;
 
 namespace VJson.Schema.UnitTests
 {
-    public class JsonSchemaRegistoryTests
+    public class JsonSchemaRegistryTests
     {
         [Test]
         public void BasicOperationTest()
         {
-            var r = new JsonSchemaRegistory();
+            var r = new JsonSchemaRegistry();
 
             Assert.Null(r.Resolve("=TEST="));
             Assert.That(r.GetRegisteredIDs(), Is.EquivalentTo(new string[] { }));
