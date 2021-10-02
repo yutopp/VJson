@@ -930,7 +930,7 @@ c
             new object[] {
                 typeof(int),
                 "3.14",
-                "(root): System.Double value (3.14) cannot convert to System.Int32.",
+                "(root): System.Double value (3.14) cannot convert to System.Int32 (Reason: Not implicit constructable).",
             },
             new object[] {
                 typeof(uint),
@@ -975,7 +975,7 @@ c
             new object[] {
                 typeof(Dictionary<string, int>),
                 "true",
-                "(root): System.Boolean value (True) cannot convert to System.Collections.Generic.Dictionary`2[System.String,System.Int32].",
+                "(root): System.Boolean value (True) cannot convert to System.Collections.Generic.Dictionary`2[System.String,System.Int32] (Reason: Not implicit constructable).",
             },
             new object[] {
                 typeof(Dictionary<string, int>),
@@ -985,7 +985,7 @@ c
             new object[] {
                 typeof(SomeObject),
                 "true",
-                "(root): System.Boolean value (True) cannot convert to VJson.UnitTests.SomeObject.",
+                "(root): System.Boolean value (True) cannot convert to VJson.UnitTests.SomeObject (Reason: Not implicit constructable).",
             },
             new object[] {
                 typeof(SomeObject),

@@ -480,15 +480,10 @@ namespace VJson
 
             // Try to convert value implicitly
             var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(targetType);
-            if (attr == null)
+            if (attr == null || !attr.ImplicitConstructable)
             {
-                var msg = state.CreateTypeConversionFailureMessage<T>(value, targetType);
+                var msg = state.CreateTypeConversionFailureMessage<T>(value, targetType, "Not implicit constructable");
                 throw new DeserializeFailureException(msg);
-            }
-
-            if (!attr.ImplicitConstructable)
-            {
-                throw new NotImplementedException($"Not implicit constructable to {targetType.ToString()}");
             }
 
             var ctor = TypeHelper.TypeWrap(targetType).GetConstructor(new[] { typeof(T) });
