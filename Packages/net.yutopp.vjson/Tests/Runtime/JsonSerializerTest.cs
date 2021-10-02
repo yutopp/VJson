@@ -14,7 +14,7 @@ namespace VJson.UnitTests
 {
     class SomeObject
     {
-        private float _p = 3.14f; // A private field will not be exported.
+        private float _p = 3.14f; // Fields which are non-public will not be exported defaultly.
         public int X;
         public string Y;
 
@@ -63,6 +63,35 @@ namespace VJson.UnitTests
         public override string ToString()
         {
             return string.Format("{{D = {0}, base = {1}}}", D, base.ToString());
+        }
+    }
+
+    // Fields which are non-public BUT having [JsonField] etc... will BE exported!
+    class HasNonPublicObject
+    {
+        [JsonField] internal long _p1 = 2;
+        [JsonField] long _p2 = 4; // Fields which are non-public BUT having [JsonField] etc... will BE exported!
+        [JsonField] private long _p3 = 6;
+
+        public override bool Equals(object rhsObj)
+        {
+            var rhs = rhsObj as HasNonPublicObject;
+            if (rhs == null)
+            {
+                return false;
+            }
+
+            return _p1 == rhs._p1 && _p2 == rhs._p2 && _p3 == rhs._p3;
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{{_p1 = {0}, _p2 = {1}, _p3 = {2}}}", _p1, _p2, _p3);
         }
     }
 
@@ -488,6 +517,10 @@ c
                         D = false,
                     }),
                 @"{""D"":false,""X"":20,""Y"":""cdcd""}",
+            },
+            new object[] {
+                new HasNonPublicObject {},
+                @"{""_p1"":2,""_p2"":4,""_p3"":6}",
             },
             new object[] {
                 new RenamedObject {
