@@ -73,7 +73,7 @@ namespace VJson.Schema.UnitTests
     public class JsonSchemaFormatTests
     {
         [Test]
-        [TestCaseSource("SchemaStringArgs")]
+        [TestCaseSource(nameof(SchemaStringArgs))]
         public void SchemaFormatTest(Type ty, string expected)
         {
             var schema = JsonSchemaAttribute.CreateFromType(ty);

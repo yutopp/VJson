@@ -488,7 +488,7 @@ namespace VJson
 
             if (!attr.ImplicitConstructable)
             {
-                throw new NotImplementedException(targetType.ToString());
+                throw new NotImplementedException($"Not implicit constructable to {targetType.ToString()}");
             }
 
             var ctor = TypeHelper.TypeWrap(targetType).GetConstructor(new[] { typeof(T) });

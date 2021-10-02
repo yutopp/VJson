@@ -7,11 +7,13 @@
 
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace VJson.UnitTests
 {
+    [Json]
     class SomeObject
     {
         private float _p = 3.14f; // Fields which are non-public will not be exported defaultly.
@@ -40,7 +42,8 @@ namespace VJson.UnitTests
         }
     }
 
-    class DerivedSomeObject : SomeObject
+    [Json]
+    sealed class DerivedSomeObject : SomeObject
     {
         public bool D;
 
@@ -67,10 +70,11 @@ namespace VJson.UnitTests
     }
 
     // Fields which are non-public BUT having [JsonField] etc... will BE exported!
-    class HasNonPublicObject
+    [Json]
+    sealed class HasNonPublicObject
     {
         [JsonField] internal long _p1 = 2;
-        [JsonField] long _p2 = 4; // Fields which are non-public BUT having [JsonField] etc... will BE exported!
+        [JsonField] long _p2 = 4; // Fields which are non-public BUT having [JsonField] (+etc) attributes will BE exported!
         [JsonField] private long _p3 = 6;
 
         public override bool Equals(object rhsObj)
@@ -95,7 +99,8 @@ namespace VJson.UnitTests
         }
     }
 
-    class CustomObject
+    [Json]
+    sealed class CustomObject
     {
         [JsonField(TypeHints = new Type[] { typeof(bool), typeof(SomeObject) })]
         public object Obj = default(object);
@@ -117,7 +122,8 @@ namespace VJson.UnitTests
         }
     }
 
-    class CustomObjectHasArray
+    [Json]
+    sealed class CustomObjectHasArray
     {
         [JsonField(TypeHints = new Type[] { typeof(SomeObject), typeof(SomeObject[]) })]
         public object Obj = default(object);
@@ -158,7 +164,8 @@ namespace VJson.UnitTests
         }
     }
 
-    class RenamedObject
+    [Json]
+    sealed class RenamedObject
     {
         [JsonField(Name = "renamed")]
         public int Actual;
@@ -180,7 +187,8 @@ namespace VJson.UnitTests
         }
     }
 
-    class IgnorableObject
+    [Json]
+    sealed class IgnorableObject
     {
         [JsonFieldIgnorable(WhenValueIs = 0)]
         public int Ignore0;
@@ -207,7 +215,8 @@ namespace VJson.UnitTests
         }
     }
 
-    class PartialTypedObject
+    [Json]
+    sealed class PartialTypedObject
     {
         public int A;
         public Dictionary<string, INode> Ext;
@@ -234,6 +243,8 @@ namespace VJson.UnitTests
     class Hoge
     {
         public bool B { get; private set; }
+
+        [Preserve]
         public Hoge(bool b)
         {
             B = b;
@@ -306,8 +317,8 @@ namespace VJson.UnitTests
     class JsonSerializerTests
     {
         [Test]
-        [TestCaseSource("CommonArgs")]
-        [TestCaseSource("OnlySerializeArgs")]
+        [TestCaseSource(nameof(CommonArgs))]
+        [TestCaseSource(nameof(OnlySerializeArgs))]
         public void SerializeFromStringTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
@@ -317,7 +328,7 @@ namespace VJson.UnitTests
         }
 
         [Test]
-        [TestCaseSource("WithIndentArgs")]
+        [TestCaseSource(nameof(WithIndentArgs))]
         public void SerializeWithIndentFromStringTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
@@ -327,9 +338,9 @@ namespace VJson.UnitTests
         }
 
         [Test]
-        [TestCaseSource("CommonArgs")]
-        [TestCaseSource("WithIndentArgs")]
-        [TestCaseSource("OnlyDeserializeArgs")]
+        [TestCaseSource(nameof(CommonArgs))]
+        [TestCaseSource(nameof(WithIndentArgs))]
+        [TestCaseSource(nameof(OnlyDeserializeArgs))]
         public void DeserializeFromStringTest(object obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
@@ -734,8 +745,8 @@ c
     class JsonSerializerForContainerTests
     {
         [Test]
-        [TestCaseSource("ListArgs")]
-        public void SerializeTest<E>(IEnumerable<E> obj, string expected)
+        [TestCaseSource(nameof(ListArgs))]
+        public void SerializeTest(IEnumerable obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
             var actual = serializer.Serialize(obj);
@@ -743,8 +754,8 @@ c
         }
 
         [Test]
-        [TestCaseSource("DictArgs")]
-        public void SerializeTest<K, V>(IDictionary<K, V> obj, string expected)
+        [TestCaseSource(nameof(DictArgs))]
+        public void SerializeTest(IDictionary obj, string expected)
         {
             var serializer = new VJson.JsonSerializer(obj != null ? obj.GetType() : typeof(object));
             var actual = serializer.Serialize(obj);
@@ -753,8 +764,8 @@ c
         }
 
         [Test]
-        [TestCaseSource("ListArgs")]
-        public void DeserializeTest<E>(IEnumerable<E> expected, string json)
+        [TestCaseSource(nameof(ListArgs))]
+        public void DeserializeTest(IEnumerable expected, string json)
         {
             var serializer = new VJson.JsonSerializer(expected != null ? expected.GetType() : typeof(object));
             var actual = serializer.Deserialize(json);
@@ -763,8 +774,8 @@ c
         }
 
         [Test]
-        [TestCaseSource("DictArgs")]
-        public void DeserializeTest<K, V>(IDictionary<K, V> expected, string json)
+        [TestCaseSource(nameof(DictArgs))]
+        public void DeserializeTest(IDictionary expected, string json)
         {
             var serializer = new VJson.JsonSerializer(expected != null ? expected.GetType() : typeof(object));
             var actual = serializer.Deserialize(json);
@@ -772,8 +783,9 @@ c
             Assert.That(actual, Is.EquivalentTo(expected));
         }
 
-        [TestCaseSource("ListArgs")]
-        public void DeserializeUntypedTest<E>(IEnumerable<E> expected, string json)
+        [Test]
+        [TestCaseSource(nameof(ListArgs))]
+        public void DeserializeUntypedTest(IEnumerable expected, string json)
         {
             var serializer = new VJson.JsonSerializer(typeof(object));
             var actual = serializer.Deserialize(json);
@@ -781,8 +793,9 @@ c
             Assert.That(actual, Is.EquivalentTo(expected));
         }
 
-        [TestCaseSource("DictArgs")]
-        public void DeserializeUntypedTest<K, V>(IDictionary<K, V> expected, string json)
+        [Test]
+        [TestCaseSource(nameof(DictArgs))]
+        public void DeserializeUntypedTest(IDictionary expected, string json)
         {
             var serializer = new VJson.JsonSerializer(typeof(object));
             var actual = serializer.Deserialize(json);
@@ -888,7 +901,7 @@ c
     class JsonSerializerErrorCaseTests
     {
         [Test]
-        [TestCaseSource("CommonArgs")]
+        [TestCaseSource(nameof(CommonArgs))]
         public void DeserializeFailureTest(Type ty, string json, string errorMsg)
         {
             var s = new JsonSerializer(ty);

@@ -92,7 +92,7 @@ namespace VJson.Schema.UnitTests
         }
 
         [TestCaseSource(nameof(EnumArgs))]
-        public void FromTypeValidationTest<E>(Type ty, E e, string expectedMsg, string _expectedContent)
+        public void FromTypeValidationTest(Type ty, object e, string expectedMsg, string _expectedContent)
         {
             var schema = JsonSchemaAttribute.CreateFromType(ty);
 
@@ -104,7 +104,7 @@ namespace VJson.Schema.UnitTests
         }
 
         [TestCaseSource(nameof(EnumArgs))]
-        public void FromTypeSerializationTest<E>(Type ty, E e, string _expectedMsg, string expectedContent)
+        public void FromTypeSerializationTest(Type ty, object e, string _expectedMsg, string expectedContent)
         {
             if (_expectedMsg != null)
             {
