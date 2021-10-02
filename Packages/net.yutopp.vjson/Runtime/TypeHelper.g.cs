@@ -85,6 +85,10 @@ namespace VJson
         private static bool ConvertFromLongToByte(long i, out object o) {
             try
             {
+                if ( i < 0 )
+                {
+                    throw new OverflowException();
+                }
                 o = checked((byte)i);
                 return true;
             }
@@ -111,6 +115,10 @@ namespace VJson
         private static bool ConvertFromLongToChar(long i, out object o) {
             try
             {
+                if ( i < 0 )
+                {
+                    throw new OverflowException();
+                }
                 o = checked((char)i);
                 return true;
             }
@@ -176,6 +184,10 @@ namespace VJson
         private static bool ConvertFromLongToUint(long i, out object o) {
             try
             {
+                if ( i < 0 )
+                {
+                    throw new OverflowException();
+                }
                 o = checked((uint)i);
                 return true;
             }
@@ -189,6 +201,10 @@ namespace VJson
         private static bool ConvertFromLongToUlong(long i, out object o) {
             try
             {
+                if ( i < 0 )
+                {
+                    throw new OverflowException();
+                }
                 o = checked((ulong)i);
                 return true;
             }
@@ -215,6 +231,10 @@ namespace VJson
         private static bool ConvertFromLongToUshort(long i, out object o) {
             try
             {
+                if ( i < 0 )
+                {
+                    throw new OverflowException();
+                }
                 o = checked((ushort)i);
                 return true;
             }

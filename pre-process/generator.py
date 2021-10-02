@@ -2,11 +2,23 @@ import sys
 import textwrap
 from string import Template
 
-def is_convertible(from_kind, to_kind):
+def is_convertible(from_kind_tup, to_kind_tup):
+    (from_kind, _) = from_kind_tup
+    (to_kind, _) = to_kind_tup
+
     if from_kind == to_kind:
         return True
 
     if from_kind == "integer" and to_kind == "number":
+        return True
+
+    return False
+
+def is_signed_to_unsigned(from_kind_tup, to_kind_tup):
+    (_, from_signed) = from_kind_tup
+    (_, to_signed) = to_kind_tup
+
+    if from_signed == "s" and to_signed == "u":
         return True
 
     return False
@@ -35,20 +47,20 @@ def main(args):
         "string",
     ]
     kinds = {
-        "bool": "bool",
-        "byte": "integer",
-        "sbyte": "integer",
-        "char": "integer",
-        "decimal": "number",
-        "double": "number",
-        "float": "number",
-        "int": "integer",
-        "uint": "integer",
-        "long": "integer",
-        "ulong": "integer",
-        "short": "integer",
-        "ushort": "integer",
-        "string": "string",
+        "bool":    ("bool", "_"),
+        "byte":    ("integer", "u"),
+        "sbyte":   ("integer", "s"),
+        "char":    ("integer", "u"),
+        "decimal": ("number", "_"),
+        "double":  ("number", "_"),
+        "float":   ("number", "_"),
+        "int":     ("integer", "s"),
+        "uint":    ("integer", "u"),
+        "long":    ("integer", "s"),
+        "ulong":   ("integer", "u"),
+        "short":   ("integer", "s"),
+        "ushort":  ("integer", "u"),
+        "string":  ("string", "_"),
     }
 
     from_types = ["bool", "long", "double", "string"]
@@ -108,10 +120,21 @@ private static readonly Dictionary<Type, Dictionary<Type, Converter>> _convTable
             if from_ty == to_ty:
                 continue
 
+            need_signed_check = is_signed_to_unsigned(kinds[from_ty], kinds[to_ty])
+
             output_funcs += textwrap.indent("""
 private static bool ConvertFrom{2}To{3}({0} i, out object o) {{
     try
-    {{
+    {{""".format(from_ty, to_ty, from_ty.capitalize(), to_ty.capitalize()), mk_indent(2))
+
+            if need_signed_check:
+                output_funcs += textwrap.indent("""
+        if ( i < 0 )
+        {{
+            throw new OverflowException();
+        }}""".format(), mk_indent(2))
+
+            output_funcs += textwrap.indent("""
         o = checked(({1})i);
         return true;
     }}
