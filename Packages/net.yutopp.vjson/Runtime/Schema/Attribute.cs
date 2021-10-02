@@ -10,12 +10,12 @@ using System;
 namespace VJson.Schema
 {
     [AttributeUsage(AttributeTargets.Field, Inherited = false)]
-    public sealed class JsonSchemaRequiredAttribute : Attribute
+    public sealed class JsonSchemaRequiredAttribute : PreserveAttribute
     {
     }
 
     [AttributeUsage(AttributeTargets.Field, Inherited = false)]
-    public sealed class JsonSchemaDependenciesAttribute : Attribute
+    public sealed class JsonSchemaDependenciesAttribute : PreserveAttribute
     {
         public string[] Dependencies { get; private set; }
 
@@ -32,7 +32,7 @@ namespace VJson.Schema
     }
 
     [AttributeUsage(AttributeTargets.Field, Inherited = false)]
-    public class JsonSchemaRefAttribute : Attribute
+    public class JsonSchemaRefAttribute : PreserveAttribute
     {
         public Type TagType { get; private set; }
         public InfluenceRange Influence { get; private set; }

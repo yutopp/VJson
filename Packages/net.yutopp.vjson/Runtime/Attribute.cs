@@ -17,15 +17,26 @@ namespace VJson
         AsString,
     }
 
+    // NOTE:
+    //   If you are using VJson on pureC#, this Attribute will not have any effect.
+    //   However, as long as you are using it on Unity and IL2CPP, this Attribute will be effective in preventing unnecessary optimization.
+    //
+    //   See: https://docs.unity3d.com/2019.4/Documentation/ScriptReference/Scripting.PreserveAttribute.html
+    //   > For 3rd party libraries that do not want to take on a dependency on UnityEngine.dll,
+    //   > it is also possible to define their own PreserveAttribute. The code stripper will respect that too,
+    //   > and it will consider any attribute with the exact name "PreserveAttribute" as a reason not to strip the thing it is applied on,
+    //   > regardless of the namespace or assembly of the attribute.
+    public class PreserveAttribute : System.Attribute { }
+
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum)]
-    public sealed class JsonAttribute : System.Attribute
+    public sealed class JsonAttribute : PreserveAttribute
     {
         public bool ImplicitConstructable; // Only for classes
         public EnumConversionType EnumConversion; // Only for enums
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public sealed class JsonFieldAttribute : System.Attribute
+    public sealed class JsonFieldAttribute : PreserveAttribute
     {
         public string Name;
         public int Order = 0;
@@ -53,7 +64,7 @@ namespace VJson
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public sealed class JsonFieldIgnorableAttribute : System.Attribute
+    public sealed class JsonFieldIgnorableAttribute : PreserveAttribute
     {
         public object WhenValueIs;
         public int WhenLengthIs;
