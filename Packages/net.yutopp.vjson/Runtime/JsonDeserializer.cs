@@ -313,7 +313,7 @@ namespace VJson
 
                     // TODO: add type check
                     var container = Activator.CreateInstance(targetType);
-                    var fields = TypeHelper.TypeWrap(targetType).GetFields();
+                    var fields = TypeHelper.GetSerializableFields(targetType);
                     foreach (var field in fields)
                     {
                         var attr = TypeHelper.GetCustomAttribute<JsonFieldAttribute>(field);

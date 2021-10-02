@@ -121,6 +121,16 @@ namespace VJson
             return pairs.Select(v => new KeyValuePair<string, object>(v.Key.Key, v.Value));
         }
 
+        public static IEnumerable<FieldInfo> GetSerializableFields(Type ty)
+        {
+            var tyi = TypeWrap(ty);
+            var publicFields = tyi.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            var privateFields = tyi.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where(field => {
+                return GetCustomAttribute<JsonFieldAttribute>(field) != null;
+            });
+            return publicFields.Concat(privateFields);
+        }
+
         private struct RankedKey
         {
             public int Order;
@@ -170,7 +180,7 @@ namespace VJson
             }
             else
             {
-                var fields = TypeWrap(ty).GetFields(BindingFlags.Public | BindingFlags.Instance);
+                var fields = GetSerializableFields(ty);
                 foreach (var field in fields)
                 {
                     var fieldAttr = GetCustomAttribute<JsonFieldAttribute>(field);

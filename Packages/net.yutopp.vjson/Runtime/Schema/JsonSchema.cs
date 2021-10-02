@@ -423,7 +423,7 @@ namespace VJson.Schema
                 {
                     schema.AddToAllOf(baseSchema);
 
-                    var baseFields = TypeHelper.TypeWrap(baseType).GetFields(BindingFlags.Public | BindingFlags.Instance);
+                    var baseFields = TypeHelper.GetSerializableFields(baseType);
                     baseFieldNames = new HashSet<string>(baseFields.Select(f => f.Name));
                 }
             }
@@ -432,7 +432,7 @@ namespace VJson.Schema
             var required = new List<string>();
             var dependencies = new Dictionary<string, string[]>();
 
-            var fields = TypeHelper.TypeWrap(ty).GetFields(BindingFlags.Public | BindingFlags.Instance);
+            var fields = TypeHelper.GetSerializableFields(ty);
             foreach (var field in fields)
             {
                 var fieldType = field.FieldType;
