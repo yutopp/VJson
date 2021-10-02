@@ -111,12 +111,15 @@ and user defined classes. For user defined classes, converting only all public f
 
 e.g.
 
+(It is strongly recommended to always add VJson attributes such as [JsonField] to fields that you want to treat as Json. This will avoid problems with IL2CPP, especially when using Unity.)
+
 ```csharp
 class SomeObject
 {
-    private float _p = 3.14f; // A private field will not be exported.
-    public int X;
-    public string Y;
+    private float _p = 3.14f;    // Fields which are non-public will not be exported by default.
+    [JsonField] long _p2 = 4;    // Fields which are non-public BUT having [JsonField] (+etc) attributes will BE exported!
+    public int X;                // Fields which are public will be exported by default, but we strongly recommended to add [JsonField] attributes like below.
+    [JsonField] public string Y;
 }
 
 var obj = new SomeObject {
@@ -126,7 +129,7 @@ var obj = new SomeObject {
 
 var serializer = new VJson.JsonSerializer(typeof(SomeObject));
 var json = serializer.Serialize(obj);
-// > {"X":10,"Y":"abab"}
+// > {"_p2": 4,"X":10,"Y":"abab"}
 
 var v = serializer.Deserialize("{\"X\":10,\"Y\":\"abab\"}");
 // > v becomes same as obj.
