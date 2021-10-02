@@ -18,7 +18,7 @@ namespace VJson.Internal
         {
             get
             {
-                return _elemName != null ? _elemName : "(root)";
+                return !string.IsNullOrEmpty(_elemName) ? _elemName : "(root)";
             }
         }
 

@@ -44,7 +44,7 @@ namespace VJson
 
         public static string FieldName(JsonFieldAttribute f, FieldInfo fi)
         {
-            if (f != null && f.Name != null)
+            if (f != null && !string.IsNullOrEmpty(f.Name))
             {
                 return f.Name;
             }
