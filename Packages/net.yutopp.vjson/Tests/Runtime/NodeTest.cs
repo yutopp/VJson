@@ -13,8 +13,9 @@ namespace VJson.UnitTests
 {
     public class NodeKindTests
     {
-        [TestCaseSource("ValuesArgs")]
-        public void KindOfValueTest<T>(T value, NodeKind expected)
+        [Test]
+        [TestCaseSource(nameof(ValuesArgs))]
+        public void KindOfValueTest(object value, NodeKind expected)
         {
             var actual = Node.KindOfValue(value);
             Assert.AreEqual(expected, actual);
@@ -44,7 +45,7 @@ namespace VJson.UnitTests
     public class NodeComparisonTests
     {
         [Test]
-        [TestCaseSource("FixtureArgs")]
+        [TestCaseSource(nameof(FixtureArgs))]
         public void EqualityTest(INode lhs, INode rhs, bool expected)
         {
             var actual = Object.Equals(lhs, rhs);
