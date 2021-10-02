@@ -938,6 +938,11 @@ c
                 "(root): System.Int64 value (-1) cannot convert to System.UInt32.",
             },
             new object[] {
+                typeof(uint),
+                "4294967296",
+                "(root): System.Int64 value (4294967296) cannot convert to System.UInt32.",
+            },
+            new object[] {
                 typeof(byte),
                 "256",
                 "(root): System.Int64 value (256) cannot convert to System.Byte.",
