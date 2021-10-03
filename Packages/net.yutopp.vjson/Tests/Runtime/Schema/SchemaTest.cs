@@ -260,7 +260,6 @@ namespace VJson.Schema.UnitTests
         };
     }
 
-
 #if VJSON_FULL_TESTS
     public class JsonSchemaFromTestCasesTests
     {
