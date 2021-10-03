@@ -2,7 +2,7 @@
 
 > A JSON serializer/deserializer (with JsonSchema support) library written in pure C#.
 
-[![CircleCI](https://circleci.com/gh/yutopp/VJson.svg?style=svg)](https://circleci.com/gh/yutopp/VJson)
+[![ci](https://github.com/yutopp/VJson/actions/workflows/ci.yml/badge.svg)](https://github.com/yutopp/VJson/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/net.yutopp.vjson)](https://www.npmjs.com/package/net.yutopp.vjson)
 [![NuGet Badge](https://buildstats.info/nuget/vjson)](https://www.nuget.org/packages/VJson/)
 [![codecov](https://codecov.io/gh/yutopp/VJson/branch/master/graph/badge.svg)](https://codecov.io/gh/yutopp/VJson)
