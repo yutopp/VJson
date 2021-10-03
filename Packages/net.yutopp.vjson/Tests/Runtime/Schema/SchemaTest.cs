@@ -246,7 +246,8 @@ namespace VJson.Schema.UnitTests
                 typeof(ValidatorWithSerializerTests.CustomTag<float>),
                 "{\"type\":\"number\",\"minimum\":0}",
             },
-            // ↓ Run same testcases twice, it will be broken on IL2CPP. Thus added as test cases.
+            // ↓ Run same test cases twice, it will be broken on IL2CPP. Thus added as test cases.
+            // See: https://github.com/yutopp/VJson/blob/120020a1c90dd1f0275d0f9353eef4e089943b0a/Packages/net.yutopp.vjson/Runtime/Schema/JsonSchema.cs#L385
             new object[] {
                 typeof(G2),
                 @"{""$id"":""g2"",""type"":""object"",""properties"":{},""allOf"":[{""$ref"":""VJson.Schema.UnitTests.JsonSchemaFormatTests+Gb2""}]}",
@@ -258,6 +259,7 @@ namespace VJson.Schema.UnitTests
             // ↑
         };
     }
+
 
 #if VJSON_FULL_TESTS
     public class JsonSchemaFromTestCasesTests
