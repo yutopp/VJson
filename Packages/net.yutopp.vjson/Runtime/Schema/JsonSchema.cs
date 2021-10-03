@@ -261,6 +261,7 @@ namespace VJson.Schema
         {
         }
 
+        [Preserve]
         public JsonSchemaAttribute(bool b)
         {
             if (!b)
@@ -381,7 +382,7 @@ namespace VJson.Schema
                 reg = new JsonSchemaRegistry();
             }
 
-            var schema = TypeHelper.GetCustomAttribute<JsonSchemaAttribute>(ty);
+            var schema = (JsonSchemaAttribute) TypeHelper.GetCustomAttribute<JsonSchemaAttribute>(ty)?.MemberwiseClone(); // On IL2CPP, returns same instance, thus call MemberwiseClone.
             if (schema == null)
             {
                 schema = new JsonSchemaAttribute();

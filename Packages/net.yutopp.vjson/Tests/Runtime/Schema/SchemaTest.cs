@@ -80,6 +80,11 @@ namespace VJson.Schema.UnitTests
             Assert.AreEqual(expected, schema.ToString());
         }
 
+        public abstract class Gb2 {}
+
+        [JsonSchema(Id = "g2")]
+        public sealed class G2 : Gb2 {}
+
         public static object[] SchemaStringArgs = new object[] {
             new object[] {
                 typeof(int),
@@ -241,6 +246,16 @@ namespace VJson.Schema.UnitTests
                 typeof(ValidatorWithSerializerTests.CustomTag<float>),
                 "{\"type\":\"number\",\"minimum\":0}",
             },
+            // ↓ Run same testcases twice, it will be broken on IL2CPP. Thus added as test cases.
+            new object[] {
+                typeof(G2),
+                @"{""$id"":""g2"",""type"":""object"",""properties"":{},""allOf"":[{""$ref"":""VJson.Schema.UnitTests.JsonSchemaFormatTests+Gb2""}]}",
+            },
+            new object[] {
+                typeof(G2),
+                @"{""$id"":""g2"",""type"":""object"",""properties"":{},""allOf"":[{""$ref"":""VJson.Schema.UnitTests.JsonSchemaFormatTests+Gb2""}]}",
+            },
+            // ↑
         };
     }
 
