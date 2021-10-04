@@ -28,7 +28,7 @@ namespace VJson
     //   > regardless of the namespace or assembly of the attribute.
     public class PreserveAttribute : System.Attribute { }
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum)]
     public sealed class JsonAttribute : PreserveAttribute
     {
         public bool ImplicitConstructable; // Only for classes
