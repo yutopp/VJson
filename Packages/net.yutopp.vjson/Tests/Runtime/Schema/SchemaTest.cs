@@ -263,18 +263,20 @@ namespace VJson.Schema.UnitTests
 #if VJSON_FULL_TESTS
     public class JsonSchemaFromTestCasesTests
     {
-        class TestCase
+        [Json]
+        sealed class TestCase
         {
-            public string description = default(string);
-            public JsonSchemaAttribute schema = default(JsonSchemaAttribute);
-            public UnitTest[] tests = default(UnitTest[]);
+            [JsonField] public string description = default(string);
+            [JsonField] public JsonSchemaAttribute schema = default(JsonSchemaAttribute);
+            [JsonField] public UnitTest[] tests = default(UnitTest[]);
         }
 
-        class UnitTest
+        [Json]
+        sealed class UnitTest
         {
-            public string description = default(string);
-            public object data = default(object);
-            public bool valid = default(bool);
+            [JsonField] public string description = default(string);
+            [JsonField] public object data = default(object);
+            [JsonField] public bool valid = default(bool);
         }
 
         [Test]
