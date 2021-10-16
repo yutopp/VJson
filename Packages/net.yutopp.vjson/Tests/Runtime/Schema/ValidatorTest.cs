@@ -226,14 +226,15 @@ namespace VJson.Schema.UnitTests
             },
         };
 
+        [Json]
         public class HasEnumerable
         {
             [ItemsJsonSchema(Minimum = 0.0, Maximum = 1.0)]
             public float[] Fs;
-            public object[] Os = new object[] { };
+            [JsonField] public object[] Os = new object[] { };
 
-            public List<float> FsList = new List<float>();
-            public List<object> OsList = new List<object>();
+            [JsonField] public List<float> FsList = new List<float>();
+            [JsonField] public List<object> OsList = new List<object>();
         }
 
         public static object[] HasEnumerableArgs = new object[] {
@@ -262,6 +263,60 @@ namespace VJson.Schema.UnitTests
                 // Empty is not allowed
                 "Object.Property.(root)[\"Fs\"]: Type is not matched(Actual: Null; Expected: array).",
                 null,
+            },
+            // nested
+            new object[] {
+                new HasEnumerable
+                {
+                    Fs = new float[] {},
+                    OsList = new List<object>
+                    {
+                        new NotRequiredObjectWithIgnorable { X = 10 },
+                    },
+                },
+                null,
+                "{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[{\"X\":10}]}",
+            },
+            new object[] {
+                new HasEnumerable
+                {
+                    Fs = new float[] {},
+                    OsList = new List<object>
+                    {
+                        new NotRequiredObjectWithIgnorable { X = 10 },
+                        new NotRequiredObjectWithIgnorable { X = -1 },
+                        new NotRequiredObjectWithIgnorable { X = 20 },
+                    },
+                },
+                null,
+                "{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[{\"X\":10},{},{\"X\":20}]}",
+            },
+            new object[] {
+                new HasEnumerable
+                {
+                    Fs = new float[] {},
+                    OsList = new List<object>
+                    {
+                        new HasEnumerable
+                        {
+                            Fs = new float[] {},
+                            OsList = new List<object>
+                            {
+                                new NotRequiredObjectWithIgnorable { X = 10 },
+                            },
+                        },
+                        new HasEnumerable
+                        {
+                            Fs = new float[] {},
+                            OsList = new List<object>
+                            {
+                                new NotRequiredObjectWithIgnorable { X = -1 },
+                            },
+                        },
+                    },
+                },
+                null,
+                "{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[{\"X\":10}]},{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[{}]}]}",
             },
         };
 

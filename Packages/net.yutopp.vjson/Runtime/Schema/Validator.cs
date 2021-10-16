@@ -71,7 +71,6 @@ namespace VJson.Schema
                                                       actual, expected);
                         return new ConstraintsViolationException(msg);
                     }
-
                 }
                 else
                 {
@@ -337,8 +336,9 @@ namespace VJson.Schema
             return null;
         }
 
-        ConstraintsViolationException ValidateArray(IEnumerable<object> v, State state, JsonSchemaRegistry reg)
+        ConstraintsViolationException ValidateArray(IEnumerable<object> vsIter, State state, JsonSchemaRegistry reg)
         {
+            var v = vsIter.ToArray();
             var length = v.Count();
 
             if (_schema.MaxItems != int.MinValue)
