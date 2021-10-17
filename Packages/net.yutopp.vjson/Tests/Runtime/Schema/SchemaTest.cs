@@ -34,7 +34,7 @@ namespace VJson.Schema.UnitTests
         [Test]
         public void CreateFromPersonTest()
         {
-            var schema = JsonSchemaAttribute.CreateFromClass<Person>();
+            var schema = JsonSchema.CreateFromType<Person>();
             Assert.IsNotNull(schema);
 
             Assert.AreEqual("Person", schema.Title);
@@ -45,21 +45,21 @@ namespace VJson.Schema.UnitTests
             Assert.That(schema.Properties.Count, Is.EqualTo(3));
 
             Assert.That(schema.Properties["firstName"],
-                        Is.EqualTo(new JsonSchemaAttribute
+                        Is.EqualTo(new JsonSchema
                         {
                             Description = "The person's first name.",
                             Type = "string",
                         })
                         );
             Assert.That(schema.Properties["lastName"],
-                        Is.EqualTo(new JsonSchemaAttribute
+                        Is.EqualTo(new JsonSchema
                         {
                             Description = "The person's last name.",
                             Type = "string",
                         })
                         );
             Assert.That(schema.Properties["age"],
-                        Is.EqualTo(new JsonSchemaAttribute
+                        Is.EqualTo(new JsonSchema
                         {
                             Description = "Age in years which must be equal to or greater than zero.",
                             Type = "integer",
@@ -76,7 +76,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource(nameof(SchemaStringArgs))]
         public void SchemaFormatTest(Type ty, string expected)
         {
-            var schema = JsonSchemaAttribute.CreateFromType(ty);
+            var schema = JsonSchema.CreateFromType(ty);
             Assert.AreEqual(expected, schema.ToString());
         }
 
@@ -266,17 +266,17 @@ namespace VJson.Schema.UnitTests
         [Json]
         sealed class TestCase
         {
-            [JsonField] public string description = default(string);
-            [JsonField] public JsonSchemaAttribute schema = default(JsonSchemaAttribute);
-            [JsonField] public UnitTest[] tests = default(UnitTest[]);
+            [JsonField] public string description = default;
+            [JsonField] public JsonSchema schema = default;
+            [JsonField] public UnitTest[] tests = default;
         }
 
         [Json]
         sealed class UnitTest
         {
-            [JsonField] public string description = default(string);
-            [JsonField] public object data = default(object);
-            [JsonField] public bool valid = default(bool);
+            [JsonField] public string description = default;
+            [JsonField] public object data = default;
+            [JsonField] public bool valid = default;
         }
 
         [Test]

@@ -11,11 +11,11 @@ namespace VJson.Schema
 {
     public sealed class JsonSchemaRegistry
     {
-        readonly Dictionary<string, JsonSchemaAttribute> _registory = new Dictionary<string, JsonSchemaAttribute>();
+        readonly Dictionary<string, JsonSchema> _registory = new Dictionary<string, JsonSchema>();
 
-        public JsonSchemaAttribute Resolve(string id)
+        public JsonSchema Resolve(string id)
         {
-            JsonSchemaAttribute j = null;
+            JsonSchema j = null;
             if (_registory.TryGetValue(id, out j))
             {
                 return j;
@@ -24,7 +24,7 @@ namespace VJson.Schema
             return null;
         }
 
-        public void Register(string id, JsonSchemaAttribute j)
+        public void Register(string id, JsonSchema j)
         {
             _registory.Add(id, j);
         }

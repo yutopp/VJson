@@ -17,9 +17,9 @@ namespace VJson.Schema
 
     public sealed class JsonSchemaValidator
     {
-        readonly JsonSchemaAttribute _schema;
+        readonly JsonSchema _schema;
 
-        public JsonSchemaValidator(JsonSchemaAttribute j)
+        public JsonSchemaValidator(JsonSchema j)
         {
             _schema = j;
         }
@@ -389,7 +389,7 @@ namespace VJson.Schema
             {
                 if (_schema.Items.GetType().IsArray)
                 {
-                    var itemSchemas = (JsonSchemaAttribute[])_schema.Items;
+                    var itemSchemas = (JsonSchema[])_schema.Items;
 
                     var i = 0;
                     foreach (var elem in v)
@@ -416,7 +416,7 @@ namespace VJson.Schema
                 }
                 else
                 {
-                    var itemSchema = (JsonSchemaAttribute)_schema.Items;
+                    var itemSchema = (JsonSchema)_schema.Items;
                     var i = 0;
                     foreach (var elem in v)
                     {
@@ -523,12 +523,12 @@ namespace VJson.Schema
                     goto depChecked;
                 }
 
-                var schemaDep = _schema.Dependencies as Dictionary<string, JsonSchemaAttribute>;
+                var schemaDep = _schema.Dependencies as Dictionary<string, JsonSchema>;
                 if (schemaDep != null)
                 {
                     foreach (var va in validated)
                     {
-                        JsonSchemaAttribute ext = null;
+                        JsonSchema ext = null;
                         if (schemaDep.TryGetValue(va.Key, out ext))
                         {
                             var ex = ext.Validate(v, new State().NestAsElem(va.Key), reg);
@@ -559,7 +559,7 @@ namespace VJson.Schema
 
             if (_schema.Properties != null)
             {
-                JsonSchemaAttribute itemSchema = null;
+                JsonSchema itemSchema = null;
                 if (_schema.Properties.TryGetValue(key, out itemSchema))
                 {
                     matched = true;

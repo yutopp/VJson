@@ -19,7 +19,7 @@ namespace VJson.Schema.UnitTests
             Assert.Null(r.Resolve("=TEST="));
             Assert.That(r.GetRegisteredIDs(), Is.EquivalentTo(new string[] { }));
 
-            var s = new JsonSchemaAttribute();
+            var s = new JsonSchema();
             r.Register("a", s);
 
             Assert.That(r.Resolve("a"), Is.EqualTo(s));

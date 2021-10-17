@@ -31,7 +31,7 @@ namespace VJson.Schema.UnitTests
         public void ValidationTest<T>(T o, string expectedMsg, string _expectedContent)
         {
             var r = new JsonSchemaRegistry();
-            var schema = JsonSchemaAttribute.CreateFromClass<T>(r);
+            var schema = JsonSchema.CreateFromType<T>(r);
 
             var ex = schema.Validate(o, r);
 
@@ -58,7 +58,7 @@ namespace VJson.Schema.UnitTests
         public void ValidationForINodeTest(Type ty, INode node, string expectedMsg, string _expectedContent)
         {
             var r = new JsonSchemaRegistry();
-            var schema = JsonSchemaAttribute.CreateFromType(ty, r);
+            var schema = JsonSchema.CreateFromType(ty, r);
 
             var ex = schema.Validate(node, r);
 
@@ -97,7 +97,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource(nameof(EnumArgs))]
         public void FromTypeValidationTest(Type ty, object e, string expectedMsg, string _expectedContent)
         {
-            var schema = JsonSchemaAttribute.CreateFromType(ty);
+            var schema = JsonSchema.CreateFromType(ty);
 
             var ex = schema.Validate(e);
 
@@ -641,7 +641,7 @@ namespace VJson.Schema.UnitTests
         public class HasCustomTagInt
         {
             [JsonSchemaRef(typeof(CustomTag<int>))]
-            public int X = 0;
+            public int X = 0; // Int but has constraints that "Minimum = 0" defined by CustomTag
         }
 
         public class HasCustomTagArray
