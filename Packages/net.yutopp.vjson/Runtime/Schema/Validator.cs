@@ -364,28 +364,22 @@ namespace VJson.Schema
             if (_schema.UniqueItems)
             {
                 // O(N^2) to use DeepEquals...
-                var i = 0;
-                foreach (var elem in v)
+                for(int i=0; i<v.Length; ++i)
                 {
-                    var j = 0;
-                    foreach (var elemS in v)
+                    for(int j=0; j<v.Length; ++j)
                     {
                         if (i == j)
                         {
                             continue;
                         }
 
-                        if (TypeHelper.DeepEquals(elem, elemS))
+                        if (TypeHelper.DeepEquals(v[i], v[j]))
                         {
                             var msg = state.CreateMessage("UniqueItems assertion: Elements at {0} and {1} are duplicated",
                                                           i, j);
                             return new ConstraintsViolationException(msg);
                         }
-
-                        ++j;
                     }
-
-                    ++i;
                 }
             }
 
