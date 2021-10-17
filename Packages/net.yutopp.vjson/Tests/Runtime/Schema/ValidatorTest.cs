@@ -18,6 +18,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource(nameof(NotRequiredObjectWithIgnorableArgs))]
         [TestCaseSource(nameof(HasDictionaryArgs))]
         [TestCaseSource(nameof(HasEnumerableArgs))]
+        [TestCaseSource(nameof(HasEnumerableNestedArgs))]
         [TestCaseSource(nameof(HasRequiredItemsArgs))]
         [TestCaseSource(nameof(HasRequiredStringArgs))]
         [TestCaseSource(nameof(HasRequiredButIgnorableStringArgs))]
@@ -44,6 +45,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource(nameof(NotRequiredObjectWithIgnorableINodeArgs))]
         // [TestCaseSource(nameof(HasDictionaryArgs))]
         // [TestCaseSource(nameof(HasEnumerableArgs))]
+        // [TestCaseSource(nameof(HasEnumerableNestedArgs))]
         // [TestCaseSource(nameof(HasRequiredItemsArgs))]
         // [TestCaseSource(nameof(HasRequiredStringArgs))]
         // [TestCaseSource(nameof(HasRequiredButIgnorableStringArgs))]
@@ -71,6 +73,7 @@ namespace VJson.Schema.UnitTests
         [TestCaseSource(nameof(NotRequiredObjectWithIgnorableArgs))]
         [TestCaseSource(nameof(HasDictionaryArgs))]
         [TestCaseSource(nameof(HasEnumerableArgs))]
+        [TestCaseSource(nameof(HasEnumerableNestedArgs))]
         [TestCaseSource(nameof(HasRequiredItemsArgs))]
         [TestCaseSource(nameof(HasRequiredStringArgs))]
         [TestCaseSource(nameof(HasRequiredButIgnorableStringArgs))]
@@ -317,6 +320,53 @@ namespace VJson.Schema.UnitTests
                 },
                 null,
                 "{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[{\"X\":10}]},{\"Fs\":[],\"FsList\":[],\"Os\":[],\"OsList\":[{}]}]}",
+            },
+        };
+
+        [Json]
+        public class HasEnumerableNested
+        {
+            [ItemsJsonSchema]
+            public HasRequiredItems[] Os;
+        }
+
+        public static object[] HasEnumerableNestedArgs = new object[] {
+            new object[] {
+                new HasEnumerableNested {Os = new HasRequiredItems[] { new HasRequiredItems { Xs = new int[] { 42 } }}},
+                null,
+                "{\"Os\":[{\"Xs\":[42]}]}",
+            },
+            new object[] {
+                new HasEnumerableNested {Os = null},
+                // Empty is not allowed
+                "Object.Property.(root)[\"Os\"]: Type is not matched(Actual: Null; Expected: array).",
+                null,
+            },
+            new object[] {
+                new HasEnumerableNested
+                {
+                    Os = new HasRequiredItems[]
+                    {
+                        new HasRequiredItems { Xs = new int[] { 1 } },
+                        new HasRequiredItems { Xs = new int[] { 2 } },
+                        new HasRequiredItems { Xs = new int[] { 3 } },
+                    },
+                },
+                null,
+                "{\"Os\":[{\"Xs\":[1]},{\"Xs\":[2]},{\"Xs\":[3]}]}",
+            },
+            new object[] {
+                new HasEnumerableNested
+                {
+                    Os = new HasRequiredItems[]
+                    {
+                        new HasRequiredItems { Xs = new int[] { 1 } },
+                        new HasRequiredItems { Xs = new int[] { -1 } },
+                        new HasRequiredItems { Xs = new int[] { 3 } },
+                    },
+                },
+                "Object.Property.Array.Items.Object.Property.Array.Items.Number.(root)[\"Os\"][1][\"Xs\"][0]: Minimum assertion !(-1 >= 0).",
+                null,
             },
         };
 
