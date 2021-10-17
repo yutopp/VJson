@@ -17,7 +17,7 @@ namespace VJson.Schema
 
     public sealed class JsonSchemaValidator
     {
-        JsonSchemaAttribute _schema;
+        readonly JsonSchemaAttribute _schema;
 
         public JsonSchemaValidator(JsonSchemaAttribute j)
         {
@@ -339,7 +339,7 @@ namespace VJson.Schema
         ConstraintsViolationException ValidateArray(IEnumerable<object> vsIter, State state, JsonSchemaRegistry reg)
         {
             var v = vsIter.ToArray();
-            var length = v.Count();
+            var length = v.Length;
 
             if (_schema.MaxItems != int.MinValue)
             {
@@ -419,7 +419,6 @@ namespace VJson.Schema
 
                         ++i;
                     }
-
                 }
                 else
                 {
