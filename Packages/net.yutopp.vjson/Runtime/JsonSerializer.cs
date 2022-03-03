@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 namespace VJson
 {
@@ -85,6 +86,24 @@ namespace VJson
             }
         }
 
+        static readonly Dictionary<Type, Action<JsonWriter, object>> writeActionMap = new Dictionary<Type, Action<JsonWriter, object>>()
+        {
+            {typeof(short), (writer, v) => writer.WriteValue((short)v)},
+            {typeof(ushort), (writer, v) => writer.WriteValue((ushort)v)},
+            {typeof(int), (writer, v) => writer.WriteValue((int)v)},
+            {typeof(uint), (writer, v) => writer.WriteValue((uint)v)},
+            {typeof(long), (writer, v) => writer.WriteValue((long)v)},
+            {typeof(ulong), (writer, v) => writer.WriteValue((ulong)v)},
+            {typeof(float), (writer, v) => writer.WriteValue((float)v)},
+            {typeof(double), (writer, v) => writer.WriteValue((double)v)},
+            {typeof(bool), (writer, v) => writer.WriteValue((bool)v)},
+            {typeof(byte), (writer, v) => writer.WriteValue((byte)v)},
+            {typeof(sbyte), (writer, v) => writer.WriteValue((sbyte)v)},
+            {typeof(char), (writer, v) => writer.WriteValue((char)v)},
+            {typeof(string), (writer, v) => writer.WriteValue((string)v)},
+            {typeof(decimal), (writer, v) => writer.WriteValue((decimal)v)},
+        };
+
         void SerializePrimitive<T>(JsonWriter writer, T o)
         {
             if (TypeHelper.TypeWrap(o.GetType()).IsEnum)
@@ -105,8 +124,21 @@ namespace VJson
                 return;
             }
 
-            var write = TypeHelper.TypeWrap(typeof(JsonWriter)).GetMethod("WriteValue", new[] { o.GetType() });
-            write.Invoke(writer, new object[] { o });
+            Action<JsonWriter, object> write;
+            if (writeActionMap.TryGetValue(o.GetType(), out write))
+            {
+                write(writer, o);
+            }
+            else
+            {
+                throw new Exception(
+                    string.Format(
+                        "SerializePrimitive method require primitive type, but {0} is not primitive type ({1})",
+                        o,
+                        o.GetType().ToString()
+                    )
+                );
+            }
         }
 
         void SerializeArray<T>(JsonWriter writer, T o)
