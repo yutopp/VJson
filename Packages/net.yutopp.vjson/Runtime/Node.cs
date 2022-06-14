@@ -520,13 +520,13 @@ namespace VJson
             // Unwrap all Nullable<T>s
             // Any class values are nullable, however this library does not treat them as nullables.
             // Thus we adjust logic of Nullable<T> to as same as class values. Nullable<T> will be treated as T.
-            if (TypeHelper.TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(Nullable<>))
+            var optInnerTy = Nullable.GetUnderlyingType(ty);
+            if (optInnerTy != null)
             {
-                return KindOfType(TypeHelper.TypeWrap(ty).GetGenericArguments()[0]);
+                return KindOfType(optInnerTy);
             }
 
-            NodeKind k;
-            if (_primitiveTable.TryGetValue(ty, out k))
+            if (_primitiveTable.TryGetValue(ty, out var k))
             {
                 return k;
             }

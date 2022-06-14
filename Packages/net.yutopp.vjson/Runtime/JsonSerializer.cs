@@ -59,7 +59,7 @@ namespace VJson
 
         void SerializeValue<T>(JsonWriter writer, T o)
         {
-            if (o is INode) {
+            if (o != null && o is INode) {
                 // unwrap INode
                 SerializeValue(writer, (o as INode).GenericContent);
                 return;
