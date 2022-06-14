@@ -16,7 +16,6 @@ test: test-dotnet
 
 .PHONY: setup
 setup: pre-generated-files
-	git submodule update --init --recursive
 
 .PHONY: pre-generated-files
 pre-generated-files: ${PACKAGE_DIR}/Runtime/TypeHelper.g.cs
