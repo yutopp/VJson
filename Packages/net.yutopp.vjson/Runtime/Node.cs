@@ -501,7 +501,7 @@ namespace VJson
 
         public static NodeKindWrapped KindOfTypeWrapped(Type ty)
         {
-            if (TypeHelper.TypeWrap(typeof(INode)).IsAssignableFrom(ty))
+            if (typeof(INode).IsAssignableFrom(ty))
             {
                 return new NodeKindWrapped {
                     Kind = _nodeKindTable[ty],
@@ -532,7 +532,7 @@ namespace VJson
             }
 
             // Enum(integer or string)
-            if (TypeHelper.TypeWrap(ty).IsEnum)
+            if (ty.IsEnum)
             {
                 var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(ty);
                 return attr != null && attr.EnumConversion == EnumConversionType.AsString

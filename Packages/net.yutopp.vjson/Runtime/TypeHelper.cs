@@ -15,26 +15,14 @@ namespace VJson
 {
     static partial class TypeHelper
     {
-#if NET20 || NET35 || NET40 || NET_2_0 || NET_2_0_SUBSET
-        public static Type TypeWrap(Type ty)
-        {
-            return ty;
-        }
-#else
-        public static TypeInfo TypeWrap(Type ty)
-        {
-            return ty.GetTypeInfo();
-        }
-#endif
-
         public static bool IsBoxed(Type ty)
         {
-            var ti = TypeWrap(ty);
-            if (ti.IsClass) {
+            if (ty.IsClass) {
                 return true;
             }
 
-            return ti.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Nullable<>);
+            var optInnerTy = Nullable.GetUnderlyingType(ty);
+            return optInnerTy != null;
         }
 
         public static T GetCustomAttribute<T>(FieldInfo fi) where T : Attribute
@@ -46,7 +34,7 @@ namespace VJson
 
         public static T GetCustomAttribute<T>(Type ty) where T : Attribute
         {
-            return (T)TypeWrap(ty).GetCustomAttributes(typeof(T), false)
+            return (T)ty.GetCustomAttributes(typeof(T), false)
                 .Where(a => a.GetType() == typeof(T))
                 .FirstOrDefault();
         }
@@ -54,7 +42,7 @@ namespace VJson
         // TODO: implement cache
         public static string[] GetStringEnumNames(Type ty)
         {
-            var enumFields = TypeWrap(ty).GetFields(BindingFlags.Static|BindingFlags.Public);
+            var enumFields = ty.GetFields(BindingFlags.Static|BindingFlags.Public);
             return enumFields.Select(fi => {
                     var attr = GetCustomAttribute<JsonFieldAttribute>(fi);
                     if (attr != null && attr.Name != null) {
@@ -78,7 +66,7 @@ namespace VJson
             var ty = o.GetType();
             if (ty.IsArray)
             {
-                if (ty.HasElementType && TypeWrap(ty.GetElementType()).IsClass)
+                if (ty.HasElementType && ty.GetElementType().IsClass)
                 {
                     return ((IEnumerable<object>)o);
                 }
@@ -105,9 +93,9 @@ namespace VJson
                 return null;
             }
 
-            if (TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(List<>))
+            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(List<>))
             {
-                return TypeWrap(ty).GetGenericArguments()[0];
+                return ty.GetGenericArguments()[0];
             }
 
             return null;
@@ -123,9 +111,8 @@ namespace VJson
 
         public static IEnumerable<FieldInfo> GetSerializableFields(Type ty)
         {
-            var tyi = TypeWrap(ty);
-            var publicFields = tyi.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            var privateFields = tyi.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where(field => {
+            var publicFields = ty.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            var privateFields = ty.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where(field => {
                 return GetCustomAttribute<JsonFieldAttribute>(field) != null;
             });
             return publicFields.Concat(privateFields);
@@ -159,9 +146,9 @@ namespace VJson
         private static IEnumerable<KeyValuePair<RankedKey, object>> ToRankedKeyValuesUnordered(object o)
         {
             var ty = o.GetType();
-            if (TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                var keyType = TypeWrap(ty).GetGenericArguments()[0];
+                var keyType = ty.GetGenericArguments()[0];
                 if (keyType != typeof(string))
                 {
                     // TODO: Should allow them and call `ToString`?

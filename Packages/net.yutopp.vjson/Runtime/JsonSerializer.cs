@@ -106,7 +106,7 @@ namespace VJson
 
         void SerializePrimitive<T>(JsonWriter writer, T o)
         {
-            if (TypeHelper.TypeWrap(o.GetType()).IsEnum)
+            if (o.GetType().IsEnum)
             {
                 var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(o.GetType());
                 switch (attr != null ? attr.EnumConversion : EnumConversionType.AsInt)

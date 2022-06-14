@@ -178,7 +178,7 @@ namespace VJson
             bool isConvertible =
                 targetType == typeof(object)
                 || (targetType.IsArray)
-                || (TypeHelper.TypeWrap(targetType).IsGenericType && targetType.GetGenericTypeDefinition() == typeof(List<>))
+                || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(List<>))
                 ;
             if (!isConvertible)
             {
@@ -225,7 +225,7 @@ namespace VJson
                     var len = aNode.Elems != null ? aNode.Elems.Count : 0;
                     var container = (IList)Activator.CreateInstance(conteinerTy);
 
-                    var elemType = TypeHelper.TypeWrap(conteinerTy).GetGenericArguments()[0];
+                    var elemType = conteinerTy.GetGenericArguments()[0];
                     for (int i = 0; i < len; ++i)
                     {
                         var v = DeserializeValue(aNode.Elems[i], elemType, state.NestAsElem(i));
@@ -264,7 +264,7 @@ namespace VJson
             {
                 bool asDictionary =
                     targetType == typeof(object)
-                    || (TypeHelper.TypeWrap(targetType).IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    || (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     ;
                 if (asDictionary)
                 {
@@ -277,7 +277,7 @@ namespace VJson
                             : typeof(Dictionary<string, object>);
                     }
 
-                    var keyType = TypeHelper.TypeWrap(containerTy).GetGenericArguments()[0];
+                    var keyType = containerTy.GetGenericArguments()[0];
                     if (keyType != typeof(string))
                     {
                         throw new NotImplementedException();
@@ -290,7 +290,7 @@ namespace VJson
                         goto dictionaryDecoded;
                     }
 
-                    var allElemType = TypeHelper.TypeWrap(containerTy).GetGenericArguments()[1];
+                    var allElemType = containerTy.GetGenericArguments()[1];
                     foreach (var elem in oNode.Elems)
                     {
                         var elemType = allElemType;
@@ -427,7 +427,7 @@ namespace VJson
                 throw new DeserializeFailureException(msg);
             }
 
-            if (TypeHelper.TypeWrap(targetType).IsEnum)
+            if (targetType.IsEnum)
             {
                 var enumAttr = TypeHelper.GetCustomAttribute<JsonAttribute>(targetType);
                 switch (enumAttr != null ? enumAttr.EnumConversion : EnumConversionType.AsInt)
@@ -486,7 +486,7 @@ namespace VJson
                 throw new DeserializeFailureException(msg);
             }
 
-            var ctor = TypeHelper.TypeWrap(targetType).GetConstructor(new[] { typeof(T) });
+            var ctor = targetType.GetConstructor(new[] { typeof(T) });
             if (ctor == null)
             {
                 var msg = state.CreateTypeConversionFailureMessage<T>(value,

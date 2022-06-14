@@ -17,7 +17,7 @@ namespace VJson.Schema
     {
         public static bool IsRefTagDerived(Type ty, out Type elemType)
         {
-            var baseType = TypeHelper.TypeWrap(ty).BaseType;
+            var baseType = ty.BaseType;
             if (baseType != null)
             {
                 return IsRefTag(baseType, out elemType);
@@ -29,9 +29,9 @@ namespace VJson.Schema
 
         public static bool IsRefTag(Type ty, out Type elemType)
         {
-            if (TypeHelper.TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(RefTag<>))
+            if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(RefTag<>))
             {
-                elemType = TypeHelper.TypeWrap(ty).GetGenericArguments()[0];
+                elemType = ty.GetGenericArguments()[0];
                 return true;
             }
 

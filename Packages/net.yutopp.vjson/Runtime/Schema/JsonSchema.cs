@@ -322,7 +322,7 @@ namespace VJson.Schema
 
                 case NodeKind.Integer:
                     object[] enumsForInteger = null;
-                    if (TypeHelper.TypeWrap(ty).IsEnum)
+                    if (ty.IsEnum)
                     {
                         enumsForInteger = System.Enum.GetValues(ty).Cast<object>().ToArray();
                     }
@@ -340,7 +340,7 @@ namespace VJson.Schema
 
                 case NodeKind.String:
                     object[] enumsForString = null;
-                    if (TypeHelper.TypeWrap(ty).IsEnum)
+                    if (ty.IsEnum)
                     {
                         enumsForString = TypeHelper.GetStringEnumNames(ty);
                     }
@@ -364,7 +364,7 @@ namespace VJson.Schema
                         return new JsonSchema();
                     }
 
-                    if (TypeHelper.TypeWrap(ty).IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    if (ty.IsGenericType && ty.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     {
                         return new JsonSchema
                         {
@@ -407,7 +407,7 @@ namespace VJson.Schema
             var schema = CreateFromSchemaAttr(schemaAttr);
             schema.Type = "object";
 
-            var baseType = TypeHelper.TypeWrap(ty).BaseType;
+            var baseType = ty.BaseType;
             HashSet<string> baseFieldNames = null;
             if (baseType != null)
             {
