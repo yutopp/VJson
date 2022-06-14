@@ -106,14 +106,15 @@ namespace VJson
 
         void SerializePrimitive<T>(JsonWriter writer, T o)
         {
-            if (o.GetType().IsEnum)
+            var ty = o.GetType();
+            if (ty.IsEnum)
             {
-                var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(o.GetType());
+                var attr = TypeHelper.GetCustomAttribute<JsonAttribute>(ty);
                 switch (attr != null ? attr.EnumConversion : EnumConversionType.AsInt)
                 {
                     case EnumConversionType.AsInt:
                         // Convert to simple integer
-                        SerializeValue(writer, Convert.ChangeType(o, Enum.GetUnderlyingType(o.GetType())));
+                        SerializeValue(writer, Convert.ChangeType(o, Enum.GetUnderlyingType(ty)));
                         break;
 
                     case EnumConversionType.AsString:
@@ -124,8 +125,7 @@ namespace VJson
                 return;
             }
 
-            Action<JsonWriter, object> write;
-            if (writeActionMap.TryGetValue(o.GetType(), out write))
+            if (writeActionMap.TryGetValue(ty, out var write))
             {
                 write(writer, o);
             }
@@ -135,7 +135,7 @@ namespace VJson
                     string.Format(
                         "SerializePrimitive method require primitive type, but {0} is not primitive type ({1})",
                         o,
-                        o.GetType().ToString()
+                        ty.ToString()
                     )
                 );
             }
