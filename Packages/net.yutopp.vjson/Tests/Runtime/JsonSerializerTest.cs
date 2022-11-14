@@ -9,7 +9,9 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace VJson.UnitTests
 {
@@ -1239,6 +1241,163 @@ c
                 new HasNullable {
                     X = 10,
                 },
+            },
+        };
+    }
+
+    class JsonSerializerLocaleTests
+    {
+        CultureInfo _previousCurrentCulture;
+        CultureInfo _previousCurrentUICulture;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _previousCurrentCulture = Thread.CurrentThread.CurrentCulture;
+            _previousCurrentUICulture = Thread.CurrentThread.CurrentUICulture;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Thread.CurrentThread.CurrentUICulture = _previousCurrentUICulture;
+            Thread.CurrentThread.CurrentCulture = _previousCurrentCulture;
+        }
+
+        [Test]
+        [TestCaseSource(nameof(HasDoubleObjectForLocaleArgs))]
+        [TestCaseSource(nameof(HasLongObjectForLocaleArgs))]
+        public void DeserializationLocaleTest<T>(string o, string localeCode, T expectedObj)
+        {
+            var cultureInfo = new CultureInfo(localeCode);
+            Thread.CurrentThread.CurrentCulture = cultureInfo;
+            Thread.CurrentThread.CurrentUICulture = cultureInfo;
+
+            var obj = new JsonSerializer(typeof(T)).Deserialize(o);
+            Assert.AreEqual(expectedObj, obj);
+        }
+
+        [Json]
+        public class HasDoubleObject : IEquatable<HasDoubleObject>
+        {
+            [JsonField] public double X;
+
+            public bool Equals(HasDoubleObject other)
+            {
+                return X == other.X;
+            }
+        }
+
+        const double DoubleValue = -1.23;
+        const string HasDoubleJson = "{\"X\":-1.23}";
+
+        public static object[] HasDoubleObjectForLocaleArgs = new object[] {
+            new object[] {
+                HasDoubleJson,
+                "en-US",
+                new HasDoubleObject {X = DoubleValue},
+            },
+            new object[] {
+                HasDoubleJson,
+                "es-ES",
+                new HasDoubleObject {X = DoubleValue},
+            },
+            new object[] {
+                HasDoubleJson,
+                "de-DE",
+                new HasDoubleObject {X = DoubleValue},
+            },
+            new object[] {
+                HasDoubleJson,
+                "fr-FR",
+                new HasDoubleObject {X = DoubleValue},
+            },
+            new object[] {
+                HasDoubleJson,
+                "ja-JP",
+                new HasDoubleObject {X = DoubleValue},
+            },
+            new object[] {
+                HasDoubleJson,
+                "zh-TW",
+                new HasDoubleObject {X = DoubleValue},
+            },
+            new object[] {
+                HasDoubleJson,
+                "zh-CN",
+                new HasDoubleObject {X = DoubleValue},
+            },
+            new object[] {
+                HasDoubleJson,
+                "ko-KR",
+                new HasDoubleObject {X = DoubleValue},
+            },
+            new object[] {
+                HasDoubleJson,
+                "th-TH",
+                new HasDoubleObject {X = DoubleValue},
+            },
+        };
+
+        [Json]
+        public class HasLongObject : IEquatable<HasLongObject>
+        {
+            [JsonField] public long X;
+
+            public bool Equals(HasLongObject other)
+            {
+                return X == other.X;
+            }
+        }
+
+        const long LongValue = -23456;
+        const string HasLongJson = "{\"X\":-23456}";
+
+        public static object[] HasLongObjectForLocaleArgs = new object[] {
+            new object[] {
+                HasLongJson,
+                "en-US",
+                new HasLongObject {X = LongValue},
+            },
+            new object[] {
+                HasLongJson,
+                "es-ES",
+                new HasLongObject {X = LongValue},
+            },
+            new object[] {
+                HasLongJson,
+                "de-DE",
+                new HasLongObject {X = LongValue},
+            },
+            new object[] {
+                HasLongJson,
+                "fr-FR",
+                new HasLongObject {X = LongValue},
+            },
+            new object[] {
+                HasLongJson,
+                "ja-JP",
+                new HasLongObject {X = LongValue},
+            },
+            new object[] {
+                HasLongJson,
+                "zh-TW",
+                new HasLongObject {X = LongValue},
+            },
+            new object[] {
+                HasLongJson,
+                "zh-CN",
+                new HasLongObject {X = LongValue},
+            },
+            new object[] {
+                HasLongJson,
+                "ko-KR",
+                new HasLongObject {X = LongValue},
+            },
+            new object[] {
+                HasLongJson,
+                "th-TH",
+                new HasLongObject {X = LongValue},
             },
         };
     }
